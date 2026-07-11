@@ -1,5 +1,5 @@
 /* 사자성어 여행단 - 서비스 워커 (network-first) */
-const CACHE = "idiom-quest-v78-station-subway-v27";
+const CACHE = "idiom-quest-v80-station-path-passenger-scale";
 const V18_SCENES=[
   "./assets/v18/backgrounds/interior/study-cafe-v18.png",
   "./assets/v18/backgrounds/exterior/street-v18.png","./assets/v18/backgrounds/exterior/station-v18.png","./assets/v18/backgrounds/exterior/gs25-v18.png","./assets/v18/backgrounds/exterior/school-v18.png",
@@ -45,7 +45,12 @@ const V27_ASSETS=[
     `./assets/v27/characters/passengers/passenger-${id}-seated-v27.png`
   ])
 ];
-const CORE = ["./","./index.html","./manifest.json","./icon-192.png","./icon-512.png","./captain-cast-v1.png","./assets/v18/characters/avatar-lineup-v18.png",...V18_SCENES,...PLAYER_IMAGES,...NPC_IMAGES,...CREATURE_IMAGES,...STATUE_IMAGES,...V19_PLAYER_SEATED,...V19_STUDY_BACK,...V19_POET_SEATED,...V19_PASSENGER_SEATED,...V19_TEACHERS,...V19_SPECIAL,...V20_ASSETS,...V21_ASSETS,...V22_ASSETS,...V23_ASSETS,...V24_ASSETS,...V25_ASSETS,...V26_ASSETS,...V27_ASSETS,...CAPTAIN_PIXEL_SCENES];
+const V28_ASSETS=[
+  "./assets/v28/backgrounds/convenience-exterior-v28.png","./assets/v28/backgrounds/convenience-interior-v28.png",
+  "./assets/v28/characters/cleo-v28.png","./assets/v28/characters/millennium-cat-v28.png"
+];
+const V29_ASSETS=["./assets/v29/backgrounds/station-wayfinding-v29.png"];
+const CORE = ["./","./index.html","./manifest.json","./icon-192.png","./icon-512.png","./captain-cast-v1.png","./assets/v18/characters/avatar-lineup-v18.png",...V18_SCENES,...PLAYER_IMAGES,...NPC_IMAGES,...CREATURE_IMAGES,...STATUE_IMAGES,...V19_PLAYER_SEATED,...V19_STUDY_BACK,...V19_POET_SEATED,...V19_PASSENGER_SEATED,...V19_TEACHERS,...V19_SPECIAL,...V20_ASSETS,...V21_ASSETS,...V22_ASSETS,...V23_ASSETS,...V24_ASSETS,...V25_ASSETS,...V26_ASSETS,...V27_ASSETS,...V28_ASSETS,...V29_ASSETS,...CAPTAIN_PIXEL_SCENES];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", e => {
