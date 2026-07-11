@@ -424,9 +424,9 @@ const v21StaffSheets=Object.fromEntries(Object.entries(V21_STAFF_FILES).map(([na
 }));
 const SCENE_FILES={
   street:"assets/v20/backgrounds/street-v20.png",
-  station:"assets/v18/backgrounds/exterior/station-v18.png",
-  platform:"assets/v18/backgrounds/other/final/platform-v18.png",
-  subway:"assets/v18/backgrounds/other/final/subway-v18.png",
+  station:"assets/v27/backgrounds/station-v27.png",
+  platform:"assets/v27/backgrounds/platform-v27.png",
+  subway:"assets/v27/backgrounds/subway-v27.png",
   convenience:"assets/v18/backgrounds/exterior/gs25-v18.png",
   convenienceInterior:"assets/v18/backgrounds/interior/gs25-interior-v18.png",
   school:"assets/v18/backgrounds/exterior/school-v18.png",
@@ -469,9 +469,10 @@ Object.assign(CHARACTER_FILES,{
   "gu-gyohun":"assets/v19/characters/teachers/gu-gyohun-idle-v19.png","gu-gyohun-action":"assets/v19/characters/teachers/gu-gyohun-teach-v19.png",
   "kim-dongjun":"assets/v19/characters/teachers/kim-dongjun-idle-v19.png","kim-dongjun-action":"assets/v19/characters/teachers/kim-dongjun-teach-v19.png",
   "lee-hanbin":"assets/v19/characters/teachers/lee-hanbin-idle-v19.png","lee-hanbin-action":"assets/v19/characters/teachers/lee-hanbin-teach-v19.png",
-  "passenger-woman":"assets/v18/characters/npcs/passenger-woman-v18.png","passenger-woman-action":"assets/v18/characters/npcs/passenger-woman-action-v18.png",
-  "passenger-office":"assets/v18/characters/npcs/passenger-office-v18.png","passenger-office-action":"assets/v18/characters/npcs/passenger-office-action-v18.png",
-  "passenger-elder":"assets/v18/characters/npcs/passenger-elder-v18.png","passenger-elder-action":"assets/v18/characters/npcs/passenger-elder-action-v18.png",
+  "passenger-woman":"assets/v27/characters/passengers/passenger-woman-standing-v27.png",
+  "passenger-office":"assets/v27/characters/passengers/passenger-office-standing-v27.png",
+  "passenger-elder":"assets/v27/characters/passengers/passenger-elder-standing-v27.png",
+  "passenger-student":"assets/v27/characters/passengers/passenger-student-standing-v27.png",
   "student-back-01":"assets/v19/characters/seated/study-cafe/student-back-01-v19.png",
   "student-back-02":"assets/v19/characters/seated/study-cafe/student-back-02-v19.png",
   "student-back-03":"assets/v19/characters/seated/study-cafe/student-back-03-v19.png",
@@ -481,10 +482,10 @@ Object.assign(CHARACTER_FILES,{
   "shin-dongyeop-seated":"assets/v19/characters/seated/poets/shin-dongyeop-seated-v19.png",
   "jeon-gwangyong-seated":"assets/v19/characters/seated/poets/jeon-gwangyong-seated-v19.png",
   "kim-sowol-seated":"assets/v19/characters/seated/poets/kim-sowol-seated-v19.png",
-  "passenger-woman-seated":"assets/v19/characters/seated/passengers/passenger-woman-seated-v19.png",
-  "passenger-office-seated":"assets/v19/characters/seated/passengers/passenger-office-seated-v19.png",
-  "passenger-elder-seated":"assets/v19/characters/seated/passengers/passenger-elder-seated-v19.png",
-  "smith-seated":"assets/v19/characters/seated/passengers/smith-seated-v19.png",
+  "passenger-woman-seated":"assets/v27/characters/passengers/passenger-woman-seated-v27.png",
+  "passenger-office-seated":"assets/v27/characters/passengers/passenger-office-seated-v27.png",
+  "passenger-elder-seated":"assets/v27/characters/passengers/passenger-elder-seated-v27.png",
+  "passenger-student-seated":"assets/v27/characters/passengers/passenger-student-seated-v27.png",
   shongshongi:"assets/v18/characters/creatures/shongshongi-v18.png",
   "millennium-cat":"assets/v18/characters/creatures/millennium-cat-v18.png",
   yeomra:"assets/v26/characters/yeomra/yeomra-idle-v26.png","yeomra-action":"assets/v26/characters/yeomra/yeomra-command-v26.png",
@@ -553,8 +554,8 @@ const COUNTER=[];
 const PLANTS=[];
 const EXIT=[7,10];
 // 사리역 외관의 출입문과 플랫폼 안쪽의 열차 탑승 지점
-const STATION_ENTRY_POS=[7,5];
-const PLATFORM_TRAIN_POS=[7,5];
+const STATION_ENTRY_POS=[7,7];
+const PLATFORM_TRAIN_POS=[7,6];
 const PLATFORM_PASSENGERS=[[2,8],[4,8],[10,8],[12,8]];
 const CONVENIENCE_DOOR=[10,5];
 const CONVENIENCE_EXIT=[7,10];
@@ -678,16 +679,16 @@ function blocked(x,y){
     return isWall(x,y);
   }
   if(scene==="station"){
-    // 위쪽 도로에서 역사 양옆 보행로를 돌아 정면 광장으로 내려간다.
+    // 새 정면 역사 건물은 2~6행, 출입문 앞은 7행이다.
     if(inZone(x,y,6,8,0,0)) return false;
-    if(inZone(x,y,6,8,5,5)) return false;
-    if(y>=2&&y<=5&&x>=3&&x<=11) return true;
+    if(inZone(x,y,6,8,7,7)) return false;
+    if(y>=2&&y<=6&&x>=3&&x<=11) return true;
     return isWall(x,y);
   }
   if(scene==="platform"){
     if(inZone(x,y,6,8,0,0)) return false;
-    if(y<=4&&x!==7) return true;
-    if(y===5&&(x<6||x>8)) return true;
+    if(y<=5&&x!==7) return true;
+    if(y===6&&(x<6||x>8)) return true;
     return isWall(x,y)||inList(PLATFORM_PASSENGERS,x,y);
   }
   if(scene==="subway") return isWall(x,y);
@@ -2100,8 +2101,8 @@ function pixelSceneSign(text,x,y,color="#fff1bd",size=9){
 const STUDENT_ASSETS={"스미스":"student-back-01","마리":"student-back-02","애니":"student-back-03","스티븐":"student-back-04","숑숑이":"shongshongi"};
 const POET_ASSETS={"김수영":"kim-sooyoung","신동엽":"shin-dongyeop","조세희":"jeon-gwangyong","전광용":"jeon-gwangyong","김소월":"kim-sowol"};
 const TEACHER_ASSETS={"류용수":"ryu-yongsu","구교훈":"gu-gyohun","김동준":"kim-dongjun","이한빈":"lee-hanbin"};
-const PASSENGER_ASSETS=["passenger-woman","passenger-office","passenger-elder","smith"];
-const PASSENGER_SEATED_ASSETS=["passenger-woman-seated","passenger-office-seated","passenger-elder-seated","smith-seated"];
+const PASSENGER_ASSETS=["passenger-woman","passenger-office","passenger-elder","passenger-student"];
+const PASSENGER_SEATED_ASSETS=["passenger-woman-seated","passenger-office-seated","passenger-elder-seated","passenger-student-seated"];
 function assetReady(key){const img=characterImages[key];return img&&img.complete&&img.naturalWidth?img:null;}
 function characterPhase(key){let value=0;for(let i=0;i<key.length;i++)value=(value*31+key.charCodeAt(i))%997;return value/997;}
 function characterIsSpeaking(label){
@@ -2133,7 +2134,7 @@ function drawCharacterAsset(key,gx,gy,options={}){
   const bob=walking?Math.sin(T*16+phase*6)*1.7:Math.sin(T*1.7+phase*6)*.45;
   const sway=(actionImg?Math.sin(T*5+phase*5)*.012:0)+(walking?Math.sin(T*12)*.018:0);
   const flip=options.facing==="left"?-1:1;
-  ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";
+  ctx.save();ctx.imageSmoothingEnabled=options.pixelArt?false:true;ctx.imageSmoothingQuality="high";
   ctx.translate(x,baseFoot+bob);ctx.rotate(sway);ctx.scale(flip,1);
   ctx.fillStyle=options.shadow||"#13242d45";ctx.beginPath();ctx.ellipse(0,1,width*.31,Math.max(2.6,width*.085),0,0,Math.PI*2);ctx.fill();
   if(options.seated){ctx.globalAlpha=.34;ctx.fillStyle="#233942";ctx.beginPath();ctx.ellipse(0,-2,width*.28,5,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
@@ -2252,15 +2253,15 @@ function drawOfficialStudyCafeStreetSign(){
   ctx.restore();
 }
 function drawStreetClean(){drawPixelSceneBackground("street");drawOfficialStudyCafeStreetSign();drawOfficialSidaeExteriorSign();}
-function drawStationFrame(){drawPixelSceneBackground("station");}
+function drawStationFrame(){drawPixelSceneBackground("station");pixelSceneSign("사리역",240,151,"#f6e8bd",13);}
 function drawStationPlatform(){
-  drawPixelSceneBackground("platform");pixelSceneSign("사리역",80,48,"#214b50",8);pixelSceneSign("집으로 가는 열차",382,48,"#62411e",8);
-  PLATFORM_PASSENGERS.forEach((p,i)=>drawCharacterAsset(PASSENGER_ASSETS[i],p[0],p[1],{width:47,height:66}));
+  drawPixelSceneBackground("platform");pixelSceneSign("사리역",80,82,"#d8ebef",9);pixelSceneSign("집으로 가는 열차",400,82,"#f2dfac",8);
+  PLATFORM_PASSENGERS.forEach((p,i)=>drawCharacterAsset(PASSENGER_ASSETS[i],p[0],p[1],{width:56,height:70,pixelArt:true}));
 }
 function drawSubwayInterior(){
   drawPixelSceneBackground("subway");ctx.save();ctx.globalAlpha=.35;ctx.fillStyle="#7eb7d4";
   for(const [x,w] of [[48,128],[304,128]])for(let i=0;i<4;i++){const sx=x+((T*(18+i*5)+i*37)%w);ctx.fillRect(sx,76+i*10,10+i*5,2);}ctx.restore();
-  [[78,191],[142,191],[338,191],[402,191]].forEach((p,i)=>drawCharacterAsset(PASSENGER_SEATED_ASSETS[i],0,0,{screenX:p[0],screenFoot:p[1],width:64,height:64,noBlink:true,action:false,shadow:"#17253038"}));
+  [[80,226],[151,226],[329,226],[400,226]].forEach((p,i)=>drawCharacterAsset(PASSENGER_SEATED_ASSETS[i],0,0,{screenX:p[0],screenFoot:p[1],width:58,height:72,noBlink:true,action:false,pixelArt:true,shadow:"#17253038"}));
 }
 function drawConvenienceFrame(){drawPixelSceneBackground("convenience");drawPixelCat();}
 function drawConvenienceInterior(){
@@ -2413,8 +2414,8 @@ function drawPortalMarkers(){
   if(scene==="cafe")drawPortalThreshold(240,340,76);
   else if(scene==="street"){
     drawPortalThreshold(100,128,64);drawPortalThreshold(240,130,72,0,"#ffd18a");drawPortalThreshold(438,128,60);drawPortalThreshold(240,342,86,0,"#f4df9c");drawPortalEdge(478,226,150,"right");
-  }else if(scene==="station"){drawPortalThreshold(240,4,82,0,"#f2d28b");drawPortalThreshold(240,182,72);}
-  else if(scene==="platform"){drawPortalThreshold(240,4,82,0,"#f2d28b");drawPortalThreshold(240,191,82);}
+  }else if(scene==="station"){drawPortalThreshold(240,4,82,0,"#f2d28b");drawPortalThreshold(240,224,72);}
+  else if(scene==="platform"){drawPortalThreshold(240,4,82,0,"#f2d28b");drawPortalThreshold(240,208,82);}
   else if(scene==="convenience"){drawPortalEdge(2,247,150,"left");drawPortalEdge(478,247,150,"right");drawPortalThreshold(337,221,74);}
   else if(scene==="convenienceInterior")drawPortalThreshold(240,342,82);
   else if(scene==="school"){drawPortalThreshold(240,153,70);drawPortalThreshold(240,342,84);}
@@ -2713,10 +2714,10 @@ cv.addEventListener("click", e=>{
     else if(poet)autoWalkTo(poet.x,poet.y,false,()=>interactWithPoet(poet));
     else if(inZone(tx,ty,6,8,9,10))autoWalkTo(...RESTAURANT_EXIT,false,leaveRestaurant);
   }else if(scene==="station"&&mode==="explore"){
-    if(inZone(tx,ty,6,8,4,6))autoWalkTo(...STATION_ENTRY_POS,false,enterStationPlatform);
+    if(inZone(tx,ty,6,8,6,8))autoWalkTo(...STATION_ENTRY_POS,false,enterStationPlatform);
     else if(inZone(tx,ty,6,8,0,1))autoWalkTo(7,0,false,leaveStationFrame);
   }else if(scene==="platform"&&mode==="explore"){
-    if(inZone(tx,ty,6,8,4,6))autoWalkTo(...PLATFORM_TRAIN_POS,false,boardStationTrain);
+    if(inZone(tx,ty,6,8,5,7))autoWalkTo(...PLATFORM_TRAIN_POS,false,boardStationTrain);
     else if(inZone(tx,ty,6,8,0,1))autoWalkTo(7,0,false,leaveStationPlatform);
   }else if(scene==="convenience"&&mode==="explore"){
     if(Math.abs(tx-CAT_POS[0])<=1&&Math.abs(ty-CAT_POS[1])<=1)autoWalkTo(...CAT_POS,false,talkToCat);
@@ -2771,11 +2772,11 @@ function tryMove(d){
     if(d==="up"&&((nx===ACADEMY_DOOR[0]&&ny===ACADEMY_DOOR[1])||(px===ACADEMY_DOOR[0]&&py===ACADEMY_DOOR[1]))){ dir=d; enterAcademy(); return; }
   }
   if(scene==="station"){
-    if(d==="up"&&inZone(nx,ny,6,8,5,5)){dir=d;enterStationPlatform();return;}
+    if(d==="up"&&inZone(nx,ny,6,8,7,7)){dir=d;enterStationPlatform();return;}
     if(d==="up"&&inZone(nx,ny,6,8,0,0)){dir=d;leaveStationFrame();return;}
   }
   if(scene==="platform"){
-    if(d==="up"&&inZone(nx,ny,6,8,5,5)){dir=d;boardStationTrain();return;}
+    if(d==="up"&&inZone(nx,ny,6,8,6,6)){dir=d;boardStationTrain();return;}
     if(d==="up"&&inZone(nx,ny,6,8,0,0)){dir=d;leaveStationPlatform();return;}
   }
   if(scene==="convenience"){
