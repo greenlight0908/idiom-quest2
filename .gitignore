@@ -1,0 +1,9 @@
+.DS_Store
+Thumbs.db
+references/
+tools/
+**/sources/
+assets/sources-*/
+*-source-*.png
+*.m
+assets/**/remake-spec.json
