@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>문학 품사 탐정단 · 퀴즈 샘플</title>
+  <style>
+    :root{
+      --ink:#171328;--panel:#24203a;--panel2:#302a48;--paper:#fff5dc;
+      --gold:#ffd475;--jade:#65d7b0;--red:#ff7b78;--muted:#bcb5cb;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:#0d1120;color:var(--paper);font-family:"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif}
+    body{display:grid;place-items:center;padding:18px;background:
+      radial-gradient(circle at 20% 15%,#3f315f66,transparent 30%),
+      radial-gradient(circle at 85% 80%,#175d5266,transparent 34%),
+      linear-gradient(160deg,#11162a,#19132a 55%,#0c2427)}
+    button{font:inherit}
+    .game{width:min(720px,100%);min-height:580px;border:4px solid #d9c9a5;border-radius:18px;background:linear-gradient(180deg,#27203d,#171426);box-shadow:0 14px 50px #000a,inset 0 0 0 4px #6f5a86;overflow:hidden}
+    header{padding:18px 22px 14px;background:linear-gradient(180deg,#403458,#28213e);border-bottom:3px solid #8876a0;text-align:center}
+    header h1{margin:0;color:var(--gold);font-size:clamp(24px,5vw,36px);letter-spacing:2px;text-shadow:0 3px #6f443a}
+    header p{margin:7px 0 0;color:#ddd3ed;font-size:13px;line-height:1.5}
+    .status{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:10px 18px;background:#111526;border-bottom:2px solid #504866;font-size:13px}
+    .status span:last-child{text-align:right}.progress{height:10px;background:#29243b;border:1px solid #766a88;border-radius:9px;overflow:hidden}.progress i{display:block;width:0;height:100%;background:linear-gradient(90deg,var(--jade),#ffe07e);transition:width .35s}
+    main{padding:22px}
+    .card{padding:20px;border:3px solid #71658b;border-radius:14px;background:linear-gradient(180deg,#302943,#211c34);box-shadow:0 5px 0 #0b0a12}
+    .source{color:#9edbc7;font-size:12px;letter-spacing:.5px}
+    blockquote{margin:12px 0 16px;padding:17px 18px;border-left:5px solid var(--gold);border-radius:6px;background:#151426;font-family:serif;font-size:clamp(20px,4vw,27px);line-height:1.7;word-break:keep-all}
+    mark{padding:2px 5px;border-radius:5px;background:#ffe184;color:#301f2a;box-shadow:0 0 13px #ffcf5d66}
+    .guide{margin:0 0 16px;padding:10px 12px;border:1px solid #5f5872;border-radius:8px;color:#d4ccdf;background:#191628;font-size:12px;line-height:1.6}
+    .analysis-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    fieldset{min-width:0;margin:0;padding:12px;border:2px solid #625978;border-radius:10px;background:#1c192c}
+    legend{padding:0 7px;color:var(--gold);font-weight:800;font-size:14px}
+    .choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+    .choice{min-height:42px;padding:8px;border:2px solid #665f78;border-bottom-width:4px;border-radius:8px;background:#302b42;color:var(--paper);cursor:pointer;transition:.12s}
+    .choice:hover,.choice:focus-visible{outline:none;border-color:#b6a9d0;transform:translateY(-1px)}
+    .choice.selected{border-color:var(--gold);background:#5b4939;color:#fff6d7;box-shadow:0 0 12px #ffd47533}
+    .choice.correct{border-color:var(--jade);background:#174f46}.choice.wrong{border-color:var(--red);background:#572c3b}
+    .actions{display:flex;gap:9px;margin-top:16px}.primary,.secondary{flex:1;padding:12px;border:2px solid #eee0bf;border-bottom-width:5px;border-radius:9px;cursor:pointer;font-weight:800}
+    .primary{background:linear-gradient(#ffe39b,#f3aa59);color:#302132}.primary:disabled{filter:grayscale(1);opacity:.45;cursor:not-allowed}.secondary{background:#302b42;color:var(--paper)}
+    .feedback{display:none;margin-top:15px;padding:13px 15px;border:2px solid var(--jade);border-radius:10px;background:#102e2e;line-height:1.65;font-size:13px}.feedback.bad{border-color:var(--red);background:#351c2b}.feedback b{color:var(--gold)}
+    .start,.result{text-align:center;padding:28px 18px}.start .mascot,.result .mascot{font-size:70px;filter:drop-shadow(0 6px 4px #0008);animation:bob 1.7s ease-in-out infinite}.start h2,.result h2{font-size:27px;color:var(--gold);margin:8px 0}.start p,.result p{max-width:520px;margin:10px auto 20px;color:#d8d0e3;line-height:1.75;word-break:keep-all}.start .primary,.result .primary{max-width:330px}
+    .sample-note{margin-top:17px;color:#aaa2b6;font-size:11px;line-height:1.6}
+    @keyframes bob{50%{transform:translateY(-7px)}}
+    @media(max-width:600px){body{padding:6px}.game{min-height:calc(100vh - 12px);border-width:2px;border-radius:10px}header{padding:12px}.status{padding:8px 10px}main{padding:10px}.card{padding:12px}.analysis-grid{grid-template-columns:1fr}.choice{min-height:38px;font-size:13px}blockquote{padding:12px;margin:8px 0 11px}.guide{font-size:11px}}
+  </style>
+</head>
+<body>
+  <section class="game" aria-label="품사와 문장 성분 퀴즈 샘플">
+    <header>
+      <h1>문학 품사 탐정단</h1>
+      <p>시구 속 단어의 정체와 문장 안 역할을 함께 찾아라!</p>
+    </header>
+    <div class="status">
+      <span id="stepText">샘플 퀴즈</span>
+      <div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+      <span id="scoreText">점수 0</span>
+    </div>
+    <main id="screen"></main>
+  </section>
+
+  <script>
+    const QUESTIONS=[
+      {
+        author:"윤동주",title:"서시",quote:"죽는 날까지 <mark>하늘</mark>을 우러러",word:"하늘",chunk:"하늘을",
+        pos:"명사",part:"목적어",
+        posOptions:["명사","대명사","동사","형용사"],partOptions:["주어","목적어","관형어","부사어"],
+        explain:"‘하늘’은 사물의 이름을 나타내는 <b>명사</b>이다. 조사 ‘을’이 붙은 ‘하늘을’은 ‘우러러’의 대상을 나타내므로 <b>목적어</b>이다."
+      },
+      {
+        author:"김영랑",title:"모란이 피기까지는",quote:"<mark>모란</mark>이 피기까지는",word:"모란",chunk:"모란이",
+        pos:"명사",part:"주어",
+        posOptions:["명사","대명사","관형사","감탄사"],partOptions:["주어","목적어","보어","서술어"],
+        explain:"‘모란’은 꽃의 이름이므로 <b>명사</b>이다. ‘모란이’는 ‘피다’의 주체이므로 문장 안에서 <b>주어</b> 역할을 한다."
+      },
+      {
+        author:"정지용",title:"향수",quote:"<mark>넓은</mark> 벌 동쪽 끝으로",word:"넓은",chunk:"넓은",
+        pos:"형용사",part:"관형어",
+        posOptions:["동사","형용사","관형사","부사"],partOptions:["서술어","관형어","부사어","독립어"],
+        explain:"‘넓은’은 형용사 ‘넓다’가 활용한 말이므로 품사는 <b>형용사</b>이다. 뒤의 명사 ‘벌’을 꾸며 주므로 문장 성분은 <b>관형어</b>이다. 관형사와 혼동하지 않도록 주의한다."
+      },
+      {
+        author:"윤동주",title:"서시",quote:"오늘 밤에도 별이 <mark>바람</mark>에 스치운다",word:"바람",chunk:"바람에",
+        pos:"명사",part:"부사어",
+        posOptions:["명사","대명사","동사","부사"],partOptions:["주어","목적어","관형어","부사어"],
+        explain:"‘바람’은 자연 현상의 이름을 나타내는 <b>명사</b>이다. ‘바람에’는 ‘스치운다’가 이루어지는 원인·상황을 덧붙이므로 <b>부사어</b>이다."
+      },
+      {
+        author:"한용운",title:"님의 침묵",quote:"님은 <mark>갔습니다</mark>",word:"갔습니다",chunk:"갔습니다",
+        pos:"동사",part:"서술어",
+        posOptions:["명사","동사","형용사","조사"],partOptions:["주어","목적어","서술어","부사어"],
+        explain:"‘갔습니다’의 기본형은 움직임을 나타내는 ‘가다’이므로 <b>동사</b>이다. 문장에서 주어 ‘님은’의 움직임을 풀이하므로 <b>서술어</b>이다."
+      }
+    ];
+
+    const screen=document.getElementById("screen"),stepText=document.getElementById("stepText"),scoreText=document.getElementById("scoreText"),progressBar=document.getElementById("progressBar");
+    let index=0,score=0,selectedPos="",selectedPart="",answered=false;
+
+    function startScreen(){
+      stepText.textContent="샘플 퀴즈";scoreText.textContent="점수 0";progressBar.style.width="0%";
+      screen.innerHTML=`<div class="start"><div class="mascot">🔎</div><h2>품사와 문장 성분은 다르다!</h2><p><b>품사</b>는 단어 자체의 갈래이고, <b>문장 성분</b>은 그 단어가 문장 안에서 맡은 역할이다.<br>한 시구에서 두 가지를 차례로 찾아보자.</p><button class="primary" id="startQuiz">샘플 5문제 시작</button><div class="sample-note">독립형 시안 · 추후 편의점 안젤라 또는 새로운 문법 캐릭터의 대화에 연결 가능</div></div>`;
+      document.getElementById("startQuiz").onclick=()=>{index=0;score=0;renderQuestion();};
+    }
+    function renderQuestion(){
+      const q=QUESTIONS[index];selectedPos="";selectedPart="";answered=false;
+      stepText.textContent=`문제 ${index+1} / ${QUESTIONS.length}`;scoreText.textContent=`점수 ${score}`;progressBar.style.width=`${index/QUESTIONS.length*100}%`;
+      screen.innerHTML=`<div class="card"><div class="source">${q.author} 「${q.title}」</div><blockquote>${q.quote}</blockquote><p class="guide">표시된 <b>‘${q.word}’</b>의 품사와, 시구 속 <b>‘${q.chunk}’</b>의 문장 성분을 각각 고르세요.</p><div class="analysis-grid"><fieldset><legend>① ‘${q.word}’의 품사</legend><div class="choice-grid" id="posChoices">${q.posOptions.map(v=>`<button class="choice" data-value="${v}">${v}</button>`).join("")}</div></fieldset><fieldset><legend>② ‘${q.chunk}’의 문장 성분</legend><div class="choice-grid" id="partChoices">${q.partOptions.map(v=>`<button class="choice" data-value="${v}">${v}</button>`).join("")}</div></fieldset></div><div class="feedback" id="feedback"></div><div class="actions"><button class="secondary" id="quitBtn">처음으로</button><button class="primary" id="checkBtn" disabled>정답 확인</button></div></div>`;
+      bindChoices("posChoices",v=>selectedPos=v);bindChoices("partChoices",v=>selectedPart=v);
+      document.getElementById("quitBtn").onclick=startScreen;document.getElementById("checkBtn").onclick=checkAnswer;
+    }
+    function bindChoices(id,setter){
+      const wrap=document.getElementById(id);
+      wrap.querySelectorAll(".choice").forEach(btn=>btn.onclick=()=>{
+        if(answered)return;wrap.querySelectorAll(".choice").forEach(b=>b.classList.remove("selected"));btn.classList.add("selected");setter(btn.dataset.value);document.getElementById("checkBtn").disabled=!(selectedPos&&selectedPart);
+      });
+    }
+    function checkAnswer(){
+      if(answered)return;answered=true;const q=QUESTIONS[index];const ok=selectedPos===q.pos&&selectedPart===q.part;if(ok)score+=20;
+      markAnswers("posChoices",q.pos,selectedPos);markAnswers("partChoices",q.part,selectedPart);
+      const fb=document.getElementById("feedback");fb.style.display="block";fb.classList.toggle("bad",!ok);fb.innerHTML=`<b>${ok?"정답입니다!":"다시 구분해 봅시다."}</b><br>정답: 품사 <b>${q.pos}</b> · 문장 성분 <b>${q.part}</b><br>${q.explain}`;
+      scoreText.textContent=`점수 ${score}`;const check=document.getElementById("checkBtn");check.disabled=false;check.textContent=index===QUESTIONS.length-1?"결과 보기":"다음 문제";check.onclick=()=>{index++;if(index<QUESTIONS.length)renderQuestion();else resultScreen();};
+    }
+    function markAnswers(id,answer,picked){document.getElementById(id).querySelectorAll(".choice").forEach(b=>{b.disabled=true;if(b.dataset.value===answer)b.classList.add("correct");else if(b.dataset.value===picked)b.classList.add("wrong");});}
+    function resultScreen(){
+      progressBar.style.width="100%";stepText.textContent="분석 완료";scoreText.textContent=`점수 ${score}`;
+      const msg=score===100?"시구 속 단어의 정체를 완벽하게 밝혀냈습니다!":score>=60?"품사와 문장 성분의 차이를 잘 찾아냈습니다.":"품사와 역할을 한 번 더 나누어 생각해 봅시다.";
+      screen.innerHTML=`<div class="result"><div class="mascot">${score===100?"🏆":"📚"}</div><h2>${score}점</h2><p>${msg}<br><br><b>기억하기:</b> ‘넓은’처럼 문장에서는 관형어이지만 품사는 형용사인 말이 있다.</p><button class="primary" id="retryQuiz">다시 풀기</button><div class="sample-note">정식 도입 시 오답만 다시 풀기, 작가별 단계, 보상 아이템 기능을 추가할 수 있습니다.</div></div>`;
+      document.getElementById("retryQuiz").onclick=()=>{index=0;score=0;renderQuestion();};
+    }
+    startScreen();
+  </script>
+</body>
+</html>
