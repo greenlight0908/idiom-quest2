@@ -1,5 +1,5 @@
 /* 사자성어 여행단 - 서비스 워커 (network-first) */
-const CACHE = "idiom-quest-v84-school-chicken-pos-quiz";
+const CACHE = "idiom-quest-v85-redrawn-chicken-interjection-choice";
 const V18_SCENES=[
   "./assets/v18/backgrounds/interior/study-cafe-v18.png",
   "./assets/v18/backgrounds/exterior/street-v18.png","./assets/v18/backgrounds/exterior/station-v18.png","./assets/v18/backgrounds/exterior/gs25-v18.png","./assets/v18/backgrounds/exterior/school-v18.png",

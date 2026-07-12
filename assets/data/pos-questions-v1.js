@@ -144,4 +144,7 @@ const POS_QUESTION_BANK=POS_GROUPS.flatMap(group=>group.entries.map(entry=>{
     e:`‘${entry[1]}’${posTopic(entry[1])} ${entry[2]} 따라서 품사는 ${group.answer}이다.`
   };
 }));
+// 첫 문제는 정답(부사)을 유지하고 3번 선택지를 감탄사로 고정한다.
+POS_QUESTION_BANK[0].opts=["부사","명사","감탄사","수사"];
+POS_QUESTION_BANK[0].a=0;
 if(POS_QUESTION_BANK.length!==100)throw new Error(`품사 문항 수 오류: ${POS_QUESTION_BANK.length}`);
