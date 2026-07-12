@@ -49,7 +49,7 @@
   <section class="game" aria-label="품사와 문장 성분 퀴즈 샘플">
     <header>
       <h1>문학 품사 탐정단</h1>
-      <p>시구 속 단어의 정체와 문장 안 역할을 함께 찾아라!</p>
+      <p>최상 난도 · 시구 속 활용형, 조사, 절의 역할까지 분석하라!</p>
     </header>
     <div class="status">
       <span id="stepText">샘플 퀴즈</span>
@@ -62,34 +62,34 @@
   <script>
     const QUESTIONS=[
       {
-        author:"윤동주",title:"서시",quote:"죽는 날까지 <mark>하늘</mark>을 우러러",word:"하늘",chunk:"하늘을",
-        pos:"명사",part:"목적어",
-        posOptions:["명사","대명사","동사","형용사"],partOptions:["주어","목적어","관형어","부사어"],
-        explain:"‘하늘’은 사물의 이름을 나타내는 <b>명사</b>이다. 조사 ‘을’이 붙은 ‘하늘을’은 ‘우러러’의 대상을 나타내므로 <b>목적어</b>이다."
+        author:"김소월",title:"진달래꽃",quote:"나 <mark>보기</mark>가 역겨워 / 가실 때에는",word:"보기",chunk:"나 보기가",
+        pos:"동사(명사형)",part:"주어(명사절)",
+        posOptions:["파생 명사","동사(명사형)","의존 명사","명사 파생 접미사 결합"],partOptions:["주어(명사절)","목적어(명사절)","부사어(부사절)","관형어(관형절)"],
+        explain:"‘보기’는 동사 ‘보다’에 명사형 전성 어미 ‘-기’가 붙은 <b>동사의 명사형</b>이다. 품사가 명사로 바뀐 것이 아니다. ‘나 보기’라는 명사절에 주격 조사 ‘가’가 붙어 ‘역겨워’의 주체가 되므로 ‘나 보기가’ 전체는 <b>주어(명사절)</b>이다."
       },
       {
-        author:"김영랑",title:"모란이 피기까지는",quote:"<mark>모란</mark>이 피기까지는",word:"모란",chunk:"모란이",
-        pos:"명사",part:"주어",
-        posOptions:["명사","대명사","관형사","감탄사"],partOptions:["주어","목적어","보어","서술어"],
-        explain:"‘모란’은 꽃의 이름이므로 <b>명사</b>이다. ‘모란이’는 ‘피다’의 주체이므로 문장 안에서 <b>주어</b> 역할을 한다."
+        author:"윤동주",title:"서시",quote:"모든 죽어 가는 <mark>것</mark>을 사랑해야지",word:"것",chunk:"모든 죽어 가는 것을",
+        pos:"의존 명사",part:"목적어",
+        posOptions:["자립 명사","의존 명사","대명사","명사형 어미"],partOptions:["주어","목적어","보어","관형어"],
+        explain:"‘것’은 앞의 관형어 ‘모든 죽어 가는’의 꾸밈을 받아야 쓰이는 <b>의존 명사</b>이다. 목적격 조사 ‘을’이 붙은 명사구 전체는 ‘사랑해야지’의 대상을 나타내므로 <b>목적어</b>이다."
       },
       {
         author:"정지용",title:"향수",quote:"<mark>넓은</mark> 벌 동쪽 끝으로",word:"넓은",chunk:"넓은",
-        pos:"형용사",part:"관형어",
-        posOptions:["동사","형용사","관형사","부사"],partOptions:["서술어","관형어","부사어","독립어"],
-        explain:"‘넓은’은 형용사 ‘넓다’가 활용한 말이므로 품사는 <b>형용사</b>이다. 뒤의 명사 ‘벌’을 꾸며 주므로 문장 성분은 <b>관형어</b>이다. 관형사와 혼동하지 않도록 주의한다."
+        pos:"형용사(관형사형)",part:"관형어",
+        posOptions:["관형사","형용사(관형사형)","동사(관형사형)","성상 부사"],partOptions:["서술어","관형어","부사어","독립어"],
+        explain:"‘넓은’은 형용사 ‘넓다’에 관형사형 어미 ‘-은’이 붙은 활용형이므로 품사는 여전히 <b>형용사</b>이다. 그러나 문장 안에서는 명사 ‘벌’을 꾸미므로 <b>관형어</b>이다. ‘관형사’와 ‘관형어’를 구분해야 한다."
       },
       {
-        author:"윤동주",title:"서시",quote:"오늘 밤에도 별이 <mark>바람</mark>에 스치운다",word:"바람",chunk:"바람에",
-        pos:"명사",part:"부사어",
-        posOptions:["명사","대명사","동사","부사"],partOptions:["주어","목적어","관형어","부사어"],
-        explain:"‘바람’은 자연 현상의 이름을 나타내는 <b>명사</b>이다. ‘바람에’는 ‘스치운다’가 이루어지는 원인·상황을 덧붙이므로 <b>부사어</b>이다."
+        author:"윤동주",title:"서시",quote:"오늘 밤에<mark>도</mark> 별이 바람에 스치운다",word:"도",chunk:"오늘 밤에도",
+        pos:"보조사",part:"부사어",
+        posOptions:["주격 조사","부사격 조사","보조사","연결 어미"],partOptions:["주어","목적어","관형어","부사어"],
+        explain:"‘도’는 ‘역시·또한’의 뜻을 더하는 <b>보조사</b>이다. 보조사가 붙었다고 앞말의 원래 역할이 사라지지는 않는다. ‘오늘 밤에도’는 ‘스치운다’의 시간을 나타내므로 문장 성분은 <b>부사어</b>이다."
       },
       {
-        author:"한용운",title:"님의 침묵",quote:"님은 <mark>갔습니다</mark>",word:"갔습니다",chunk:"갔습니다",
-        pos:"동사",part:"서술어",
-        posOptions:["명사","동사","형용사","조사"],partOptions:["주어","목적어","서술어","부사어"],
-        explain:"‘갔습니다’의 기본형은 움직임을 나타내는 ‘가다’이므로 <b>동사</b>이다. 문장에서 주어 ‘님은’의 움직임을 풀이하므로 <b>서술어</b>이다."
+        author:"김영랑",title:"모란이 피기까지는",quote:"모란이 <mark>피기</mark>까지는 / 나는 아직 나의 봄을 기다리고 있을 테요",word:"피기",chunk:"모란이 피기까지는",
+        pos:"동사(명사형)",part:"부사어",
+        posOptions:["파생 명사","동사(명사형)","형용사(명사형)","의존 명사"],partOptions:["주어","목적어","관형어","부사어"],
+        explain:"‘피기’는 동사 ‘피다’에 명사형 전성 어미 ‘-기’가 붙은 <b>동사의 명사형</b>이다. ‘모란이 피기까지는’은 뒤 절의 ‘기다리고 있을 테요’가 성립하는 시간적 한계를 나타내므로 전체가 <b>부사어</b>로 기능한다."
       }
     ];
 
@@ -98,7 +98,7 @@
 
     function startScreen(){
       stepText.textContent="샘플 퀴즈";scoreText.textContent="점수 0";progressBar.style.width="0%";
-      screen.innerHTML=`<div class="start"><div class="mascot">🔎</div><h2>품사와 문장 성분은 다르다!</h2><p><b>품사</b>는 단어 자체의 갈래이고, <b>문장 성분</b>은 그 단어가 문장 안에서 맡은 역할이다.<br>한 시구에서 두 가지를 차례로 찾아보자.</p><button class="primary" id="startQuiz">샘플 5문제 시작</button><div class="sample-note">독립형 시안 · 추후 편의점 안젤라 또는 새로운 문법 캐릭터의 대화에 연결 가능</div></div>`;
+      screen.innerHTML=`<div class="start"><div class="mascot">🧠</div><h2>최상 난도: 형태와 역할의 함정</h2><p><b>명사형이라고 명사가 아니고, 관형어라고 관형사도 아니다.</b><br>보조사·의존 명사·전성 어미·안긴문장을 구별해 시구를 분석하자.</p><button class="primary" id="startQuiz">최상 난도 5문제 시작</button><div class="sample-note">고등 국어 문법 심화형 · 두 항목을 모두 맞혀야 점수를 얻습니다.</div></div>`;
       document.getElementById("startQuiz").onclick=()=>{index=0;score=0;renderQuestion();};
     }
     function renderQuestion(){
@@ -124,7 +124,7 @@
     function resultScreen(){
       progressBar.style.width="100%";stepText.textContent="분석 완료";scoreText.textContent=`점수 ${score}`;
       const msg=score===100?"시구 속 단어의 정체를 완벽하게 밝혀냈습니다!":score>=60?"품사와 문장 성분의 차이를 잘 찾아냈습니다.":"품사와 역할을 한 번 더 나누어 생각해 봅시다.";
-      screen.innerHTML=`<div class="result"><div class="mascot">${score===100?"🏆":"📚"}</div><h2>${score}점</h2><p>${msg}<br><br><b>기억하기:</b> ‘넓은’처럼 문장에서는 관형어이지만 품사는 형용사인 말이 있다.</p><button class="primary" id="retryQuiz">다시 풀기</button><div class="sample-note">정식 도입 시 오답만 다시 풀기, 작가별 단계, 보상 아이템 기능을 추가할 수 있습니다.</div></div>`;
+      screen.innerHTML=`<div class="result"><div class="mascot">${score===100?"🏆":"📚"}</div><h2>${score}점</h2><p>${msg}<br><br><b>핵심:</b> 전성 어미가 붙어도 원래 품사가 유지될 수 있으며, 단어·구·절이 맡는 문장 성분은 품사와 별도로 판단한다.</p><button class="primary" id="retryQuiz">다시 풀기</button><div class="sample-note">정식 도입 시 제한 시간, 연속 정답 보너스, 오답 복습을 추가할 수 있습니다.</div></div>`;
       document.getElementById("retryQuiz").onclick=()=>{index=0;score=0;renderQuestion();};
     }
     startScreen();
