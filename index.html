@@ -521,7 +521,7 @@ let px=7, py=9, dir="down", stepFrame=0;
 let statues=[], cleared=0, yeomraVisible=false;
 let dialogQueue=[], dialogDone=null, typing=null, fullText="";
 let currentPlayerEmotion="neutral";
-let runStart=0, finished=false, memLB=[], sessionToken=null, survivalRunRecorded=false;
+let runStart=0, finished=false, memLB=[], sessionToken=null;
 /* ★★★ 통합 랭킹 서버 주소 ★★★
    Google Apps Script 웹 앱 URL을 아래 따옴표 안에 붙여넣으세요.
    비워 두면 이 기기에만 기록이 저장됩니다. */
@@ -2889,29 +2889,21 @@ function openModal(html){ resetMobileJoystick();modal.innerHTML=html; modal.styl
 function closeModal(){ modal.style.display="none"; modal.innerHTML=""; }
 
 /* ═══════════════ 타이틀 ═══════════════ */
-const SURVIVAL_STATS_KEY="idiom_survival_stats_v1";
-function loadSurvivalStats(){
+async function loadGlobalSurvivalStat(){
+  const box=document.getElementById("survivalStat");
+  if(!box||!SERVER_URL)return;
   try{
-    const raw=JSON.parse(localStorage.getItem(SURVIVAL_STATS_KEY)||"{}");
-    const attempts=Math.max(0,Math.floor(Number(raw.attempts)||0));
-    const survivals=Math.min(attempts,Math.max(0,Math.floor(Number(raw.survivals)||0)));
-    return {attempts,survivals};
-  }catch(e){return {attempts:0,survivals:0};}
-}
-function saveSurvivalStats(stats){
-  try{localStorage.setItem(SURVIVAL_STATS_KEY,JSON.stringify(stats));}catch(e){}
-}
-function recordSurvivalAttempt(){
-  const stats=loadSurvivalStats();stats.attempts++;saveSurvivalStats(stats);survivalRunRecorded=false;
-}
-function recordSurvivalSuccess(){
-  if(survivalRunRecorded)return;
-  const stats=loadSurvivalStats();stats.survivals=Math.min(stats.attempts,stats.survivals+1);saveSurvivalStats(stats);survivalRunRecorded=true;
-}
-function survivalStatHtml(){
-  const {attempts,survivals}=loadSurvivalStats();
-  const rate=attempts?`${Math.round(survivals/attempts*100)}%`:"--";
-  return `<div class="survival-stat" aria-label="이 기기 생환률 ${rate}"><span>🔥 내 생환률</span><b>${rate}</b><small>생환 ${survivals}회 / 도전 ${attempts}회 · 이 기기 기준</small></div>`;
+    const res=await fetch(`${SERVER_URL}?action=stats&t=${Date.now()}`,{cache:"no-store"});
+    if(!res.ok)throw new Error("stats");
+    const stats=await res.json();
+    const attempts=Math.max(0,Math.floor(Number(stats.attempts)||0));
+    const survivals=Math.min(attempts,Math.max(0,Math.floor(Number(stats.survivals)||0)));
+    const rate=attempts?Math.round(survivals/attempts*100):0;
+    box.setAttribute("aria-label",`전체 학생 생환률 ${rate}%`);
+    box.innerHTML=`<span>🔥 전체 학생 생환률</span><b>${rate}%</b><small>생환 ${survivals}회 / 도전 ${attempts}회 · 실패 기록은 7/12부터</small>`;
+  }catch(e){
+    box.innerHTML=`<span>🔥 전체 학생 생환률</span><b>--</b><small>서버 통계를 불러올 수 없습니다</small>`;
+  }
 }
 function showTitle(){
   mode="title"; scene="cafe"; hudR.textContent="";
@@ -2923,7 +2915,7 @@ function showTitle(){
   openModal(`
     <div class="box mini avatar-start-box">
       <div class="title-big yellow">사자성어 여행단</div>
-      ${survivalStatHtml()}
+      <div class="survival-stat" id="survivalStat" aria-live="polite"><span>🔥 전체 학생 생환률</span><b>--</b><small>서버 통계를 불러오는 중</small></div>
       <input id="nameInput" maxlength="8" placeholder="주인공의 이름은?" autocomplete="off">
       <div class="avatar-picker-title">함께 모험할 캐릭터</div>
       <div class="avatar-grid" role="radiogroup" aria-label="주인공 캐릭터 선택">
@@ -2956,6 +2948,7 @@ function showTitle(){
   document.getElementById("startBtn").onclick=start;
   document.getElementById("lbBtn").onclick=()=>{ showRankingModal(); };
   input.addEventListener("keydown",e=>{ if(e.key==="Enter") start(); });
+  loadGlobalSurvivalStat();
   input.focus();
 }
 
@@ -3442,7 +3435,6 @@ function spawnStatues(){
   const spots=shuffle(HELL_STATUE_SPOTS);
   statues=spots.map(([x,y],i)=>({x,y,idx:i,icon:icons[i],idiom:idioms[i],cleared:false}));
   runStart=Date.now(); finished=false;
-  recordSurvivalAttempt();
   requestToken();
 }
 const fmt=s=>`${String(Math.floor(s/60)).padStart(2,"0")}:${String(Math.floor(s%60)).padStart(2,"0")}`;
@@ -3715,7 +3707,6 @@ function openExitConfirm(){
 function winSequence(){
   mode="locked"; yeomraVisible=true;
   finished=true;
-  recordSurvivalSuccess();
   let clearSec=(Date.now()-runStart)/1000;
   showDialog([
     {sp:"염라대왕", text:"...놀랍구나. 열다섯 석상의 봉인을 모두 풀다니."},
