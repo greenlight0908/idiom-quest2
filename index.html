@@ -149,6 +149,9 @@ input#nameInput{
 input#nameInput:focus{ outline:none; border-color:var(--lantern); box-shadow:0 0 0 3px #ffb85c22,0 0 18px #ffb85c33; }
 .avatar-start-box{max-width:420px!important;margin-top:1%!important;padding:10px 12px!important;}
 .avatar-start-box .title-big{font-size:27px!important;line-height:1.05!important;margin:2px 0 6px!important;letter-spacing:2px!important;}
+.survival-stat{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 0 6px;padding:5px 8px;border:2px solid #7fcdb7;border-radius:7px;background:linear-gradient(180deg,#163b3a,#102827);color:#dffff4;font-size:10px;line-height:1.25;box-shadow:inset 0 0 0 2px #9ff5dc12;}
+.survival-stat b{color:#ffd372;font-size:15px;letter-spacing:1px;}
+.survival-stat small{color:#a9d8cd;font-size:7px;}
 .avatar-start-box input#nameInput{padding:8px;margin-bottom:6px;font-size:15px;}
 .avatar-picker-title{font-size:10px;text-align:center;color:#ffe3a5;margin:2px 0 5px;letter-spacing:1px;}
 .avatar-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:9px;}
@@ -225,6 +228,8 @@ button.avatar-card.selected::after{content:"선택됨";position:absolute;right:5
   #hud{ min-height:28px; font-size:12px; padding:4px 8px; }
   .avatar-start-box{max-width:360px!important;margin-top:0!important;padding:5px 7px!important;}
   .avatar-start-box .title-big{font-size:21px!important;line-height:1!important;margin:0 0 3px!important;}
+  .survival-stat{gap:5px;margin-bottom:3px;padding:3px 5px;font-size:8px;border-width:1px;}
+  .survival-stat b{font-size:11px;}.survival-stat small{font-size:6px;}
   .avatar-start-box input#nameInput{padding:5px;margin-bottom:3px;font-size:13px;border-width:2px;}
   .avatar-picker-title{font-size:8px;margin:0 0 3px;}
   .avatar-grid{gap:5px;margin-bottom:4px;}
@@ -516,7 +521,7 @@ let px=7, py=9, dir="down", stepFrame=0;
 let statues=[], cleared=0, yeomraVisible=false;
 let dialogQueue=[], dialogDone=null, typing=null, fullText="";
 let currentPlayerEmotion="neutral";
-let runStart=0, finished=false, memLB=[], sessionToken=null;
+let runStart=0, finished=false, memLB=[], sessionToken=null, survivalRunRecorded=false;
 /* ★★★ 통합 랭킹 서버 주소 ★★★
    Google Apps Script 웹 앱 URL을 아래 따옴표 안에 붙여넣으세요.
    비워 두면 이 기기에만 기록이 저장됩니다. */
@@ -2884,6 +2889,30 @@ function openModal(html){ resetMobileJoystick();modal.innerHTML=html; modal.styl
 function closeModal(){ modal.style.display="none"; modal.innerHTML=""; }
 
 /* ═══════════════ 타이틀 ═══════════════ */
+const SURVIVAL_STATS_KEY="idiom_survival_stats_v1";
+function loadSurvivalStats(){
+  try{
+    const raw=JSON.parse(localStorage.getItem(SURVIVAL_STATS_KEY)||"{}");
+    const attempts=Math.max(0,Math.floor(Number(raw.attempts)||0));
+    const survivals=Math.min(attempts,Math.max(0,Math.floor(Number(raw.survivals)||0)));
+    return {attempts,survivals};
+  }catch(e){return {attempts:0,survivals:0};}
+}
+function saveSurvivalStats(stats){
+  try{localStorage.setItem(SURVIVAL_STATS_KEY,JSON.stringify(stats));}catch(e){}
+}
+function recordSurvivalAttempt(){
+  const stats=loadSurvivalStats();stats.attempts++;saveSurvivalStats(stats);survivalRunRecorded=false;
+}
+function recordSurvivalSuccess(){
+  if(survivalRunRecorded)return;
+  const stats=loadSurvivalStats();stats.survivals=Math.min(stats.attempts,stats.survivals+1);saveSurvivalStats(stats);survivalRunRecorded=true;
+}
+function survivalStatHtml(){
+  const {attempts,survivals}=loadSurvivalStats();
+  const rate=attempts?`${Math.round(survivals/attempts*100)}%`:"--";
+  return `<div class="survival-stat" aria-label="이 기기 생환률 ${rate}"><span>🔥 내 생환률</span><b>${rate}</b><small>생환 ${survivals}회 / 도전 ${attempts}회 · 이 기기 기준</small></div>`;
+}
 function showTitle(){
   mode="title"; scene="cafe"; hudR.textContent="";
   hudL.textContent="사자성어 여행단";
@@ -2894,6 +2923,7 @@ function showTitle(){
   openModal(`
     <div class="box mini avatar-start-box">
       <div class="title-big yellow">사자성어 여행단</div>
+      ${survivalStatHtml()}
       <input id="nameInput" maxlength="8" placeholder="주인공의 이름은?" autocomplete="off">
       <div class="avatar-picker-title">함께 모험할 캐릭터</div>
       <div class="avatar-grid" role="radiogroup" aria-label="주인공 캐릭터 선택">
@@ -3412,6 +3442,7 @@ function spawnStatues(){
   const spots=shuffle(HELL_STATUE_SPOTS);
   statues=spots.map(([x,y],i)=>({x,y,idx:i,icon:icons[i],idiom:idioms[i],cleared:false}));
   runStart=Date.now(); finished=false;
+  recordSurvivalAttempt();
   requestToken();
 }
 const fmt=s=>`${String(Math.floor(s/60)).padStart(2,"0")}:${String(Math.floor(s%60)).padStart(2,"0")}`;
@@ -3684,6 +3715,7 @@ function openExitConfirm(){
 function winSequence(){
   mode="locked"; yeomraVisible=true;
   finished=true;
+  recordSurvivalSuccess();
   let clearSec=(Date.now()-runStart)/1000;
   showDialog([
     {sp:"염라대왕", text:"...놀랍구나. 열다섯 석상의 봉인을 모두 풀다니."},
