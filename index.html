@@ -416,6 +416,7 @@ const v20ChampionBoy=new Image();v20ChampionBoy.decoding="async";v20ChampionBoy.
 const v20ChampionGirl=new Image();v20ChampionGirl.decoding="async";v20ChampionGirl.src="assets/v20/characters/champions/champion-girl-v20.png";
 const v24ClassSleepSheet=new Image();v24ClassSleepSheet.decoding="async";v24ClassSleepSheet.src="assets/v24/characters/players/dongsan-sleep-at-desk-v24.png";
 const v30RoosterSheet=new Image();v30RoosterSheet.decoding="async";v30RoosterSheet.src="assets/v30/characters/creatures/school-rooster-sprites-v30.png";
+const v31AlleyCatSheet=new Image();v31AlleyCatSheet.decoding="async";v31AlleyCatSheet.src="assets/v31/characters/creatures/korean-alley-cat-v31.png";
 const V20_CAFE_STUDENT_FILES={
   "스미스":"assets/v20/characters/npcs/smith-chair-seated-v20.png",
   "마리":"assets/v20/characters/npcs/mari-chair-seated-v20.png",
@@ -450,8 +451,8 @@ const SCENE_FILES={
   station:"assets/v29/backgrounds/station-wayfinding-v29.png",
   platform:"assets/v27/backgrounds/platform-v27.png",
   subway:"assets/v27/backgrounds/subway-v27.png",
-  convenience:"assets/v28/backgrounds/convenience-exterior-v28.png",
-  convenienceInterior:"assets/v28/backgrounds/convenience-interior-v28.png",
+  convenience:"assets/v31/backgrounds/seven-eleven-exterior-v31.png",
+  convenienceInterior:"assets/v31/backgrounds/seven-eleven-interior-v31.png",
   school:"assets/v18/backgrounds/exterior/school-v18.png",
   library:"assets/v18/backgrounds/interior/dongsan-library5f-v18.png",
   restaurant:"assets/v20/backgrounds/haochi-chairless-v20.png",
@@ -2263,7 +2264,27 @@ function drawPixelNpc(gx,gy,variant=0,label="",seated=false,assetKey=""){
   const fallback=PASSENGER_ASSETS[((variant%PASSENGER_ASSETS.length)+PASSENGER_ASSETS.length)%PASSENGER_ASSETS.length];
   drawCharacterAsset(assetKey||fallback,gx,gy,{width:seated?45:48,height:seated?56:66,seated,label});
 }
-function drawPixelCat(){drawCharacterAsset("millennium-cat",...CAT_POS,{width:52,height:54,label:"천년 고양이",noBlink:true,pixelArt:true,shadow:"#10182042"});}
+function drawPixelCat(){
+  const x=CAT_POS[0]*TILE+16,foot=CAT_POS[1]*TILE+29;
+  const speaking=characterIsSpeaking("고양이"),near=Math.abs(px-CAT_POS[0])+Math.abs(py-CAT_POS[1])<=1;
+  const cycle=T%7,frame=speaking?3:cycle>4.7?2:Math.floor(T*1.8)%2;
+  ctx.save();ctx.imageSmoothingEnabled=true;
+  ctx.fillStyle="#10182042";ctx.beginPath();ctx.ellipse(x,foot+1,15,3.2,0,0,Math.PI*2);ctx.fill();
+  if(v31AlleyCatSheet.complete&&v31AlleyCatSheet.naturalWidth){
+    const col=frame%2,row=Math.floor(frame/2);
+    const sx=Math.round(col*v31AlleyCatSheet.naturalWidth/2),ex=Math.round((col+1)*v31AlleyCatSheet.naturalWidth/2);
+    const sy=Math.round(row*v31AlleyCatSheet.naturalHeight/2),ey=Math.round((row+1)*v31AlleyCatSheet.naturalHeight/2);
+    const sw=ex-sx,sh=ey-sy,dw=62,dh=62;
+    const centers=[343,342.5,331,310.5],feet=[540,536,516,516];
+    const dx=x-(centers[frame]/sw)*dw,dy=foot-(feet[frame]/sh)*dh;
+    ctx.drawImage(v31AlleyCatSheet,sx,sy,sw,sh,dx,dy,dw,dh);
+  }else{
+    ctx.font="38px serif";ctx.textAlign="center";ctx.textBaseline="bottom";ctx.fillText("🐈",x,foot+2);
+  }
+  if(speaking){ctx.fillStyle="#fff0ad";ctx.font="bold 8px NeoDGM,monospace";ctx.textAlign="center";ctx.fillText("야옹",x+27,foot-41);}
+  ctx.restore();
+  if(speaking||near)pixelLabel("천년 고양이",x,foot-55,"#766149");
+}
 function drawPixelChicken(){
   const x=CHICKEN_POS[0]*TILE+16,foot=CHICKEN_POS[1]*TILE+29;
   const speaking=characterIsSpeaking("닭"),near=Math.abs(px-CHICKEN_POS[0])+Math.abs(py-CHICKEN_POS[1])<=1;
@@ -2330,9 +2351,6 @@ function drawSubwayInterior(){
 }
 function drawConvenienceFrame(){
   drawPixelSceneBackground("convenience");
-  ctx.save();ctx.imageSmoothingEnabled=false;ctx.textAlign="center";ctx.textBaseline="middle";ctx.font="900 18px NeoDGM,monospace";
-  ctx.fillStyle="#fff";ctx.fillText("GS",259,61);ctx.fillStyle="#44d8e8";ctx.fillText("25",291,61);
-  ctx.fillStyle="#f28a32";ctx.beginPath();ctx.moveTo(273,48);ctx.lineTo(279,53);ctx.lineTo(273,56);ctx.closePath();ctx.fill();ctx.restore();
   drawPixelCat();
 }
 function drawConvenienceInterior(){
@@ -3085,13 +3103,13 @@ function leaveStationFrame(){
 }
 function enterConvenienceFrame(){
   scene="convenience";px=2;py=6;dir="right";mode="explore";hudL.textContent=`${playerName} · 편의점 앞 도로`;hudR.textContent="🌙 밤 10시";
-  showDialog([{sp:"내레이션",text:"스터디카페 오른쪽 길로 빠져나왔다. GS25 편의점의 파란 간판이 밤거리를 밝히고 있다."},{sp:"내레이션",text:"편의점 옆에는 파란 목걸이를 한 고양이가 앉아 있다. 가까이 가서 말을 걸어 보자."}],()=>{mode="explore";});
+  showDialog([{sp:"내레이션",text:"스터디카페 오른쪽 길로 빠져나왔다. 세븐일레븐의 초록·주황·빨간 간판이 밤거리를 밝히고 있다."},{sp:"내레이션",text:"편의점 옆에는 회갈색 얼룩 고양이가 앉아 있다. 가까이 가서 말을 걸어 보자."}],()=>{mode="explore";});
 }
 function leaveConvenienceFrame(){
   scene="street";px=13;py=6;dir="left";mode="explore";hudL.textContent=`${playerName} · 충장로 거리`;hudR.textContent="🌙 밤 10시";
 }
 function enterConvenienceInterior(){
-  scene="convenienceInterior";px=9;py=9;dir="up";mode="explore";hudL.textContent=`${playerName} · GS25`;hudR.textContent="🛒 영업 중";
+  scene="convenienceInterior";px=9;py=9;dir="up";mode="explore";hudL.textContent=`${playerName} · 세븐일레븐`;hudR.textContent="🛒 영업 중";
   showDialog([{sp:"안젤라",text:"어서 와."},{sp:"내레이션",text:"밝은 조명 아래 냉장고와 진열대, 계산대가 가지런히 놓여 있다."}],()=>{mode="explore";});
 }
 function leaveConvenienceInterior(){
@@ -3099,10 +3117,10 @@ function leaveConvenienceInterior(){
 }
 function enterSchoolFromConvenience(){
   scene="school";px=7;py=8;dir="up";mode="explore";hudL.textContent=`${playerName} · 안산동산고등학교`;hudR.textContent="🏫 교문 개방";
-  showDialog([{sp:"내레이션",text:"GS25 오른쪽 길을 따라가자 안산동산고등학교 정문이 나타났다."},{sp:"내레이션",text:"교문은 언제나 열려 있다. 중앙 통로를 따라 학교 안으로 들어갈 수 있다."}],()=>{mode="explore";});
+  showDialog([{sp:"내레이션",text:"세븐일레븐 오른쪽 길을 따라가자 안산동산고등학교 정문이 나타났다."},{sp:"내레이션",text:"교문은 언제나 열려 있다. 중앙 통로를 따라 학교 안으로 들어갈 수 있다."}],()=>{mode="explore";});
 }
 function leaveSchoolToConvenience(){
-  scene="convenience";px=13;py=6;dir="left";mode="explore";hudL.textContent=`${playerName} · GS25 앞`;hudR.textContent="🌙 밤 10시";
+  scene="convenience";px=13;py=6;dir="left";mode="explore";hudL.textContent=`${playerName} · 세븐일레븐 앞`;hudR.textContent="🌙 밤 10시";
 }
 function enterLibraryFromSchool(){
   scene="library";px=7;py=9;dir="up";mode="explore";hudL.textContent=`${playerName} · 5층 도서관`;hudR.textContent="📚 열람실";
@@ -3224,7 +3242,7 @@ function answerCatQuiz(choice){
   if(catQuizIndex<CAT_QUESTIONS.length){
     showDialog([{sp:"고양이",text:`정답이다냥. ${item.e}`}],showCatQuizQuestion);
   }else{
-    const raw=basePlayerName||playerName;catMaster=true;activeTitle="cat";saveCatMaster(raw);applyPlayerTitle();saveTitleProfile();hudL.textContent=`${playerName} · GS25`;hudR.textContent="🐈 칭호 획득";
+    const raw=basePlayerName||playerName;catMaster=true;activeTitle="cat";saveCatMaster(raw);applyPlayerTitle();saveTitleProfile();hudL.textContent=`${playerName} · 세븐일레븐`;hudR.textContent="🐈 칭호 획득";
     showDialog([{sp:"고양이",text:"대단하다냥! 중세국어의 핵심을 모두 꿰뚫었구냥."},{sp:"고양이",text:`칭호 획득! 이제부터 너는 고양이 ${raw}다냥. 후에 널 고양이로 임명한다냥.`}],()=>{scene="convenience";px=CAT_POS[0];py=CAT_POS[1];dir="left";mode="explore";});
   }
 }
