@@ -140,6 +140,10 @@ button.btn.primary:hover{filter:brightness(1.08)}
 .lb-time{text-align:right;white-space:nowrap;color:#d8efe9;}
 .lb-row.me{color:var(--lantern);font-weight:bold;}
 .lb-row.me .lb-rank,.lb-row.me .lb-time{color:var(--lantern);}
+.grammar-clock{display:flex;justify-content:space-between;gap:8px;margin:8px 0;padding:8px 10px;border:2px solid #d8bd69;border-radius:8px;background:#151c2f;color:#ffe6a0;font-size:12px;}
+.grammar-clock b{color:#7ff0ce;}
+.grammar-clock.danger{border-color:#ff7770;color:#ffaaa5;animation:grammarPulse .45s infinite alternate;}
+@keyframes grammarPulse{to{filter:brightness(1.3);transform:scale(1.01)}}
 input#nameInput{
   font-family:inherit; font-size:17px; width:100%; padding:11px;
   background:#151126cc; color:var(--lantern);
@@ -284,6 +288,7 @@ button.avatar-card.selected::after{content:"선택됨";position:absolute;right:5
   <p class="hint">이동: 방향키 · WASD · 화면 버튼　/　대화 넘기기: 화면 터치 · 스페이스</p>
 </div>
 
+<script src="assets/data/pos-questions-v1.js"></script>
 <script>
 "use strict";
 /* ═══════════════ 사자성어 50 ═══════════════ */
@@ -516,7 +521,7 @@ const characterImages=Object.fromEntries(Object.entries(CHARACTER_FILES).map(([k
 let selectedAvatarId="dongsan-boy";
 const selectedAvatar=()=>AVATARS.find(a=>a.id===selectedAvatarId)||AVATARS[0];
 let mode="title", scene="cafe", playerName="", basePlayerName="", mentorName="", activeTitle="", classInSession=false, classSleepPhase=false, restaurantSeated=false, orderedFood="";
-let captainStage=0, captainMaster=false, captainQuizSet=[], captainQuizIndex=0, catMaster=false;
+let captainStage=0, captainMaster=false, captainQuizSet=[], captainQuizIndex=0, catMaster=false, grammarMaster=false;
 let px=7, py=9, dir="down", stepFrame=0;
 let statues=[], cleared=0, yeomraVisible=false;
 let dialogQueue=[], dialogDone=null, typing=null, fullText="";
@@ -589,10 +594,14 @@ const CAT_POS=[5,5];
 const catAt=(x,y)=>x===CAT_POS[0]&&y===CAT_POS[1];
 const SCHOOL_EXIT=[7,10];
 const SCHOOL_GATE=[7,3];
+const CHICKEN_POS=[2,9];
+const chickenAt=(x,y)=>x===CHICKEN_POS[0]&&y===CHICKEN_POS[1];
 const LIBRARY_EXIT=[7,10];
 const LIBRARY_DESKS=[[3,4],[5,4],[7,4],[9,4],[11,4],[3,7],[5,7],[7,7],[9,7],[11,7]];
 const LIBRARY_SEATS=LIBRARY_DESKS.map(([x,y])=>[x,y+1]);
 let catQuizIndex=0, catQuizCorrect=0;
+let grammarQuizIndex=0,grammarQuizSet=[],grammarQuizTimer=null,grammarQuizDeadline=0,grammarQuizStartedAt=0,grammarQuizLocked=false;
+const GRAMMAR_QUIZ_COUNT=7,GRAMMAR_QUESTION_SECONDS=20;
 // 고양이 퀴즈 문항은 이 배열만 수정하면 문제·보기·해설을 교체할 수 있다.
 const CAT_QUESTIONS=[
   {q:"『훈민정음』이 반포된 해와 책의 간행을 가장 정확하게 짝지은 것은?",opts:["1443년 창제 · 1446년 반포","1446년 창제 · 1443년 반포","1445년 창제 · 1446년 반포","1446년 창제 · 1448년 반포"],a:0,e:"세종 25년(1443)에 창제하고 세종 28년(1446)에 『훈민정음』 해례본을 간행·반포했다."},
@@ -722,8 +731,11 @@ function blocked(x,y){
     return isWall(x,y)||y<=2||inList(CONVENIENCE_FURNITURE_CELLS,x,y);
   }
   if(scene==="school"){
+    if(chickenAt(x,y)) return true;
     if(inZone(x,y,6,8,10,10)) return false;
     if(inZone(x,y,6,8,3,3)) return false;
+    // 중앙 통로에서 왼쪽 보도의 닭 앞까지 걸어갈 수 있는 접근로.
+    if(inZone(x,y,3,8,9,9)) return false;
     if(y<=3) return true;
     if(y>=4&&y<=9&&(x<6||x>8)) return true;
     return isWall(x,y);
@@ -1649,6 +1661,8 @@ function captainMasterSaved(name){try{return JSON.parse(localStorage.getItem("ca
 function saveCaptainMaster(name){try{const a=JSON.parse(localStorage.getItem("captain_lee_masters")||"[]");if(!a.includes(name))a.push(name);localStorage.setItem("captain_lee_masters",JSON.stringify(a));}catch(e){}}
 function catMasterSaved(name){try{return JSON.parse(localStorage.getItem("cat_masters")||"[]").includes(name);}catch(e){return false;}}
 function saveCatMaster(name){try{const a=JSON.parse(localStorage.getItem("cat_masters")||"[]");if(!a.includes(name)){a.push(name);localStorage.setItem("cat_masters",JSON.stringify(a));}}catch(e){}}
+function grammarMasterSaved(name){try{return JSON.parse(localStorage.getItem("grammar_masters")||"[]").includes(name);}catch(e){return false;}}
+function saveGrammarMaster(name){try{const a=JSON.parse(localStorage.getItem("grammar_masters")||"[]");if(!a.includes(name)){a.push(name);localStorage.setItem("grammar_masters",JSON.stringify(a));}}catch(e){}}
 function loadTitleProfile(name){try{return JSON.parse(localStorage.getItem(`idiom_title_${name}`)||"{}")||{};}catch(e){return {};}}
 function saveTitleProfile(){
   if(!basePlayerName)return;
@@ -1656,7 +1670,8 @@ function saveTitleProfile(){
 }
 function applyPlayerTitle(){
   const raw=basePlayerName||playerName;if(!raw)return;
-  if(activeTitle==="cat"&&catMaster)playerName=`고양이 ${raw}`;
+  if(activeTitle==="grammar"&&grammarMaster)playerName=`품사를 이해한 ${raw}`;
+  else if(activeTitle==="cat"&&catMaster)playerName=`고양이 ${raw}`;
   else if(activeTitle==="captain"&&captainMaster)playerName=`꺼삐딴 리 마스터 ${raw}`;
   else if(activeTitle==="mentor"&&mentorName)playerName=`${mentorName}의 제자 ${raw}`;
   else if(activeTitle==="train")playerName=`집에 가려다 실패한 ${raw}`;
@@ -2248,6 +2263,25 @@ function drawPixelNpc(gx,gy,variant=0,label="",seated=false,assetKey=""){
   drawCharacterAsset(assetKey||fallback,gx,gy,{width:seated?45:48,height:seated?56:66,seated,label});
 }
 function drawPixelCat(){drawCharacterAsset("millennium-cat",...CAT_POS,{width:52,height:54,label:"천년 고양이",noBlink:true,pixelArt:true,shadow:"#10182042"});}
+function drawPixelChicken(){
+  const x=CHICKEN_POS[0]*TILE+16,foot=CHICKEN_POS[1]*TILE+29,bob=Math.sin(T*3.4)>.62?-1:0;
+  ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(x,foot+bob);
+  ctx.fillStyle="#18202955";ctx.beginPath();ctx.ellipse(0,1,13,3,0,0,7);ctx.fill();
+  // 다리와 발
+  ctx.fillStyle="#d79735";ctx.fillRect(-6,-7,3,8);ctx.fillRect(4,-7,3,8);ctx.fillRect(-10,0,8,2);ctx.fillRect(3,0,9,2);
+  // 꼬리, 몸통, 날개
+  ctx.fillStyle="#d9d5c5";ctx.fillRect(-17,-23,8,8);ctx.fillStyle="#f7f0da";ctx.fillRect(-13,-25,23,18);ctx.fillRect(-9,-29,19,23);
+  ctx.fillStyle="#c9c3af";ctx.fillRect(-8,-22,11,10);ctx.fillStyle="#eee5cf";ctx.fillRect(-6,-20,8,6);
+  // 목과 머리
+  ctx.fillStyle="#faf2d9";ctx.fillRect(5,-34,11,18);ctx.fillRect(8,-40,15,13);
+  ctx.fillStyle="#d94d3f";ctx.fillRect(9,-45,5,6);ctx.fillRect(15,-47,5,8);ctx.fillRect(19,-44,4,6);ctx.fillRect(9,-29,5,7);
+  ctx.fillStyle="#e5a33d";ctx.fillRect(23,-36,8,5);ctx.fillRect(27,-34,5,3);
+  ctx.fillStyle="#24262a";ctx.fillRect(18,-37,3,3);ctx.fillStyle="#fff";ctx.fillRect(18,-37,1,1);
+  const speaking=characterIsSpeaking("닭"),near=Math.abs(px-CHICKEN_POS[0])+Math.abs(py-CHICKEN_POS[1])<=1;
+  if(speaking){ctx.fillStyle="#fff1a8";ctx.font="bold 8px NeoDGM,monospace";ctx.textAlign="center";ctx.fillText("♪",30,-47);}
+  ctx.restore();
+  if(speaking||near)pixelLabel("닭",x,foot-52,"#8b4b32");
+}
 function drawPixelFood(){
   if(!orderedFood)return;const x=372,y=243;
   ctx.fillStyle="#f1e4c4";ctx.fillRect(x-10,y-4,20,8);ctx.fillStyle=orderedFood==="짜장면"?"#56321f":orderedFood==="짬뽕"?"#d55535":"#d8a944";ctx.fillRect(x-7,y-8,14,7);ctx.fillStyle="#e7c16b";ctx.fillRect(x-5,y-7,3,2);ctx.fillRect(x+2,y-5,3,2);
@@ -2295,7 +2329,7 @@ function drawConvenienceInterior(){
   drawCharacterAsset("cleo",...CONVENIENCE_CASHIER,{screenX:350,screenFoot:104,width:50,height:70,label:"안젤라",pixelArt:true,action:false,shadow:"#14212d22"});
   ctx.restore();
 }
-function drawSchoolCampus(){drawPixelSceneBackground("school");}
+function drawSchoolCampus(){drawPixelSceneBackground("school");drawPixelChicken();}
 function drawLibraryInterior(){drawPixelSceneBackground("library");pixelSceneSign("5층 도서관",240,31,"#f6e8bd",9);}
 function drawRestaurant(){
   drawPixelSceneBackground("restaurant");pixelSceneSign("하오츠",240,37,"#ffd378",11);
@@ -2514,7 +2548,7 @@ function drawInteractionHints(){
   else if(scene==="platform"){drawHint(...PLATFORM_TRAIN_POS);drawHint(7,0);}
   else if(scene==="convenience"){drawHint(...CAT_POS,"","#9fd8ff");drawHint(...CONVENIENCE_DOOR,"","#7de7df");drawHint(0,6);drawHint(14,6);}
   else if(scene==="convenienceInterior"){drawHint(...CONVENIENCE_CASHIER);drawHint(...CONVENIENCE_EXIT);}
-  else if(scene==="school"){drawHint(...SCHOOL_GATE);drawHint(...SCHOOL_EXIT);}
+  else if(scene==="school"){drawHint(...CHICKEN_POS,"품사 닭","#ffe08a");drawHint(...SCHOOL_GATE);drawHint(...SCHOOL_EXIT);}
   else if(scene==="library"){LIBRARY_SEATS.forEach(([x,y])=>drawHint(x,y,"","#c9f3dd"));drawHint(...LIBRARY_EXIT);}
   else if(scene==="restaurant"){POETS.forEach(p=>drawHint(p.x,p.y));drawHint(...RESTAURANT_EMPTY_SEAT);drawHint(...RESTAURANT_EXIT);}
   else if(scene==="academy"){drawHint(...ANGELA_POS);CLASSROOM_DOORS.forEach(door=>drawHint(door.x,door.y));drawHint(...ACADEMY_EXIT);}
@@ -2755,7 +2789,8 @@ cv.addEventListener("click", e=>{
     if(Math.abs(tx-CONVENIENCE_CASHIER[0])<=1&&Math.abs(ty-CONVENIENCE_CASHIER[1])<=1)autoWalkTo(...CONVENIENCE_CASHIER,false,()=>showDialog([{sp:"안젤라",text:"안녕, 난 요새 맞춤법을 공부하고 있어. 너도 미리 공부해둬."}],()=>{mode="explore";}));
     else if(inZone(tx,ty,6,8,9,10))autoWalkTo(...CONVENIENCE_EXIT,false,leaveConvenienceInterior);
   }else if(scene==="school"&&mode==="explore"){
-    if(inZone(tx,ty,6,8,9,10))autoWalkTo(...SCHOOL_EXIT,false,leaveSchoolToConvenience);
+    if(Math.abs(tx-CHICKEN_POS[0])<=1&&Math.abs(ty-CHICKEN_POS[1])<=1)autoWalkTo(...CHICKEN_POS,false,talkToChicken);
+    else if(inZone(tx,ty,6,8,9,10))autoWalkTo(...SCHOOL_EXIT,false,leaveSchoolToConvenience);
     else if(inZone(tx,ty,6,8,2,4))autoWalkTo(...SCHOOL_GATE,false,enterLibraryFromSchool);
   }else if(scene==="library"&&mode==="explore"){
     const seat=LIBRARY_SEATS.find(([sx,sy])=>tx===sx&&(ty===sy||ty===sy-1));
@@ -2817,6 +2852,7 @@ function tryMove(d){
     if(d==="down"&&inZone(nx,ny,6,8,10,10)){dir=d;leaveConvenienceInterior();return;}
   }
   if(scene==="school"){
+    if(chickenAt(nx,ny)){dir=d;talkToChicken();return;}
     if(d==="down"&&inZone(nx,ny,6,8,10,10)){dir=d;leaveSchoolToConvenience();return;}
     if(d==="up"&&inZone(nx,ny,6,8,3,3)){dir=d;enterLibraryFromSchool();return;}
   }
@@ -2939,9 +2975,9 @@ function showTitle(){
     if(!/^[가-힣]+$/.test(v)){ input.placeholder="한글만 쓸 수 있어요"; input.value=""; return; }
     if([...v].length!==3){ input.placeholder="이름은 한글 세 글자로 입력하세요"; input.value=""; return; }
     const nv=v;
-    if(FORBIDDEN.includes(nv)||FORBIDDEN_PART.some(p=>nv.includes(p))){ basePlayerName=v;playerName=v;mentorName="";activeTitle="";captainMaster=false;catMaster=false;classInSession=false;classSleepPhase=false;restaurantSeated=false;orderedFood="";closeModal();teacherDeath();return; }
-    basePlayerName=v;captainMaster=captainMasterSaved(v);catMaster=catMasterSaved(v);
-    const profile=loadTitleProfile(v);mentorName=profile.mentor||"";activeTitle=profile.active||((catMaster&&"cat")||(captainMaster&&"captain")||(mentorName&&"mentor")||"");
+    if(FORBIDDEN.includes(nv)||FORBIDDEN_PART.some(p=>nv.includes(p))){ basePlayerName=v;playerName=v;mentorName="";activeTitle="";captainMaster=false;catMaster=false;grammarMaster=false;classInSession=false;classSleepPhase=false;restaurantSeated=false;orderedFood="";closeModal();teacherDeath();return; }
+    basePlayerName=v;captainMaster=captainMasterSaved(v);catMaster=catMasterSaved(v);grammarMaster=grammarMasterSaved(v);
+    const profile=loadTitleProfile(v);mentorName=profile.mentor||"";activeTitle=profile.active||((grammarMaster&&"grammar")||(catMaster&&"cat")||(captainMaster&&"captain")||(mentorName&&"mentor")||"");
     try{localStorage.setItem("idiom_last_avatar",selectedAvatarId);}catch(e){}
     applyPlayerTitle();saveTitleProfile();classInSession=false;classSleepPhase=false;restaurantSeated=false;orderedFood="";closeModal();startCafe();
   };
@@ -3061,6 +3097,81 @@ function enterLibraryFromSchool(){
 }
 function leaveLibraryToSchool(){
   scene="school";px=SCHOOL_GATE[0];py=SCHOOL_GATE[1]+1;dir="down";mode="explore";hudL.textContent=`${playerName} · 안산동산고등학교`;hudR.textContent="🏫 교문 개방";
+}
+function stopGrammarQuizTimer(){
+  if(grammarQuizTimer!==null){clearInterval(grammarQuizTimer);grammarQuizTimer=null;}
+}
+function talkToChicken(){
+  mode="locked";
+  if(grammarMaster){
+    showDialog([{sp:"닭",text:"꼬끼오~! 품사를 이해한 학생이 다시 왔군."}],()=>{mode="explore";});
+    return;
+  }
+  showDialog([
+    {sp:"닭",text:"꼬끼오~!"},
+    {sp:playerName,text:"학교 앞에 닭이 있네..."},
+    {sp:"닭",text:"꼬끼오~!의 품사는?"}
+  ],startGrammarQuiz);
+}
+function startGrammarQuiz(){
+  stopGrammarQuizTimer();
+  grammarQuizSet=[POS_QUESTION_BANK[0],...shuffle(POS_QUESTION_BANK.slice(1)).slice(0,GRAMMAR_QUIZ_COUNT-1)];
+  grammarQuizIndex=0;grammarQuizStartedAt=Date.now();grammarQuizLocked=false;
+  showGrammarQuizQuestion();
+}
+function grammarElapsedText(){
+  const sec=Math.max(0,Math.floor((Date.now()-grammarQuizStartedAt)/1000));
+  return `${String(Math.floor(sec/60)).padStart(2,"0")}:${String(sec%60).padStart(2,"0")}`;
+}
+function showGrammarQuizQuestion(){
+  stopGrammarQuizTimer();grammarQuizLocked=false;mode="locked";
+  const item=grammarQuizSet[grammarQuizIndex];
+  openModal(`<div class="box">
+    <p class="qtext" style="text-align:center;"><b class="yellow">🐓 닭의 품사 시험</b><br><span class="hint">문제 ${grammarQuizIndex+1} / ${GRAMMAR_QUIZ_COUNT} · 전체 문제은행 ${POS_QUESTION_BANK.length}문항</span></p>
+    <div class="grammar-clock" id="grammarClock"><span>남은 시간 <b id="grammarRemain">${GRAMMAR_QUESTION_SECONDS}.0초</b></span><span>총 시간 <b id="grammarElapsed">${grammarElapsedText()}</b></span></div>
+    <p class="qtext">${item.q}</p>
+    ${item.opts.map((o,i)=>`<button class="opt" data-grammar-i="${i}">${i+1}. ${o}</button>`).join("")}
+  </div>`);
+  modal.querySelectorAll("[data-grammar-i]").forEach(b=>b.onclick=()=>answerGrammarQuiz(+b.dataset.grammarI));
+  grammarQuizDeadline=Date.now()+GRAMMAR_QUESTION_SECONDS*1000;
+  const tick=()=>{
+    const remain=Math.max(0,grammarQuizDeadline-Date.now()),remainEl=document.getElementById("grammarRemain"),elapsedEl=document.getElementById("grammarElapsed"),clock=document.getElementById("grammarClock");
+    if(remainEl)remainEl.textContent=`${(remain/1000).toFixed(1)}초`;
+    if(elapsedEl)elapsedEl.textContent=grammarElapsedText();
+    if(clock)clock.classList.toggle("danger",remain<=5000);
+    if(remain<=0&&!grammarQuizLocked){grammarQuizLocked=true;stopGrammarQuizTimer();failGrammarQuiz("시간이 다 되었다.");}
+  };
+  tick();grammarQuizTimer=setInterval(tick,100);
+}
+function answerGrammarQuiz(choice){
+  if(grammarQuizLocked)return;grammarQuizLocked=true;stopGrammarQuizTimer();
+  const item=grammarQuizSet[grammarQuizIndex];closeModal();
+  if(choice!==item.a){failGrammarQuiz(`틀렸다. 정답은 ${item.opts[item.a]}이다.`);return;}
+  grammarQuizIndex++;
+  if(grammarQuizIndex===1){
+    showDialog([{sp:"닭",text:"너 품사를 공부했구나 제대로 공부했는지 확인해봐야겠군."}],showGrammarQuizQuestion);
+    return;
+  }
+  if(grammarQuizIndex<GRAMMAR_QUIZ_COUNT){
+    showDialog([{sp:"닭",text:`정답이다. ${item.e}`}],showGrammarQuizQuestion);
+    return;
+  }
+  completeGrammarQuiz();
+}
+function failGrammarQuiz(reason){
+  stopGrammarQuizTimer();closeModal();mode="locked";
+  showDialog([{sp:"닭",text:`${reason} 품사를 잘못 판단한 자는 사자성어 지옥에서 다시 공부해라. 꼬끼오~!`}],()=>{
+    fade.style.background="#000";fade.innerHTML="닭의 울음소리가 천둥처럼 울린다...<br><br>🐓<br><br>사자성어 지옥으로 떨어진다.";fade.style.opacity=1;fade.style.pointerEvents="auto";
+    setTimeout(()=>enterHell(),1500);
+  });
+}
+function completeGrammarQuiz(){
+  const raw=basePlayerName||playerName;grammarMaster=true;activeTitle="grammar";saveGrammarMaster(raw);applyPlayerTitle();saveTitleProfile();
+  hudL.textContent=`${playerName} · 안산동산고등학교`;hudR.textContent=`🐓 7문제 정답 · ${grammarElapsedText()}`;
+  showDialog([
+    {sp:"닭",text:"꼬끼오~! 일곱 문제를 모두 맞혔다."},
+    {sp:"닭",text:`칭호 획득! 이제부터 너는 ‘품사를 이해한 ${raw}’이다.`}
+  ],()=>{mode="explore";});
 }
 function talkToCat(){
   mode="locked";
@@ -3450,6 +3561,7 @@ function rankingNameKey(name){
   compact=compact
     .replace(/^집에가려다실패한/,"")
     .replace(/^귀가에실패한/,"")
+    .replace(/^품사를이해한/,"")
     .replace(/^고양이/,"")
     .replace(/^꺼삐딴리마스터/,"")
     .replace(/^꺼삐딴리/,"")
@@ -3467,6 +3579,7 @@ function rankingNameKey(name){
 function rankingSubmitName(name){
   const raw=basePlayerName||String(name||"").trim();
   if(activeTitle==="train")return `귀가에 실패한 ${raw}`;
+  if(activeTitle==="grammar")return `품사를 이해한 ${raw}`;
   if(activeTitle==="captain")return `꺼삐딴 리 ${raw}`;
   if(activeTitle==="mentor"&&mentorName)return `${mentorName} 제자 ${raw}`;
   if(activeTitle==="general")return `대장군 ${raw}`;
