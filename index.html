@@ -170,12 +170,22 @@ button.avatar-card.selected::after{content:"선택됨";position:absolute;right:5
 .avatar-card-desc{font-size:6px;line-height:1.45;color:#b8cbd3;word-break:keep-all;}
 .avatar-start-box button.btn{padding:7px 10px;margin-bottom:5px;font-size:13px;}
 .avatar-start-box .hint{font-size:8px;margin-top:3px;}
+#appVersionBtn{display:inline-block;margin-left:8px;padding:3px 6px;border:1px solid #607789;border-radius:4px;background:#152238;color:#a9c9d5;font:7px NeoDGM,monospace;vertical-align:middle;cursor:pointer;box-shadow:none;}
+#appVersionBtn:hover,#appVersionBtn:focus-visible{outline:none;border-color:#ffd372;color:#ffe5a8;background:#20344e;}
+#appVersionBtn:disabled{opacity:.7;cursor:wait;}
 #fade{
   position:absolute; inset:0; z-index:6; background:#000; opacity:0;
   pointer-events:none; transition:opacity 1s;
   display:flex; align-items:center; justify-content:center;
   font-size:16px; text-align:center; line-height:2; padding:20px; word-break:keep-all;
 }
+#fade.captain-time-active{transition:opacity .35s;background:#000;}
+.captain-time-card{width:100%;max-width:390px;color:#f6f0e5;text-align:center;text-shadow:0 3px 0 #000,0 0 18px #d7aa5b55;}
+.captain-time-card::before,.captain-time-card::after{content:"";display:block;width:68%;height:1px;margin:0 auto 18px;background:linear-gradient(90deg,transparent,#c89b55,transparent);}
+.captain-time-card::after{margin:18px auto 0;}
+.captain-time-kicker{margin-bottom:13px;color:#bba77e;font-size:10px;letter-spacing:5px;}
+.captain-time-year{display:block;color:#ffe09a;font-size:25px;line-height:1.45;letter-spacing:1px;}
+.captain-time-place{display:block;margin-top:10px;color:#dad6cf;font-size:12px;line-height:1.65;}
 #moveJoystick{
   --joy-size:116px; --joy-knob:50px;
   position:absolute; left:72px; top:72%; z-index:5;
@@ -285,12 +295,15 @@ button.avatar-card.selected::after{content:"선택됨";position:absolute;right:5
     <button data-d="down">▼</button>
     <button data-d="right">▶</button>
   </div>
-  <p class="hint">이동: 방향키 · WASD · 화면 버튼　/　대화 넘기기: 화면 터치 · 스페이스</p>
+  <p class="hint">이동: 방향키 · WASD · 화면 버튼　/　대화 넘기기: 화면 터치 · 스페이스 <button type="button" id="appVersionBtn" title="학생용 최신 버전을 확인합니다">버전 확인 중</button></p>
 </div>
 
 <script src="assets/data/pos-questions-v1.js"></script>
 <script>
 "use strict";
+const APP_VERSION="94 · 2026.07.13";
+const appVersionBtn=document.getElementById("appVersionBtn");
+appVersionBtn.textContent=`버전 ${APP_VERSION}`;
 /* ═══════════════ 사자성어 50 ═══════════════ */
 const IDIOMS = [
 ["망양보뢰","亡羊補牢","양을 잃고 우리를 고침. 일이 잘못된 뒤에 손을 써도 이미 늦음","시험이 다 끝난 뒤에야 부랴부랴 오답 노트를 만들며 후회하는 학생"],
@@ -406,7 +419,7 @@ const modal=document.getElementById("modal"), fade=document.getElementById("fade
 const hudL=document.getElementById("hudL"), hudR=document.getElementById("hudR");
 const sidaeLogo=new Image(); sidaeLogo.src="data:image/avif;base64,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";
 
-const captainCastImage=new Image();captainCastImage.src="captain-cast-v1.png";
+// 과거의 사실풍 전신 캐스트·고정 삽화는 더 이상 로드하지 않는다.
 const cafeBackground=new Image();cafeBackground.decoding="async";cafeBackground.src="assets/v20/backgrounds/study-cafe-chairless-v20.png";
 const v20StudyChairLayers=new Image();v20StudyChairLayers.decoding="async";v20StudyChairLayers.src="assets/v20/furniture/study-chair-layers-v20.png";
 const v20BoySheet=new Image();v20BoySheet.decoding="async";v20BoySheet.src="assets/v20/characters/players/dongsan-boy-walk-v20.png";
@@ -426,16 +439,8 @@ const V20_CAFE_STUDENT_FILES={
 const v20CafeStudentSheets=Object.fromEntries(Object.entries(V20_CAFE_STUDENT_FILES).map(([name,src])=>{
   const img=new Image();img.decoding="async";img.src=src;return [name,img];
 }));
-const V20_AUTHOR_FILES={
-  "김수영":"assets/v20/characters/authors/kim-sooyoung-idle-talk-v20.png",
-  "신동엽":"assets/v20/characters/authors/shin-dongyeop-idle-talk-v20.png",
-  "조세희":"assets/v20/characters/authors/jo-sehui-idle-talk-v20.png",
-  "전광용":"assets/v20/characters/authors/jeon-gwangyong-idle-talk-v20.png",
-  "김소월":"assets/v20/characters/authors/kim-sowol-idle-talk-v20.png"
-};
-const v20AuthorSheets=Object.fromEntries(Object.entries(V20_AUTHOR_FILES).map(([name,src])=>{
-  const img=new Image();img.decoding="async";img.src=src;return [name,img];
-}));
+const V20_AUTHOR_FILES={};
+const v20AuthorSheets={};
 const V21_STAFF_FILES={
   "안젤라":"assets/v21/characters/npcs/angela-idle-talk-v21.png",
   "류용수":"assets/v21/characters/teachers/ryu-yongsu-idle-teach-v21.png",
@@ -454,7 +459,7 @@ const SCENE_FILES={
   convenience:"assets/v31/backgrounds/seven-eleven-exterior-v31.png",
   convenienceInterior:"assets/v31/backgrounds/seven-eleven-interior-v31.png",
   school:"assets/v18/backgrounds/exterior/school-v18.png",
-  library:"assets/v18/backgrounds/interior/dongsan-library5f-v18.png",
+  library:"assets/v41/backgrounds/dongsan-library5f-v41.png",
   restaurant:"assets/v20/backgrounds/haochi-chairless-v20.png",
   academy:"assets/v23/backgrounds/sidae-academy-lobby-v23.png",
   classroom:"assets/v21/backgrounds/sidae-classroom-v21.png",
@@ -463,8 +468,10 @@ const SCENE_FILES={
 const sceneImages=Object.fromEntries(Object.entries(SCENE_FILES).map(([name,src])=>{
   const img=new Image();img.decoding="async";img.src=src;return [name,img];
 }));
-const CAPTAIN_SCENE_FILES=[1,2,3,4,5,6,7,9,8,10,11,12,13,14,15,16].map(i=>`captain-scenes-pixel/captain-scene-${String(i).padStart(2,"0")}-v1.png`);
-const captainSceneImages=CAPTAIN_SCENE_FILES.map(src=>{const img=new Image();img.src=src;return img;});
+const CAPTAIN_SCENE_FILES=Array.from({length:16},(_,i)=>i===15
+  ?"assets/v43/captain-ri/captain-scene-16-v43.png"
+  :`assets/v42/captain-ri/captain-scene-${String(i+1).padStart(2,"0")}-v42.png`);
+const captainSceneImages=CAPTAIN_SCENE_FILES.map(src=>{const img=new Image();img.decoding="async";img.src=src;return img;});
 const AVATARS=[
   {id:"dongsan-boy",name:"동산고 남학생",desc:"검정 동복 · 붉은 넥타이",hair:"#27242a",hairHi:"#55505b",skin:"#efc29d",top:"#f3f4ec",topHi:"#ffffff",bottom:"#263d60",shoe:"#25262b",style:"schoolboy",outfit:"uniform-boy",bag:"none"},
   {id:"dongsan-girl",name:"동산고 여학생",desc:"검정 동복 · 회색 치마",hair:"#392d2c",hairHi:"#6e5148",skin:"#efc09a",top:"#263d60",topHi:"#4f6684",bottom:"#263d60",shoe:"#25262b",style:"schoolgirl",outfit:"uniform-girl",bag:"none"}
@@ -523,7 +530,7 @@ const characterImages=Object.fromEntries(Object.entries(CHARACTER_FILES).map(([k
 let selectedAvatarId="dongsan-boy";
 const selectedAvatar=()=>AVATARS.find(a=>a.id===selectedAvatarId)||AVATARS[0];
 let mode="title", scene="cafe", playerName="", basePlayerName="", mentorName="", activeTitle="", classInSession=false, classSleepPhase=false, restaurantSeated=false, orderedFood="";
-let captainStage=0, captainMaster=false, captainQuizSet=[], captainQuizIndex=0, catMaster=false, grammarMaster=false;
+let captainStage=0, captainMaster=false, captainQuizSet=[], captainQuizIndex=0, captainTimeCardToken=0, catMaster=false, grammarMaster=false;
 let px=7, py=9, dir="down", stepFrame=0;
 let statues=[], cleared=0, yeomraVisible=false;
 let dialogQueue=[], dialogDone=null, typing=null, fullText="";
@@ -599,11 +606,38 @@ const SCHOOL_GATE=[7,3];
 const CHICKEN_POS=[2,9];
 const chickenAt=(x,y)=>x===CHICKEN_POS[0]&&y===CHICKEN_POS[1];
 const LIBRARY_EXIT=[7,10];
-const LIBRARY_DESKS=[[3,4],[5,4],[7,4],[9,4],[11,4],[3,7],[5,7],[7,7],[9,7],[11,7]];
+// 출입문과 양쪽 책장 사이의 이동 통로를 확보하기 위해 앞줄 책상은 제거했다.
+const LIBRARY_DESKS=[[3,4],[5,4],[7,4],[9,4],[11,4]];
 const LIBRARY_SEATS=LIBRARY_DESKS.map(([x,y])=>[x,y+1]);
+const LIBRARY_BOOKCASES=[
+  {x0:1,x1:4,y0:1,y1:2,approach:[2,3],screen:[10,24,82,105]},
+  {x0:10,x1:13,y0:1,y1:2,approach:[12,3],screen:[389,24,81,105]}
+];
+const LIBRARY_SEAT_VISUALS=[
+  {gx:3,gy:5,x:108,foot:165},{gx:5,gy:5,x:174,foot:165},{gx:7,gy:5,x:240,foot:165},{gx:9,gy:5,x:306,foot:165},{gx:11,gy:5,x:371,foot:165}
+];
+let gasigogiQuizSet=[],gasigogiQuizIndex=0,gasigogiQuizCorrect=0;
 let catQuizIndex=0, catQuizCorrect=0;
 let grammarQuizIndex=0,grammarQuizSet=[],grammarQuizTimer=null,grammarQuizDeadline=0,grammarQuizStartedAt=0,grammarQuizLocked=false;
 const GRAMMAR_QUIZ_COUNT=7,GRAMMAR_QUESTION_SECONDS=20;
+const GASIGOGI_QUIZ_COUNT=5;
+const GASIGOGI_QUESTIONS=[
+  {q:"소설 첫 장면에서 경훈이 잠에서 깨어 커튼을 젖힌 때는 언제인가?",opts:["새벽 5시가 지난 때","정오 무렵","저녁 7시 무렵","자정 직전"],a:0,e:"첫 장면은 새벽 5시가 넘었는데도 방 안이 어두운 상황에서 시작한다."},
+  {q:"할아버지의 늙은 개를 처음 선물받은 사람은 누구인가?",opts:["경훈의 아버지","경훈","경훈의 숙부","김영수"],a:2,e:"숙부가 독일인 사업가에게서 그 개를 선물받았다."},
+  {q:"할아버지가 죽은 뒤 늙은 개가 보인 행동은 무엇인가?",opts:["집을 떠났다","아무것도 먹지 않았다","경훈을 공격했다","숙부를 따라갔다"],a:1,e:"늙은 개는 할아버지가 죽은 뒤 아무것도 먹지 않았다."},
+  {q:"아버지가 숙부에게 늙은 개를 주지 않은 주된 이유는 무엇인가?",opts:["개가 아파서","경훈이 원해서","개를 팔기 위해서","할아버지의 권한을 자신이 물려받았음을 보이기 위해서"],a:3,e:"개 한 마리의 소유까지도 가문의 권한을 누가 이어받았는지를 보여 주는 표지였다."},
+  {q:"경훈이 늙은 개를 향해 던진 것은 무엇인가?",opts:["두꺼운 책","돌멩이","사냥총","밥그릇"],a:0,e:"경훈은 책장에서 두꺼운 책을 뽑아 개를 향해 던졌다."},
+  {q:"숙부가 죽었을 당시 사촌은 어디에서 공부하고 있었는가?",opts:["일본","독일","미국","프랑스"],a:2,e:"사촌은 숙부가 죽었을 때 미국에서 공부하고 있었다."},
+  {q:"사촌이 미국에서 들었다고 말한 한국 섬유 노동자의 시간당 임금은 얼마인가?",opts:["9센트","19센트","45센트","1달러 19센트"],a:1,e:"사촌은 한국 섬유 노동자의 시간당 임금이 19센트라는 구호를 들었다."},
+  {q:"김영수가 은강그룹 본부에서 처음 노린 사람은 누구인가?",opts:["경훈","경훈의 숙부","경훈의 아버지인 회장","한지섭"],a:2,e:"김영수가 노린 사람은 회장이었지만 회장과 닮은 숙부를 잘못 알아보았다."},
+  {q:"김영수가 회장으로 잘못 알고 공격해 죽게 한 사람은 누구인가?",opts:["경훈의 숙부","경훈의 사촌","회사 변호사","노조 위원장"],a:0,e:"회장과 매우 닮은 숙부가 엘리베이터에서 내리자 김영수는 그를 회장으로 오인했다."},
+  {q:"김영수의 방에서 발견된 폭발물 제조 재료의 조합은 무엇인가?",opts:["휘발유·성냥·석유","철가루·소금·석회","알코올·종이·숯","질산나트륨·황·목탄"],a:3,e:"검사는 질산나트륨, 황, 목탄의 구입 여부를 물었다."},
+  {q:"김영수가 화약 제조를 포기한 이유는 무엇인가?",opts:["재료가 부족해서","다른 사람이 다칠 수 있어서","회사가 허락해서","사촌이 말려서"],a:1,e:"김영수는 다른 사람이 다칠 수 있다고 생각해 화약 제조를 포기했다고 진술했다."},
+  {q:"법정에서 임금·부당해고·노조 선거 개입 등을 증언한 사람은 누구인가?",opts:["숙모","경훈의 아버지","한지섭","여자아이"],a:2,e:"한지섭이 증인으로 나와 노동자들의 생활과 회사의 억압을 설명했다."},
+  {q:"재판부가 김영수에게 선고한 형은 무엇인가?",opts:["사형","무기징역","징역 10년","집행유예"],a:0,e:"재판장은 김영수에게 사형을 선고했다."},
+  {q:"경훈이 ‘행복하게 일하는 약’ 계획을 처음 말한 상대는 누구인가?",opts:["아버지","사촌","회사 변호사","어머니"],a:3,e:"경훈은 집으로 돌아온 뒤 어머니에게 노동자들의 음식이나 음료에 약을 넣겠다는 생각을 말했다."},
+  {q:"경훈의 꿈에서 그물로 몰려온 것은 어떤 모습의 물고기였는가?",opts:["살이 통통한 잉어","앙상한 뼈와 가시가 드러난 가시고기","황금빛 고래","날개가 달린 물고기"],a:1,e:"살찐 고기 대신 뼈와 가시가 드러난 가시고기 떼가 그물에 몰려왔다."}
+];
 // 고양이 퀴즈 문항은 이 배열만 수정하면 문제·보기·해설을 교체할 수 있다.
 const CAT_QUESTIONS=[
   {q:"『훈민정음』이 반포된 해와 책의 간행을 가장 정확하게 짝지은 것은?",opts:["1443년 창제 · 1446년 반포","1446년 창제 · 1443년 반포","1445년 창제 · 1446년 반포","1446년 창제 · 1448년 반포"],a:0,e:"세종 25년(1443)에 창제하고 세종 28년(1446)에 『훈민정음』 해례본을 간행·반포했다."},
@@ -623,21 +657,9 @@ for(const [x0,x1,y0,y1] of [[2,4,4,6],[10,12,4,6],[2,4,7,9],[10,12,7,9]]){
 }
 // 의자가 없는 새 하오츠에서는 아래 좌표가 착석 좌석이 아니라 주문 지점이다.
 const RESTAURANT_EMPTY_SEAT=[8,9];
-const POETS=[
-  {x:5,y:5,name:"김수영",tone:"blue",work:"풀",poem:"풀이 눕는다. / 비를 몰아오는 동풍에 나부껴 / 풀은 눕고",explain:"풀은 거센 바람에 쓰러지지만 다시 일어납니다. 이 모습은 억압에도 굴하지 않고 되살아나는 민중의 끈질긴 생명력과 저항 의지를 상징하지."},
-  {x:9,y:5,name:"신동엽",tone:"green",work:"껍데기는 가라",poem:"껍데기는 가라. / 사월도 알맹이만 남고 / 껍데기는 가라.",explain:"여기서 ‘껍데기’는 거짓과 허위, 분열을 뜻합니다. 그런 겉치레를 몰아내고 순수한 정신과 진정한 화합을 되찾자는 외침이지요."},
-  {x:5,y:8,name:"조세희",tone:"amber",work:"난장이가 쏘아올린 작은 공",poem:"낙원구 행복동의 작은 공은 높이 떠올랐지만, 가족의 삶은 철거와 산업화의 그늘에 놓였습니다.",explain:"1970년대 도시 재개발과 산업화의 이면에서 소외된 가족의 삶을 통해 빈부 격차와 인간다운 삶의 조건을 묻는 연작소설입니다."},
-  {x:9,y:8,name:"전광용",tone:"purple",work:"꺼삐딴 리",story:true},
-  {x:7,y:5,name:"김소월",tone:"rose",work:"진달래꽃",poem:"나 보기가 역겨워 / 가실 때에는 / 말없이 고이 보내 드리우리다.",explain:"떠나는 임을 붙잡지 않고 꽃을 뿌려 보내겠다는 절제된 이별의 노래입니다. 겉으로는 담담하지만 속에는 깊은 슬픔과 사랑이 반어적으로 배어 있지요."}
-];
-// 의자 없는 새 배경의 빈 통로 좌표. 네 테이블과 겹치지 않는다.
-const RESTAURANT_PERSON_VISUALS={
-  "김수영":{x:176,foot:190,size:56},
-  "신동엽":{x:304,foot:190,size:56},
-  "조세희":{x:176,foot:282,size:56},
-  "전광용":{x:304,foot:282,size:56},
-  "김소월":{x:240,foot:190,size:56}
-};
+// 하오츠는 식당 탐색 공간만 남기고 모든 작가 NPC를 제거했다.
+const POETS=[];
+const RESTAURANT_PERSON_VISUALS={};
 const poetAt=(x,y)=>POETS.find(p=>p.x===x&&p.y===y);
 const ACADEMY_EXIT=[7,10];
 // 로비의 실제 데스크 중앙과 우측 강의실 문에 논리 좌표를 맞춘다.
@@ -745,7 +767,8 @@ function blocked(x,y){
   if(scene==="library"){
     if(inZone(x,y,6,8,10,10)) return false;
     if(x<=1||x>=13||(y>=9&&(x<=4||x>=11))) return true;
-    return isWall(x,y)||y<=2||inList(LIBRARY_DESKS,x,y);
+    // 자동 이동은 책상뿐 아니라 의자도 우회한다. 수동 이동의 착석 처리는 tryMove에서 먼저 실행된다.
+    return isWall(x,y)||y<=2||inList(LIBRARY_DESKS,x,y)||inList(LIBRARY_SEATS,x,y);
   }
   if(scene==="restaurant"){
     if(inZone(x,y,6,8,10,10)) return false;
@@ -1528,122 +1551,135 @@ function drawPoet(p){
 
 /* ── 전광용 「꺼삐딴 리」 새 일러스트 독해 시퀀스 ── */
 const CAPTAIN_STORY=[
-  {year:"현재 · 수술 직후",place:"이인국 종합병원 응접실",kind:"operation",lines:[
-    {sp:"내레이션",text:"두 시간 이십 분 동안 위장 속 종양을 도려낸 수술이 끝났다. 이인국은 백금 무테안경을 벗고, 아직 깨어나지 못한 환자를 뒤로한 채 소파에 몸을 묻었다."},
-    {sp:"이인국",text:"대수술은 원장이 직접 해야 해. 이름 없는 환자와 돈이 안 되는 환자는 젊은 의사들에게 맡기면 되지."},
-    {sp:"내레이션",text:"그의 병원은 먼지 하나 없이 깨끗하고 치료비는 다른 병원의 갑절이었다. 환자의 병보다 지불 능력을 먼저 살피는 것이 그의 오래된 신조였다."},
-    {sp:"내레이션",text:"현재의 권력층과 재벌만을 고객으로 고르는 이인국의 성공담 안에는 이미 인간을 계층으로 나누는 냉혹함이 자리 잡고 있었다."}
+  {year:"현재 · 오후 2시 40분",place:"이인국 종합병원 · 수술 직후",kind:"operation",lines:[
+    {sp:"내레이션",text:"위장 속 균종을 떼어 내는 수술이 두 시간 이십 분 만에 끝났다. 아직 환자는 혼수상태였고, 이인국 박사는 성공을 확신하지 못한 채 응접실 소파에 깊숙이 기대었다."},
+    {sp:"내레이션",text:"그는 일제 강점기부터 개복 수술 시간을 단축한 일을 자랑으로 여겼다. 큰 수술은 원장의 직접 집도를 조건으로 입원하는 환자가 많았지만, 가벼운 수술과 예진은 젊은 의사들에게 넘겼다."},
+    {sp:"내레이션",text:"병원은 먼지 하나 없이 정결했고 치료비는 다른 병원의 갑절이었다. 그는 병을 살피기 전에 옷차림과 직업으로 지불 능력을 가늠하고, 돈이 없어 보이면 간호원을 시켜 돌려보냈다."},
+    {sp:"내레이션",text:"일제 때의 주요 고객은 일본인이었고, 지금은 권력층과 재벌이었다. 깨끗한 병원과 뛰어난 의술 뒤에는 사람을 돈과 권력으로 나누는 냉혹한 기준이 숨어 있었다."},
+    {sp:"내레이션",text:"1·4 후퇴 때 청진기가 든 손가방 하나로 월남한 그는 수복 뒤 셋방에서 다시 병원을 열었다. 이제는 도심의 이층 양옥과 여러 진료과를 모은 종합병원의 원장이 되어 있었다."},
+    {sp:"이인국",text:"두 시 사십 분. 브라운과의 약속까지 이십 분밖에 남지 않았군."},
+    {sp:"내레이션",text:"제국 대학 졸업 때 받은 십팔금 회중시계는 이름이 새겨진 수상품이었다. 삼십여 년 동안 주인은 수없이 변했지만 시계만은 같은 모습으로 현재와 과거를 이어 주고 있었다."}
   ]},
-  {year:"현재 · 오후 2시 40분",place:"병원 · 나미의 항공우편",kind:"letter",lines:[
-    {sp:"내레이션",text:"브라운과의 약속을 앞두고 이인국은 딸 나미의 편지를 다시 펼쳤다. 나미는 자신을 가르친 미국인 교수와 결혼하겠다고 알렸다."},
-    {sp:"나미의 편지",text:"아버지, 사랑에 국경이 있나요? 저는 그 사람과 결혼하려 합니다. 아버지의 뜻을 듣고 최종 결정하겠습니다."},
-    {sp:"이인국",text:"일제 때 일본인과의 결혼은 당연하다고 여겼으면서, 내 딸이 미국인과 결혼하는 건 왜 이렇게 불쾌하지?"},
-    {sp:"내레이션",text:"그는 딸의 선택을 걱정하는 척했지만, 미국행 초청과 자신의 체면에 도움이 될지를 먼저 계산했다. 신념보다 시류가 그의 판단을 움직였다."}
+  {year:"현재 · 약속을 앞둔 오후",place:"병원 살림방 · 나미의 항공우편",kind:"letter",lines:[
+    {sp:"내레이션",text:"수술 전 서랍에 넣어 둔 딸의 항공우편이 떠올랐다. 본래 일본식 이름 ‘나미코’였던 딸은 해방 뒤 호적에서 ‘코’를 떼고 나미가 되었다."},
+    {sp:"내레이션",text:"나미를 미국에 보내자고 먼저 주장한 사람은 이인국이었다. 영문과 교수는 장학금과 유학 재정보증인을 알선했고, 이제 나미는 그 미국인 교수와 결혼하겠다고 알렸다."},
+    {sp:"나미의 편지",text:"애정에 국경이 있어요? 아버지께서 오신 뒤 뜻을 듣고 최종 결정을 하겠습니다."},
+    {sp:"이인국",text:"일제 때 일본인과의 혼인은 더 나은 일이라고 여겼는데, 왜 이번에는 체면이 상하는 것 같지?"},
+    {sp:"내레이션",text:"그는 딸의 행복보다 국제결혼이 자신의 체면과 미국행, 돌 지난 어린 아들의 앞날에 어떤 이익이 될지를 먼저 헤아렸다."},
+    {sp:"내레이션",text:"첫 아내는 거제도 수용소에서 죽었고 원식의 생사는 알 수 없었다. 서울에서 다시 만난 옛 간호원 혜숙은 스무 살 차이의 후처가 되었고, 두 사람 사이에는 어린아이가 있었다."},
+    {sp:"혜숙",text:"나미가 좋다는 대로 해야지요. 이제 와서 우리가 막을 수 있겠어요?"},
+    {sp:"내레이션",text:"이인국은 혜숙에게 상감진사 고려청자 화병을 포장하게 했다. 브라운에게 늘 신세만 졌다는 말 속에는 미국 국무성 초청을 확정받으려는 계산이 들어 있었다."}
   ]},
-  {year:"1945년 8월 하순",place:"해방 직후 · 비어 가는 병원",kind:"colonial",lines:[
-    {sp:"내레이션",text:"해방이 오자 일본인 환자와 직원들은 사라졌고, 일본어만 쓰던 병원은 갑자기 텅 비었다. 서울 출신 간호원 혜숙만이 남아 병원을 지켰다."},
-    {sp:"내레이션",text:"이인국은 ‘친일파·민족 반역자를 타도하자’는 벽보를 보고 자신도 지목될까 전율했다. 그는 일본어 상용을 자랑하던 액자와 증명서를 몰래 찢어 버렸다."},
-    {sp:"이인국",text:"그때는 일본말을 잘하는 것이 가족을 지키는 길이었어. 모두가 그렇게 살았다고 하면 되겠지."},
-    {sp:"내레이션",text:"과거를 반성하기보다 흔적을 지우는 데 급급한 그의 태도는 앞으로의 변신을 예고했다."}
+  {year:"1945년 8월 하순",place:"해방 직후 · 텅 빈 이인국의 병원",kind:"colonial",lines:[
+    {sp:"내레이션",text:"항아리를 들고 현관을 나서는 순간, 기억은 해방 직후로 넘어갔다. 일본인 환자와 간부들이 끌려가거나 떠난 뒤 입원실은 텅 비었고 전화도 끊긴 듯 조용했다."},
+    {sp:"내레이션",text:"조수와 약제사는 고향에 다녀오겠다며 자리를 비웠고, 서울 태생 간호원 혜숙만이 빈집 같은 병원을 지켰다. 이인국은 며칠째 잠을 이루지 못한 채 닥쳐올 일을 기다렸다."},
+    {sp:"내레이션",text:"은행 철문에는 친일파와 민족 반역자를 몰아내자는 벽보가 붙었다. 이인국은 그 글보다 벽보 앞에서 자신을 훑어보던 춘석의 경멸 섞인 눈길을 더 두려워했다."},
+    {sp:"이인국",text:"나야 괜찮겠지. 다들 어쩔 수 없이 산 것 아닌가."},
+    {sp:"내레이션",text:"그러나 그의 불안은 양심의 가책이 아니었다. 일본인이라는 성벽이 무너진 뒤 자신을 보호할 새 권력이 아직 보이지 않는다는 공포였다."}
   ]},
-  {year:"1945년 8월 하순 밤",place:"소련군 탱크가 진입한 거리",kind:"tanks",lines:[
-    {sp:"혜숙",text:"거리로 나가 보세요. 태극기와 붉은 깃발을 든 사람들이 소련군을 맞고 있어요!"},
-    {sp:"내레이션",text:"탱크 행렬과 만세 소리가 밤거리를 채웠지만, 이인국은 박수도 환호도 보내지 못한 채 주변의 시선부터 살폈다."},
-    {sp:"이인국",text:"왜정 때는 일본말이 출세를 시켰지. 이제는 노어가 사람을 살릴 거야."},
-    {sp:"내레이션",text:"그는 아들 원식에게 러시아어를 배우라고 다그쳤다. 물을 떠나 살 수 없다면 새 물에서 사는 법을 익혀야 한다는 계산이었다."}
+  {year:"1945년 2월 무렵",place:"해방 약 여섯 달 전 · 이인국 병원 진찰실",kind:"liberation",lines:[
+    {sp:"내레이션",text:"기억은 다시 여섯 달 전으로 거슬러 갔다. 형무소에서 병보석으로 나온 사상범 춘석이 뼈만 남은 몸으로 업혀 와 간호원의 부축을 받으며 진찰대에 앉았다."},
+    {sp:"내레이션",text:"이인국은 병세를 들으면서도 입원 여부보다 돈을 낼 수 있는지, 일본인 간부들이 드나드는 병원에 사상범을 들였다는 소문이 날지를 먼저 계산했다."},
+    {sp:"내레이션",text:"그는 관선 시의원이자 모범적인 황국 신민이라는 자신의 지위가 무너질까 두려웠다. 결국 응급 처치만 한 뒤 입원실이 없다는 말로 환자를 돌려보냈다."},
+    {sp:"춘석",text:"입원해서 치료받지 못하면 다시 쓰러집니다. 한 번만 살려 주십시오."},
+    {sp:"이인국",text:"응급 처치는 했소. 입원실이 없으니 다른 곳을 알아보시오."},
+    {sp:"내레이션",text:"춘석의 집은 병원 건너편 골목이었다. 이인국에게는 금세 잊힐 일이었지만 춘석에게는 해방 뒤에도 지워지지 않을 기억이 되었다."}
   ]},
-  {year:"소련군 점령기",place:"병원 앞 · 치안대의 조사",kind:"liberation",lines:[
-    {sp:"내레이션",text:"춘석은 원래 이인국 병원 건너편 골목에 살던 젊은 사상범이었다. 반년 전, 형무소에서 병보석으로 풀려난 그는 뼈만 남은 몸으로 이인국을 찾아왔다."},
-    {sp:"춘석",text:"선생님, 살려 주십시오. 입원만 시켜 주시면 치료비는 나중에라도 마련하겠습니다."},
-    {sp:"내레이션",text:"이인국은 청진기로 응급 상태를 확인하고도 입원을 거부했다. 일본인 간부들이 드나드는 병원에 사상범을 들이면 자신의 ‘황국 신민’ 경력이 무너질까 두려웠기 때문이다."},
-    {sp:"이인국",text:"응급 처치만 해 주지. 입원실은 없다고 하게. 병원 체면과 고객을 생각해야 해."},
-    {sp:"내레이션",text:"춘석은 결국 길 건너 집으로 돌아갔다. 이인국은 그 선택을 오래 기억하지 않았지만, 춘석은 그날의 거절을 잊지 않았다."},
-    {sp:"치안대원",text:"양곡조합 쌀을 빼돌리고 주민을 보국대에 동원한 혐의, 친일 행적과 반일 투사 치료 거부를 조사하겠소."},
-    {sp:"내레이션",text:"해방 뒤 일본인 권력자라는 성벽이 무너지자, 이인국은 자신을 감싸 줄 사람이 아무도 없음을 깨달았다. 그 순간 과거의 환자가 복수의 증인이 되어 돌아왔다."}
+  {year:"1945년 8월 하순 · 그날 저녁",place:"소련군 탱크가 들어온 거리",kind:"tanks",lines:[
+    {sp:"내레이션",text:"시간은 다시 해방 직후로 돌아왔다. 소련군이 들어온다는 소식이 퍼지자 이인국은 벽장 속 ‘국어 상용의 가’ 표창장을 꺼내 한 글자도 남지 않도록 찢었다."},
+    {sp:"내레이션",text:"그 표창장은 가족이 집 안에서도 일본말만 쓰고 아이들을 일본 학교에 보낸 결과였다. 그는 부끄러움보다 일본인과 교제할 때 유용했던 증표를 잃는 아쉬움을 먼저 느꼈다."},
+    {sp:"아내",text:"탱크 부대가 들어왔어요. 거리는 사람들로 가득한데, 어서 나가 봅시다."},
+    {sp:"내레이션",text:"태극기와 붉은 깃발 사이로 탱크가 지나고 만세와 환호가 이어졌다. 이인국은 박수도 치지 못한 채 누가 자신의 태도를 살피는지 주변만 두리번거렸다."},
+    {sp:"내레이션",text:"집으로 돌아온 그는 라디오의 주둔군 포고문을 들었다. 시민의 생명과 재산을 보장하고 직장을 지키라는 말에도, 앞으로 무엇에 기대어 살아야 할지만 생각했다."}
   ]},
-  {year:"소련군 점령기",place:"치안대 감방 · 빼앗긴 회중시계",kind:"prison",lines:[
-    {sp:"내레이션",text:"며칠 뒤 자위대가 치안대로 바뀌던 날, 이인국은 연행되어 시멘트 바닥에 무릎을 꿇었다. 지나가는 구둣발과 욕설 속에서 그는 죽음이 가까이 왔다고 느꼈다."},
-    {sp:"춘석",text:"쪽발이 끄나풀! 민족과 조국을 팔아먹은 이 개돼지 같은 놈아!"},
-    {sp:"내레이션",text:"춘석은 일본 병사 군복과 완장을 그대로 걸친 채 그를 알아보았다. 병원에서 자신을 외면했던 의사에게서 이제는 피 묻은 값을 받아 내겠다는 눈빛이었다."},
-    {sp:"춘석",text:"왜놈 밑바시 같은 놈, 너는 총살이야!"},
-    {sp:"내레이션",text:"춘석의 군화가 옆구리와 온몸을 내리쳤다. 이인국은 반항하지 못하고 쓰러졌고, 한때 자신이 치료를 거부했던 환자의 얼굴만 또렷하게 보았다."},
-    {sp:"내레이션",text:"그때 한 소련 병사가 양복 안쪽의 십팔금 회중시계를 발견해 시계줄을 거칠게 끊어 가져갔다."},
-    {sp:"이인국",text:"그 시계만은 안 돼. 제국 대학 졸업 때 받은 상이고, 내 목숨과 함께 38선을 건넌 물건이야."},
-    {sp:"내레이션",text:"춘석의 복수와 소련 병사의 약탈이 겹친 감방에서, 이인국은 양곡 횡령·보국대 강제 동원·치료 거부·일제의 간첩 행위라는 죄목을 떠올렸다."}
+  {year:"현재 · 브라운 관사로 가는 차 안",place:"석간신문이 불러낸 원식의 기억",kind:"ending",lines:[
+    {sp:"내레이션",text:"이인국은 차 안에서 석간신문을 펼쳤다. ‘북한 소련 유학생 서독으로 탈출’이라는 제목이 눈에 들어오자, 생사를 모르는 아들 원식이 떠올랐다."},
+    {sp:"내레이션",text:"1·4 후퇴 때 그는 청진기가 든 손가방과 회중시계를 가지고 월남했다. 첫 아내는 거제도 수용소에서 죽었고, 모스크바에 남은 원식과는 전쟁 뒤 소식이 끊겼다."},
+    {sp:"이인국",text:"사태를 빨리 읽고 빠져나올 줄 알아야지. 원식은 왜 자기 아비만큼도 임기응변을 못 하는가."},
+    {sp:"내레이션",text:"그는 아들을 걱정하면서도 아들의 고지식함을 탓했다. 아들의 실종조차 자신의 처세법이 옳다는 믿음을 확인하는 기준으로 삼았다."}
   ]},
-  {year:"수감 생활 후반",place:"감방에 번진 적리",kind:"dysentery",lines:[
-    {sp:"수감자",text:"피가 섞인 변이 나옵니다. 배가 찢어질 듯 아파요."},
-    {sp:"이인국",text:"적리, 이질이야. 전염병이니 환자를 당장 격리하고 오염된 곳을 치워야 해!"},
-    {sp:"내레이션",text:"그의 진단으로 감방에는 응급 치료가 시작됐다. 날마다 환자가 늘고 죽은 사람들이 실려 나가는 동안, 이인국의 의술은 다시 주목받았다."},
-    {sp:"내레이션",text:"소련어 교본과 당사만 허용된 환경에서 그는 러시아어를 거의 암송했다. 새 권력의 언어가 곧 자신의 탈출구였기 때문이다."}
+  {year:"전쟁이 나기 전 · 소련군 점령기",place:"원식을 모스크바로 보낼 무렵",kind:"station",lines:[
+    {sp:"내레이션",text:"기억 속에서 이인국은 의과 대학에 들어간 원식에게 러시아어를 배우라고 재촉했다. 일본말이 출세를 돕던 시대가 끝났으니 이제는 새 권력의 언어를 익혀야 한다는 논리였다."},
+    {sp:"이인국",text:"고기가 물을 떠나 살 수 없다면 그 물속에서 살 방법을 찾아야 한다. 이제는 노어가 판을 친다."},
+    {sp:"첫 아내",text:"이제 겨우 죽을 고비를 면했는데 아이까지 그 한복판에 넣지 맙시다. 눈에 띄지 않게 살면 안 되겠어요?"},
+    {sp:"이인국",text:"원식이 소련에서 돌아오면 누구도 우리에게 함부로 말하지 못할 거요."},
+    {sp:"내레이션",text:"그는 스텐코프와 당 간부의 추천으로 원식의 모스크바 유학을 밀어붙였다. 이듬해 전쟁이 터지자 편지가 끊겼고, 아들을 보낸 근심은 첫 아내의 병을 깊게 했다고 그는 뒤늦게 생각했다."}
   ]},
-  {year:"소련군 군 병원",place:"응급치료실 · 스텐코프와의 첫 거래",kind:"clinic",lines:[
-    {sp:"내레이션",text:"이인국은 응급치료실에서 소련군 환자들을 살려 내며 스텐코프 소좌의 관심을 끌었다. 스텐코프의 왼쪽 뺨에는 오리알만 한 혹이 붙어 있었다."},
-    {sp:"이인국",text:"독또우루 스텐코프, 그 혹은 수술할 수 있습니다. 일본인 시장의 어려운 혹도 제가 성공시켰습니다."},
-    {sp:"내레이션",text:"말은 절반, 손짓은 절반이었다. 그러나 이인국은 혹을 제거해 주면 감옥과 죄상에서 빠져나갈 수 있으리라 확신했다."},
-    {sp:"내레이션",text:"스텐코프는 ‘하라쇼’를 반복하며 군의관들에게 예비 진단을 지시했다. 수술은 의술이면서 동시에 이인국의 도박이었다."}
+  {year:"해방 직후 · 치안대 개편 다음날",place:"치안대 조사실 · 빼앗긴 회중시계",kind:"prison",lines:[
+    {sp:"내레이션",text:"자동차에서 내리던 현재의 이인국에게 스텐코프의 목소리가 되살아났다. 기억은 자위대가 치안대로 바뀐 다음 날, 자신이 연행된 순간으로 급격히 되돌아갔다."},
+    {sp:"내레이션",text:"시멘트 바닥에 무릎을 꿇은 그는 일본인이라는 보호막이 사라졌음을 절감했다. 도망칠 시간이 사흘만 더 있었더라면 하는 후회뿐, 과거에 대한 반성은 없었다."},
+    {sp:"춘석",text:"일본의 앞잡이로 살며 민족과 조국을 팔아먹었으니, 이제 대가를 치러야 한다."},
+    {sp:"내레이션",text:"일본 병사 군복과 완장을 찬 춘석의 군화가 이인국을 쓰러뜨렸다. 예전에 거부한 환자가 새 권력의 편에서 심판자로 돌아온 것이다."},
+    {sp:"내레이션",text:"정신을 차렸을 때 한 소련 병사가 양복 안쪽의 회중시계를 발견했다. 이인국이 두 손으로 막았지만 병사는 시계줄을 끊어 시계를 가져갔다."},
+    {sp:"이인국",text:"이것만은 안 돼. 내 이름이 새겨진 졸업 수상품이야."},
+    {sp:"내레이션",text:"말이 통하지 않는 병사에게 시계를 빼앗긴 그는 ‘죽음과 시계’를 되뇌었다. 그 순간부터 시계를 되찾는 일은 살아남는 일과 같은 의미가 되었다."}
   ]},
-  {year:"운명을 건 수술",place:"스텐코프의 혹 제거 수술실",kind:"surgery",lines:[
-    {sp:"내레이션",text:"수술 실패 시 총살한다는 서약서에 서명한 뒤, 이인국은 자기 병원의 기구를 모두 옮겨 왔다. 세 명의 소련 군의관이 지켜보는 가운데 집도가 시작됐다."},
-    {sp:"내레이션",text:"마취가 끝난 지 삼 분도 지나지 않아 절개와 지혈, 봉합이 정확하게 이어졌다. 이인국은 군의관들을 자기 조수처럼 부리며 수술대를 자신의 왕국으로 만들었다."},
-    {sp:"내레이션",text:"수술은 예상보다 빠르게 끝났고, 뺨의 혹은 말끔히 제거됐다. 그의 손기술이 목숨과 자유를 동시에 붙잡은 순간이었다."},
-    {sp:"스텐코프",text:"꺼삐딴 리, 스바씨보! 독또우루 중의 첫째요."}
+  {year:"체포 뒤 한 달 무렵",place:"미결감 · 노어 회화책과 죄목",kind:"prison",lines:[
+    {sp:"내레이션",text:"감방 생활이 한 달을 넘자 이인국은 한 학생이 두고 간 노어 회화책을 처음부터 꼼꼼히 읽었다. 말을 아끼고 새 권력의 언어를 익히는 일이 유일한 대비책이었다."},
+    {sp:"내레이션",text:"양곡조합의 쌀을 몰래 팔아넘긴 일, 주민을 보국대에 강제로 동원한 일, 반일 투사의 치료를 거부한 일, 일제에 협력한 행위가 죄목으로 떠올랐다."},
+    {sp:"이인국",text:"식민지 백성이 별수 있었나. 일본인에게 기대지 않은 사람이 어디 있었다고."},
+    {sp:"내레이션",text:"그는 자신을 합리화한 뒤에야 잠시 마음이 편해졌다. 취조 때 직업이 의사라고 하자 ‘독또우루’를 되풀이하던 스텐코프의 표정에서 막연한 희망을 찾았다."}
   ]},
-  {year:"수술 직후",place:"소련군 병실 · 달라진 호칭",kind:"clinic",lines:[
-    {sp:"내레이션",text:"완치되어 퇴원하는 날 스텐코프는 이인국의 손을 세게 잡고 엄지손가락을 치켜세웠다. 적으로 대하던 의사를 이제는 ‘꺼삐딴 리’라 부르며 치켜세웠다."},
-    {sp:"스텐코프",text:"내일부터는 집에서 통근해도 좋소. 나에게 부탁할 일이 있소?"},
-    {sp:"이인국",text:"체포될 때 소련 병사가 제 회중시계를 가져갔습니다. 제 이름이 새겨진 유일한 물건입니다."},
-    {sp:"내레이션",text:"스텐코프는 위대한 붉은 군대가 도둑질을 할 리 없다면서도 시계를 찾아 주겠다고 약속했다. 이인국은 감사와 불안을 동시에 삼켰다."}
+  {year:"수감 중 어느 새벽",place:"감방에 번진 적리 · 응급치료실",kind:"dysentery",lines:[
+    {sp:"내레이션",text:"어두운 새벽, 옆의 청년이 신음했다. 이인국은 젖은 옷자락과 피가 섞인 배설물을 보고 적리, 곧 전염성 이질임을 알아챘다."},
+    {sp:"이인국",text:"적리요. 전염병이니 환자를 바로 격리해야 하오."},
+    {sp:"내레이션",text:"다른 감방에서도 같은 환자가 늘어났다. 이인국은 자신도 병들어 죽을까 두려워했고, 사상범이 옥사하면 책임자가 문책받는 사정 때문에 응급치료실에서 일하라는 명령을 받았다."},
+    {sp:"이인국",text:"의사라는 직업이 다시 살 길을 열었군. 하늘이 무너져도 빠져나갈 구멍은 있다."},
+    {sp:"내레이션",text:"그는 환자 치료에 힘을 쏟아 소련 군의관의 인정을 받았다. 그러나 형벌이 끝난 것은 아니었고, 이 보이지 않는 구속에서 완전히 벗어날 다음 기회를 노렸다."}
   ]},
-  {year:"소련군 점령기 후반",place:"스텐코프의 집무실 · 되찾은 시계",kind:"clinic",lines:[
-    {sp:"내레이션",text:"스텐코프의 명령으로 회중시계가 돌아왔다. 이인국은 시계를 손바닥에 올려놓고, 자신이 다시 죽음의 문턱에서 빠져나왔음을 확인했다."},
-    {sp:"내레이션",text:"그는 러시아어로 거듭 감사를 표했다. 언어를 바꾸고, 권력의 방식에 맞추고, 의술을 거래한 결과였다."},
-    {sp:"이인국",text:"스텐코프 소좌의 도움을 잊지 않겠습니다. 새 시대에도 충실히 일하겠습니다."},
-    {sp:"내레이션",text:"하지만 이 구원은 양심의 회복이 아니었다. 친일에서 친소로 옮겨 간 기회주의가 완성된 순간이었다."}
+  {year:"그해 크리스마스 무렵",place:"소련군 야전병원 · 스텐코프의 혹 수술",kind:"surgery",lines:[
+    {sp:"내레이션",text:"이인국은 환자를 치료하면서 스텐코프의 왼쪽 뺨에 붙은 오리알만 한 혹을 계속 살폈다. 그 혹을 고치면 자신을 구해 줄 권력자의 신임을 얻을 수 있다고 판단했다."},
+    {sp:"내레이션",text:"크리스마스 무렵 술기운이 오른 스텐코프가 순시하자, 이인국은 말과 손짓을 섞어 수술을 제안했다. 일본인 시장의 혹을 성공적으로 수술한 경험도 내세웠다."},
+    {sp:"스텐코프",text:"좋소. 군의관들의 진단을 받은 뒤 수술을 진행합시다."},
+    {sp:"내레이션",text:"이인국은 실패하면 총살을 받는다는 서약서에 서명했다. 자기 병원의 기구를 가져오고 소련 군의관 세 명을 조수처럼 지휘하며 수술대 앞에 섰다."},
+    {sp:"내레이션",text:"기구 소리와 숨소리만 들리는 방에서 수술은 예상보다 빨리 끝났다. 의술은 환자를 살리는 능력이면서 동시에 이인국 자신을 살리는 거래 수단이 되었다."}
   ]},
-  {year:"친소파 시절",place:"모스크바행 역 플랫폼",kind:"station",lines:[
-    {sp:"내레이션",text:"스텐코프와 당 간부의 추천을 등에 업고 이인국은 다시 사회적 지위를 얻었다. 그는 아들 원식을 모스크바로 유학 보내려 했다."},
-    {sp:"원식",text:"아버지, 소련에 가서 공부해도 정말 괜찮을까요?"},
-    {sp:"이인국",text:"왜정 때는 일본말이 출세를 시켰고, 이제는 노어가 그렇다. 물이 바뀌면 그 물에서 사는 법을 배워야 한다."},
-    {sp:"내레이션",text:"원식이 떠난 다음 해 전쟁이 터졌다. 편지는 끊겼고, 이인국은 아들의 안위보다 자신이 선택한 처세가 틀리지 않았다는 증거를 찾으려 했다."}
+  {year:"수술 뒤 완치된 날과 그 다음날",place:"스텐코프의 병실과 집무실",kind:"clinic",lines:[
+    {sp:"내레이션",text:"완치되어 퇴원하는 날 스텐코프는 이인국의 손을 세게 쥐고 엄지를 치켜세웠다. ‘꺼삐딴 리’라는 호칭은 뛰어난 의사라는 칭찬인 동시에 최고의 기회주의자를 풍자하는 제목이 되었다."},
+    {sp:"스텐코프",text:"꺼삐딴 리, 고맙소. 당신이 첫째요."},
+    {sp:"내레이션",text:"다음 날 스텐코프는 집에서 통근해도 좋다고 허락하고 부탁이 있는지 물었다. 이인국은 망설이다 체포 때 빼앗긴 회중시계의 시간과 장소를 자세히 설명했다."},
+    {sp:"스텐코프",text:"붉은 군대가 그런 일을 했을 리 없지만, 내가 책임지고 찾아보겠소."},
+    {sp:"내레이션",text:"이인국은 부탁 때문에 관계를 망칠까 다시 불안해했다. 그러나 결국 시계를 돌려받았고, 스텐코프의 배경으로 원식의 유학까지 추진할 수 있었다."}
   ]},
-  {year:"6·25 전쟁과 1·4 후퇴",place:"피란길 · 다시 남쪽으로",kind:"war",lines:[
-    {sp:"내레이션",text:"전쟁이 터지자 가족은 남쪽으로 내려왔다. 이인국은 청진기가 든 손가방과 회중시계를 챙겼지만, 아들 원식의 소식과 아내의 생사는 알 수 없었다."},
-    {sp:"내레이션",text:"거제도 수용소에서 아내를 잃고 아버지까지 잃은 뒤에도, 그는 슬픔보다 먼저 살아남을 자리와 병원을 계산했다."},
-    {sp:"내레이션",text:"수복되자 셋방을 얻어 병원을 열었고, 곧 타일을 바른 이층 양옥과 여러 과를 거느린 종합병원의 원장이 되었다."},
-    {sp:"이인국",text:"이번 시대의 언어는 영어와 미국식 의학이야. 다음 물이 어디로 흐르는지 먼저 봐야지."}
+  {year:"현재 · 오후 3시 무렵",place:"브라운의 관사 앞 · 성조기",kind:"ending",lines:[
+    {sp:"내레이션",text:"차가 브라운의 관사 앞에 닿으며 긴 회상이 끝났다. 이인국은 성조기를 바라보다 해방 직후의 붉은 깃발과 스텐코프가 찾아 준 회중시계를 함께 떠올렸다."},
+    {sp:"내레이션",text:"대사관에는 여러 번 갔지만 관사를 찾은 것은 처음이었다. 브라운은 삼 년 전 나미가 미국으로 갈 때부터 장학과 유학 절차를 도운 사람이었다."},
+    {sp:"이인국",text:"일본과 소련을 지나 이제는 미국이다. 이번에도 상대가 원하는 것을 정확히 보여 주면 된다."},
+    {sp:"내레이션",text:"현재의 성조기는 과거의 일장기와 붉은 깃발을 잇는다. 시대와 권력은 바뀌어도 이인국의 처세 방식은 바뀌지 않았다."}
   ]},
-  {year:"전쟁 이후",place:"서울 · 혜숙과 나미의 집",kind:"letter",lines:[
-    {sp:"내레이션",text:"옛 간호원 혜숙은 이인국과 재혼해 어린아이를 낳았다. 나미는 혜숙을 어머니라 부르지 않았고, 시간이 흐를수록 두 사람 사이의 간격은 커졌다."},
-    {sp:"혜숙",text:"나미가 자기 길을 가게 두세요. 미국에서 만난 사람과 결혼하고 싶다잖아요."},
-    {sp:"이인국",text:"그 결혼이 내 미국행에도 도움이 된다면, 굳이 반대할 필요는 없겠지."},
-    {sp:"내레이션",text:"가족의 사랑과 상처까지 출세의 계산표에 올려놓는 이인국의 모습은, 개인의 성공이 가족의 행복과 같지 않음을 드러낸다."}
+  {year:"현재 · 브라운과의 면담",place:"관사 응접실 · 고려청자 화병",kind:"embassy",lines:[
+    {sp:"내레이션",text:"응접실에는 조선왕조실록과 대동야승 같은 고서, 금동불상과 백자 등 한국의 골동품이 가득했다. 이인국은 그것들도 누군가의 청탁 선물일지 모른다고 생각했다."},
+    {sp:"내레이션",text:"그는 상감진사 고려청자 화병을 내놓았다. 문화재를 국외로 보낸다는 자책은 없었고, 이미 선물이 많은 브라운이 자신의 물건을 귀하게 여길지만 걱정했다."},
+    {sp:"이인국",text:"대단한 것은 아닙니다. 그저 제 성의입니다."},
+    {sp:"브라운",text:"귀중한 물건입니다. 닥터 리, 영어도 아주 정확하군요."},
+    {sp:"내레이션",text:"이인국은 일본식 영어 교육을 받았고 최근에는 개인 교사에게 영어를 배우고 있다고 답했다. 일본어와 러시아어에 이어 영어까지 권력에 접근하는 도구가 되었다."}
   ]},
-  {year:"현재 · 브라운과의 약속",place:"미국 대사관 직원 브라운의 관사",kind:"embassy",lines:[
-    {sp:"내레이션",text:"브라운의 관사에는 조선왕조실록과 대동야승, 금동불상과 백자가 가득했다. 이인국은 그 골동품들 사이에서 자신이 들고 온 상감진사 고려청자를 꺼냈다."},
-    {sp:"이인국",text:"대단한 물건은 아닙니다. 그저 제 성의입니다. 선생님께서 마음에 들어 하시면 좋겠습니다."},
-    {sp:"브라운",text:"닥터 리, 정말 귀중한 선물이군요. 국무성에서 통지가 왔습니다. 미국행 절차가 진행될 겁니다."},
-    {sp:"내레이션",text:"브라운이 권한 스카치를 마시며 이인국은 스텐코프의 보드카와 두 권력자의 얼굴을 겹쳐 보았다. 깃발만 바뀌었을 뿐, 그는 다시 같은 방식으로 살아남고 있었다."}
+  {year:"현재 · 면담이 끝날 무렵",place:"브라운의 관사 · 미국행 통지",kind:"embassy",lines:[
+    {sp:"내레이션",text:"브라운이 술을 권하자 이인국은 보드카를 단숨에 마시던 스텐코프의 얼굴을 겹쳐 보았다. 자신은 혈압을 생각해 스카치를 조금씩 마시며 결과를 기다렸다."},
+    {sp:"브라운",text:"국무성에서 통지가 왔습니다. 떠날 때 소개장도 써 드리겠습니다."},
+    {sp:"내레이션",text:"이인국은 기쁨을 감추며 악수를 청했다. 수술 뒤 스텐코프가 자신에게 했던 행동을 이번에는 그가 브라운에게 되풀이했다."},
+    {sp:"이인국",text:"감사합니다. 미국에 가서의 일도 잘 부탁드립니다."},
+    {sp:"내레이션",text:"그는 고려청자와 언어, 친분을 이용한 자신의 처세법이 미국에도 통했다고 확신했다. 두 사람은 다음 날 휴전선 부근으로 사냥을 가기로 약속했다."}
   ]},
-  {year:"에필로그 · 브라운을 만난 뒤",place:"서울의 가을 거리 · 택시 안",kind:"ending",lines:[
-    {sp:"내레이션",text:"미 국무성 초청이 확정되자 이인국은 브라운의 소개장과 미국행을 떠올리며 택시에 올랐다. 창밖의 가을 하늘은 유난히 높고 푸르렀다."},
-    {sp:"이인국",text:"일본인 속에서도 살았고, 소련인 속에서도 살아났어. 양키라고 다를까. 내 살 구멍은 아직 막히지 않았지."},
-    {sp:"내레이션",text:"그의 독백은 자신에게는 성공 신화였지만, 작품 밖에서 보면 민족과 양심을 버리고 권력만 좇은 기회주의자의 자기 합리화다."},
-    {sp:"전광용",text:"회중시계가 과거를 되돌려 보여 준 까닭은 하나야. 시대가 바뀔 때마다 변한 것은 세상이 아니라, 살아남기 위해 얼굴을 바꾼 이인국의 태도였다는 걸 보여 주려는 거지."},
-    {sp:"작품 해설",text:"현재에서 과거로 거슬러 가는 역순행적 구성, 회중시계라는 회상의 매개, ‘꺼삐딴’이라는 호칭의 풍자는 친일·친소·친미로 변신한 인물을 비판적으로 드러낸다."}
+  {year:"현재 · 브라운의 관사를 나온 뒤",place:"서울의 가을 거리 · 반도호텔행 택시",kind:"ending",lines:[
+    {sp:"내레이션",text:"빠르면 일주일 안에 떠날 수 있다는 말을 들은 이인국은 몸이 날아갈 듯 가벼웠다. 막 수술한 환자의 경과가 잠시 떠올랐지만 미국행 계획에 곧 밀려났다."},
+    {sp:"내레이션",text:"임상 경험이 짧은 의사도 미국에 다녀오면 권위를 얻는 현실을 떠올리며, 자신도 귀국 뒤 더 높은 자리에 오를 모습을 그렸다."},
+    {sp:"이인국",text:"일본인 틈에서도 살았고 소련인 속에서도 살아났다. 미국인이라고 다를까. 내 살 길은 아직 막히지 않았다."},
+    {sp:"내레이션",text:"그는 캘리포니아산 시가를 물고 택시를 세워 반도호텔로 가자고 했다. 차창 너머 가을 하늘은 그에게만 더욱 높고 푸르게 보였다."},
+    {sp:"작품 해설",text:"작품은 회중시계와 신문, 성조기를 매개로 현재와 과거를 여러 번 오간다. 그 시간 이동 속에서 친일·친소·친미로 얼굴을 바꾸면서도 한 번도 반성하지 않는 이인국의 기회주의가 선명해진다."}
   ]}
 ];
 
 const CAPTAIN_QUESTIONS=[
   {q:"이인국 박사가 브라운과 만나기 전 회중시계로 확인한 시각은?",o:["오후 1시 40분","오후 2시 40분","오후 3시 정각","오후 4시 20분"],a:1,e:"현재 시각은 오후 2시 40분이며 약속까지 20분이 남아 있었습니다."},
-  {q:"작품의 첫 장면에서 이인국이 막 끝낸 수술은?",o:["폐 절제 수술","맹장 수술","위장 종양 적출 수술","뇌종양 수술"],a:2,e:"두 시간 이십 분 동안 위장 속 종양을 적출하는 수술을 집도했습니다."},
+  {q:"작품의 첫 장면에서 이인국이 막 끝낸 수술은?",o:["폐 절제 수술","맹장 수술","위장 속 균종 제거 수술","뇌종양 수술"],a:2,e:"두 시간 이십 분 동안 위장 속 균종을 제거하는 수술을 집도했습니다."},
   {q:"이인국의 회중시계가 작품 구성에서 하는 가장 중요한 기능은?",o:["범행 시각을 증명한다","과거 회상을 이끌어 현재와 과거를 연결한다","원식의 귀국 시간을 알린다","환자의 수술 시간을 재기만 한다"],a:1,e:"회중시계는 이인국의 과거를 불러내며 역순행적 구성을 가능하게 하는 매개체입니다."},
   {q:"회중시계는 이인국에게 어떤 물건인가?",o:["브라운이 준 선물","혜숙에게 받은 결혼 예물","제국 대학 졸업 때 받은 수상품","스텐코프의 유품"],a:2,e:"제국 대학 졸업 때 받은 십팔금 수상품이며, 피난길까지 함께한 그의 분신입니다."},
   {q:"미국에 유학한 나미가 결혼하려는 상대는?",o:["소련군 장교","미국인 교수","한국인 의사","일본인 사업가"],a:1,e:"나미는 자신을 지도한 미국인 교수와 결혼하겠다고 편지를 보냅니다."},
   {q:"나미의 결혼에 대한 이인국의 태도에서 드러나는 모순은?",o:["외국어를 전혀 배우지 않았다","일본인과의 혼인은 긍정했지만 딸의 미국인 혼인에는 분노한다","딸의 유학을 처음부터 반대했다","혜숙의 의견만 따른다"],a:1,e:"그의 판단 기준이 민족이나 신념이 아니라 자신의 이해관계임을 보여 줍니다."},
   {q:"해방 직후 병원에 끝까지 남아 있던 간호원은?",o:["나미","혜숙","춘석","원식"],a:1,e:"서울 출신 간호원 혜숙이 병원을 지켰고, 훗날 이인국과 재혼합니다."},
   {q:"춘석이 이인국 박사에게 원한을 품게 된 직접적인 계기는?",o:["수술비를 더 받았기 때문","사상범이라는 이유로 입원을 거부당했기 때문","러시아어를 가르쳐 달라고 거절당했기 때문","회중시계를 빼앗겼기 때문"],a:1,e:"춘석은 병보석으로 나온 뒤 위중한 상태로 찾아왔지만, 이인국은 병원 체면과 고객을 핑계로 응급 처치만 하고 돌려보냈습니다."},
-  {q:"해방 뒤 춘석은 이인국을 어디에서 어떤 모습으로 마주했는가?",o:["미 대사관에서 양복 차림으로","시가 행진 대열에서 자위대 완장을 차고","모스크바 역에서 소련 유학생으로","병원 수술실에서 간호원으로"],a:1,e:"춘석은 해방 경축 시가 행진에서 자위대 완장을 두른 채 이인국을 노려보았고, 이후 치안대에서 그를 폭행했습니다."},
+  {q:"해방 직후 은행 철문의 벽보 앞에서 이인국을 불안하게 만든 인물은?",o:["브라운","원식","춘석","스텐코프"],a:2,e:"이인국은 친일파와 민족 반역자를 몰아내자는 벽보보다, 그 앞에서 자신을 훑어보던 춘석의 눈길을 더 두려워했습니다."},
   {q:"소련군 입성 소식을 들은 이인국이 아들 원식에게 권한 것은?",o:["중국어 공부","의학 포기","러시아어 공부","즉시 월남"],a:2,e:"권력의 언어가 바뀌었다고 판단해 원식에게 러시아어 학습을 강조했습니다."},
   {q:"이인국이 체포된 이유로 제시되지 않은 것은?",o:["양곡조합 쌀의 부정 처분","주민의 보국대 동원","친일 행적","독립운동 자금 제공"],a:3,e:"독립운동 지원이 아니라 친일 행위와 부정 축재 등이 그의 혐의였습니다."},
   {q:"감방에서 이인국이 생명의 열쇠처럼 공부한 책은?",o:["영어 문법책","러시아어 회화책","일본 의학서","한국사 교과서"],a:1,e:"그는 새 권력에 적응하려고 러시아어 회화책을 거의 외우다시피 했습니다."},
@@ -1696,31 +1732,6 @@ function storyBadge(year,place){
   ctx.fillStyle="#0b1119bb";rr(360,14,105,22,5);ctx.fill();ctx.textAlign="center";ctx.fillStyle="#f4d895";ctx.font="9px NeoDGM,monospace";ctx.fillText(`꺼삐딴 리 ${captainStage+1}/${CAPTAIN_STORY.length}`,412,29);
 }
 function storyWindow(x,y,w,h,night=false){ctx.fillStyle="#253746";ctx.fillRect(x,y,w,h);ctx.fillStyle=night?"#16253b":"#88aec2";ctx.fillRect(x+5,y+5,w-10,h-10);ctx.strokeStyle="#d9e1df";ctx.strokeRect(x+5,y+5,w-10,h-10);ctx.beginPath();ctx.moveTo(x+w/2,y+5);ctx.lineTo(x+w/2,y+h-5);ctx.stroke();}
-const CAPTAIN_CAST={
-  lee:{cell:0,label:"정규영 · 이인국 역"},stenkov:{cell:1,label:"스텐코프"},brown:{cell:2,label:"브라운"},
-  wonsik:{cell:3,label:"원식"},hyesuk:{cell:4,label:"혜숙"},nami:{cell:5,label:"나미"}
-};
-const CAPTAIN_STAGE_CAST=[
-  ["lee"],["lee"],["lee","nami"],["lee","hyesuk"],["lee","wonsik"],["lee"],["lee"],["lee"],
-  ["lee","stenkov"],["lee","stenkov"],["lee","stenkov"],["lee","wonsik"],["lee","hyesuk"],["lee","hyesuk","nami"],["lee","brown"],["lee"]
-];
-function drawCaptainCastCard(id,x,y,w=126,h=207){
-  if(!captainCastImage.complete||!captainCastImage.naturalWidth)return;
-  const d=CAPTAIN_CAST[id],cell=d.cell,col=cell%3,row=Math.floor(cell/3),cw=captainCastImage.naturalWidth/3,ch=captainCastImage.naturalHeight/2;
-  ctx.save();rr(x,y,w,h,9);ctx.clip();
-  ctx.fillStyle="#e9e2d4";ctx.fillRect(x,y,w,h);
-  ctx.drawImage(captainCastImage,col*cw+cw*.14,row*ch,cw*.72,ch,x,y,w,h);
-  const g=ctx.createLinearGradient(0,y+h-48,0,y+h);g.addColorStop(0,"#0c132000");g.addColorStop(1,"#0c1320e8");ctx.fillStyle=g;ctx.fillRect(x,y+h-55,w,55);
-  ctx.restore();
-  ctx.strokeStyle=id==="lee"?"#f0c66a":"#879eb5";ctx.lineWidth=id==="lee"?2:1;rr(x,y,w,h,9);ctx.stroke();
-  ctx.fillStyle=id==="lee"?"#e2b856":"#28394c";rr(x+5,y+h-21,w-10,16,4);ctx.fill();ctx.fillStyle=id==="lee"?"#20242b":"#f3ead8";ctx.font=`bold ${id==="lee"?7:8}px NeoDGM,monospace`;ctx.textAlign="center";ctx.fillText(d.label,x+w/2,y+h-10);
-}
-function drawCaptainCastForStage(){
-  const cast=CAPTAIN_STAGE_CAST[captainStage]||["lee"];
-  if(cast.length===1){drawCaptainCastCard(cast[0],16,51,134,209);return;}
-  if(cast.length===2){drawCaptainCastCard(cast[0],12,51,124,209);drawCaptainCastCard(cast[1],344,51,124,209);return;}
-  drawCaptainCastCard(cast[0],6,57,105,198);drawCaptainCastCard(cast[1],188,57,105,198);drawCaptainCastCard(cast[2],369,57,105,198);
-}
 function drawCaptainStory(){
   const s=CAPTAIN_STORY[captainStage]||CAPTAIN_STORY[0],k=s.kind;
   ctx.fillStyle="#18212b";ctx.fillRect(0,0,cv.width,cv.height);
@@ -1760,7 +1771,6 @@ function drawCaptainStory(){
   }else{
     const sky=ctx.createLinearGradient(0,0,0,245);sky.addColorStop(0,"#407fba");sky.addColorStop(.65,"#9bcbe0");sky.addColorStop(1,"#e6c98a");ctx.fillStyle=sky;ctx.fillRect(0,0,cv.width,245);ctx.fillStyle="#746f66";ctx.fillRect(0,245,cv.width,107);for(let x=0;x<cv.width;x+=56){ctx.fillStyle="#d8d0b8";ctx.fillRect(x+5,252,42,5);}ctx.fillStyle="#27333d";rr(101,159,278,90,22);ctx.fill();ctx.fillStyle="#6d8390";rr(116,171,248,59,16);ctx.fill();ctx.fillStyle="#a9d0df";ctx.fillRect(151,177,85,43);ctx.fillRect(246,177,82,43);storyPerson(239,184,"#38485e","suit");ctx.fillStyle="#e9b756";ctx.fillRect(118,232,244,5);
   }
-  drawCaptainCastForStage();
   // 장면별 움직이는 조명·먼지·연기 효과
   ctx.save();
   if(k==="war"){for(let i=0;i<18;i++){const x=(i*71+T*24)%500,y=65+(i*43%180);ctx.fillStyle=i%3?"#e28b4555":"#ffd06a66";ctx.fillRect(x,y,2,2);}}
@@ -1778,12 +1788,12 @@ function drawCaptainIllustrationStory(){
   const img=captainSceneImages[captainStage];
   ctx.fillStyle="#0a0f18";ctx.fillRect(0,0,cv.width,cv.height);
   if(img&&img.complete&&img.naturalWidth){
-    ctx.imageSmoothingEnabled=false;const scale=Math.min(cv.width/img.naturalWidth,cv.height/img.naturalHeight);
-    const w=Math.round(img.naturalWidth*scale),h=Math.round(img.naturalHeight*scale);
-    ctx.drawImage(img,Math.round((cv.width-w)/2),Math.round((cv.height-h)/2),w,h);
+    ctx.imageSmoothingEnabled=false;ctx.drawImage(img,0,0,cv.width,cv.height);
   }else{
-    ctx.fillStyle="#1a2230";ctx.fillRect(0,0,cv.width,cv.height);
-    ctx.fillStyle="#f2d285";ctx.font="bold 14px NeoDGM,monospace";ctx.textAlign="center";ctx.fillText("장면 일러스트를 불러오는 중...",cv.width/2,cv.height/2);
+    // 삽화를 불러오는 짧은 순간에도 구형 도트 장면을 다시 노출하지 않는다.
+    const glow=ctx.createRadialGradient(cv.width/2,cv.height/2,20,cv.width/2,cv.height/2,280);
+    glow.addColorStop(0,"#26303c");glow.addColorStop(1,"#080c13");ctx.fillStyle=glow;ctx.fillRect(0,0,cv.width,cv.height);
+    return;
   }
   const shade=ctx.createLinearGradient(0,cv.height-150,0,cv.height);shade.addColorStop(0,"#080d1700");shade.addColorStop(1,"#080d17dd");ctx.fillStyle=shade;ctx.fillRect(0,cv.height-150,cv.width,150);
   ctx.fillStyle="#0b1321cc";rr(14,12,214,32,6);ctx.fill();ctx.strokeStyle="#d8b15c";ctx.lineWidth=1;ctx.strokeRect(18,16,206,24);
@@ -1813,21 +1823,35 @@ function openCaptainStoryChoice(){
 function startCaptainStory(){
   mode="story";captainStage=0;scene="captain";restaurantSeated=false;
   hudL.textContent="꺼삐딴 리";hudR.textContent=CAPTAIN_STORY[0].year;
-  showDialog(CAPTAIN_STORY[0].lines,advanceCaptainStory);
+  showCaptainTimeCard(0,()=>showDialog(CAPTAIN_STORY[0].lines,advanceCaptainStory));
+}
+function showCaptainTimeCard(stageIndex,done){
+  const s=CAPTAIN_STORY[stageIndex],token=++captainTimeCardToken;
+  if(!s){if(done)done();return;}
+  fade.classList.add("captain-time-active");
+  fade.style.background="#000";fade.style.pointerEvents="auto";fade.style.opacity=0;
+  fade.innerHTML=`<div class="captain-time-card"><div class="captain-time-kicker">시간의 이동</div><strong class="captain-time-year">${s.year}</strong><span class="captain-time-place">${s.place}</span></div>`;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{if(token===captainTimeCardToken)fade.style.opacity=1;}));
+  setTimeout(()=>{if(token===captainTimeCardToken)fade.style.opacity=0;},1350);
+  setTimeout(()=>{
+    if(token!==captainTimeCardToken)return;
+    fade.classList.remove("captain-time-active");fade.innerHTML="";fade.style.pointerEvents="none";
+    if(done)done();
+  },1750);
 }
 function advanceCaptainStory(){
   captainStage++;
   if(captainStage>=CAPTAIN_STORY.length){
-    fade.style.background="#120d10";fade.style.opacity=1;fade.style.pointerEvents="auto";
+    fade.innerHTML="";fade.style.background="#120d10";fade.style.opacity=1;fade.style.pointerEvents="auto";
     setTimeout(()=>{fade.style.opacity=0;fade.style.pointerEvents="none";
       showDialog([
-        {sp:"전광용",text:"이제 내가 들려준 이야기를 제대로 이해했는지 확인하자."},
-        {sp:"전광용",text:"스무 문제 가운데 다섯 문제를 무작위로 내겠다. 하나라도 틀리면 곧장 저승행이다."}
+        {sp:"서가 안내",text:"책의 마지막 장을 덮었다. 이제 작품을 제대로 이해했는지 확인해 보자."},
+        {sp:"서가 안내",text:`${CAPTAIN_QUESTIONS.length}문제 가운데 다섯 문제가 무작위로 출제된다. 하나라도 틀리면 곧장 저승행이다.`}
       ],startCaptainQuiz);
     },550);return;
   }
-  fade.style.background="#120d10";fade.style.opacity=1;fade.style.pointerEvents="auto";
-  setTimeout(()=>{hudR.textContent=CAPTAIN_STORY[captainStage].year;fade.style.opacity=0;fade.style.pointerEvents="none";showDialog(CAPTAIN_STORY[captainStage].lines,advanceCaptainStory);},420);
+  hudR.textContent=CAPTAIN_STORY[captainStage].year;
+  showCaptainTimeCard(captainStage,()=>showDialog(CAPTAIN_STORY[captainStage].lines,advanceCaptainStory));
 }
 
 function startCaptainQuiz(){
@@ -1856,9 +1880,9 @@ function captainQuizFail(){
   closeModal();mode="locked";
   stageWrap.classList.add("shake");setTimeout(()=>stageWrap.classList.remove("shake"),650);
   showDialog([
-    {sp:"전광용",text:"너 내 얘기를 뭘로 들은 거냐?"},
-    {sp:"전광용",text:"작품을 대충 듣고도 이해한 척한 죄가 크구나. 한자성어 나라에서 다시 정신을 가다듬고 와라!"},
-    {sp:"내레이션",text:"전광용이 책장을 힘껏 덮자 바닥이 갈라지고 검은 연기가 솟아올랐다."}
+    {sp:"서가 안내",text:"작품의 사건을 잘못 이해했다."},
+    {sp:"서가 안내",text:"한자성어 나라에서 다시 정신을 가다듬고 돌아오도록 하자."},
+    {sp:"내레이션",text:"책장이 저절로 덮이자 바닥이 갈라지고 검은 연기가 솟아올랐다."}
   ],()=>{
     fade.innerHTML="문학 시험 실패<br><br>저승으로 추락한다...";fade.style.background="#050208";fade.style.opacity=1;fade.style.pointerEvents="auto";
     setTimeout(enterHellFromCaptain,1500);
@@ -1880,9 +1904,9 @@ function awardCaptainMaster(){
   openModal(`<div class="box">
     <div class="title-big yellow">문학 시험 만점</div>
     <div class="explain good" style="text-align:center;">🏆 칭호 획득<br><b style="font-size:20px;">「꺼삐딴 리 마스터 ${basePlayerName}」</b><br><br>무작위 다섯 문제를 모두 맞혔다.<br>앞으로 주인공의 이름은 이 칭호로 표시된다.</div>
-    <button class="btn primary" id="captainReturnBtn">하오츠로 돌아간다</button>
+    <button class="btn primary" id="captainReturnBtn">도서관으로 돌아간다</button>
   </div>`);
-  document.getElementById("captainReturnBtn").onclick=()=>{closeModal();scene="restaurant";mode="explore";px=7;py=8;dir="left";hudL.textContent=`${playerName} · 하오츠`;hudR.textContent="🥟 영업 중";showDialog([{sp:"전광용",text:"훌륭하다, 꺼삐딴 리 마스터. 이제 이 작품의 풍자와 역순행적 구성을 잊지 않겠구나."}],()=>{mode="explore";});};
+  document.getElementById("captainReturnBtn").onclick=()=>{closeModal();scene="library";mode="explore";px=7;py=9;dir="up";hudL.textContent=`${playerName} · 5층 도서관`;hudR.textContent="📚 독서 완료";showDialog([{sp:"서가 안내",text:"『꺼삐딴 리』의 풍자와 역순행적 구성을 정확히 이해했다."}],()=>{mode="explore";});};
 }
 
 function drawRestaurantSeatedPlayer(){
@@ -2361,18 +2385,15 @@ function drawConvenienceInterior(){
   ctx.restore();
 }
 function drawSchoolCampus(){drawPixelSceneBackground("school");drawPixelChicken();}
-function drawLibraryInterior(){drawPixelSceneBackground("library");pixelSceneSign("5층 도서관",240,31,"#f6e8bd",9);}
+function drawLibraryInterior(){
+  drawPixelSceneBackground("library");pixelSceneSign("5층 도서관 · 오도",240,19,"#f6e8bd",8);
+  const pulse=.45+.25*Math.sin(T*3.2);ctx.save();ctx.lineWidth=2;ctx.setLineDash([5,4]);ctx.strokeStyle=`rgba(255,216,117,${pulse})`;
+  for(const z of LIBRARY_BOOKCASES){const [x,y,w,h]=z.screen;ctx.strokeRect(x+3,y+3,w-6,h-6)}ctx.restore();
+  if(mode==="explore"){pixelLabel("책 선택",51,116,"#8b6234");pixelLabel("책 선택",429,116,"#8b6234");}
+}
 function drawRestaurant(){
   drawPixelSceneBackground("restaurant");pixelSceneSign("하오츠",240,37,"#ffd378",11);
-  POETS.forEach(p=>{
-    const v=RESTAURANT_PERSON_VISUALS[p.name],img=v20AuthorSheets[p.name];
-    if(img&&img.complete&&img.naturalWidth){
-      const speaking=characterIsSpeaking(p.name),frame=speaking?1:0,bob=speaking?Math.sin(T*7+characterPhase(p.name)*4)*.6:0;
-      ctx.save();ctx.imageSmoothingEnabled=false;ctx.fillStyle="#1717184a";ctx.beginPath();ctx.ellipse(v.x,v.foot,12,3,0,0,Math.PI*2);ctx.fill();
-      ctx.drawImage(img,frame*40,0,40,56,v.x-20,v.foot-56+bob,40,56);ctx.restore();
-      if(speaking||Math.abs(px-p.x)+Math.abs(py-p.y)<=1)pixelLabel(p.name,v.x,v.foot-61,"#713f35");
-    }else drawCharacterAsset(POET_ASSETS[p.name],p.x,p.y,{screenX:v.x,screenFoot:v.foot,width:40,height:56,label:p.name,shadow:"#2b211a28"});
-  });drawPixelFood();
+  drawPixelFood();
 }
 function drawAcademy(){
   drawPixelSceneBackground("academy");
@@ -2428,7 +2449,10 @@ function drawStudySeatedPlayer(){
   if(scene==="cafe"){
     const index=SEATS.findIndex(([x,y])=>x===px&&y===py),v=CAFE_SEAT_VISUALS[index];
     if(v)drawSelectedAvatarBackSeated(v.x,v.y+14,46);
-  }else if(scene==="library")drawSelectedAvatarBackSeated(px*TILE+16,py*TILE+29,52);
+  }else if(scene==="library"){
+    const v=LIBRARY_SEAT_VISUALS.find(s=>s.gx===px&&s.gy===py)||{x:px*TILE+16,foot:py*TILE+29};
+    drawSelectedAvatarBackSeated(v.x,v.foot,50);
+  }
 }
 function drawRestaurantSeatedPlayer(){
   const bob=Math.sin(T*1.25)>.15?0:1;
@@ -2580,7 +2604,7 @@ function drawInteractionHints(){
   else if(scene==="convenience"){drawHint(...CAT_POS,"","#9fd8ff");drawHint(...CONVENIENCE_DOOR,"","#7de7df");drawHint(0,6);drawHint(14,6);}
   else if(scene==="convenienceInterior"){drawHint(...CONVENIENCE_CASHIER);drawHint(...CONVENIENCE_EXIT);}
   else if(scene==="school"){drawHint(...CHICKEN_POS,"품사 닭","#ffe08a");drawHint(...SCHOOL_GATE);drawHint(...SCHOOL_EXIT);}
-  else if(scene==="library"){LIBRARY_SEATS.forEach(([x,y])=>drawHint(x,y,"","#c9f3dd"));drawHint(...LIBRARY_EXIT);}
+  else if(scene==="library"){LIBRARY_SEATS.forEach(([x,y])=>drawHint(x,y,"","#c9f3dd"));drawHint(2,3,"책 고르기","#ffe08a");drawHint(12,3,"책 고르기","#ffe08a");drawHint(...LIBRARY_EXIT);}
   else if(scene==="restaurant"){POETS.forEach(p=>drawHint(p.x,p.y));drawHint(...RESTAURANT_EMPTY_SEAT);drawHint(...RESTAURANT_EXIT);}
   else if(scene==="academy"){drawHint(...ANGELA_POS);CLASSROOM_DOORS.forEach(door=>drawHint(door.x,door.y));drawHint(...ACADEMY_EXIT);}
   else if(scene==="classroom"){MATH_TEACHERS.filter(t=>!mentorName||t.name===mentorName).forEach(t=>drawHint(t.x,t.y));drawHint(...CLASSROOM_EXIT);}
@@ -2824,8 +2848,10 @@ cv.addEventListener("click", e=>{
     else if(inZone(tx,ty,6,8,9,10))autoWalkTo(...SCHOOL_EXIT,false,leaveSchoolToConvenience);
     else if(inZone(tx,ty,6,8,2,4))autoWalkTo(...SCHOOL_GATE,false,enterLibraryFromSchool);
   }else if(scene==="library"&&mode==="explore"){
+    const bookcase=LIBRARY_BOOKCASES.find(z=>cx>=z.screen[0]&&cx<=z.screen[0]+z.screen[2]&&cy>=z.screen[1]&&cy<=z.screen[1]+z.screen[3]);
     const seat=LIBRARY_SEATS.find(([sx,sy])=>tx===sx&&(ty===sy||ty===sy-1));
-    if(seat)autoWalkTo(seat[0],seat[1],true,()=>{dir="up";openSeatChoice();});
+    if(bookcase)autoWalkTo(bookcase.approach[0],bookcase.approach[1],true,()=>{dir="up";openLibraryBookMenu();});
+    else if(seat)autoWalkTo(seat[0],seat[1],false,()=>{dir="up";px=seat[0];py=seat[1];stepFrame++;openSeatChoice();});
     else if(inZone(tx,ty,6,8,9,10))autoWalkTo(...LIBRARY_EXIT,false,leaveLibraryToSchool);
   }else if(scene==="academy"&&mode==="explore"){
     const door=academyDoorFromClick(cx,cy);
@@ -2888,6 +2914,8 @@ function tryMove(d){
     if(d==="up"&&inZone(nx,ny,6,8,3,3)){dir=d;enterLibraryFromSchool();return;}
   }
   if(scene==="library"){
+    const bookcase=LIBRARY_BOOKCASES.find(z=>inZone(nx,ny,z.x0,z.x1,z.y0,z.y1));
+    if(bookcase){dir=d;openLibraryBookMenu();return;}
     if(inList(LIBRARY_SEATS,nx,ny)){dir=d;px=nx;py=ny;stepFrame++;openSeatChoice();return;}
     if(d==="down"&&inZone(nx,ny,6,8,10,10)){dir=d;leaveLibraryToSchool();return;}
   }
@@ -3124,10 +3152,60 @@ function leaveSchoolToConvenience(){
 }
 function enterLibraryFromSchool(){
   scene="library";px=7;py=9;dir="up";mode="explore";hudL.textContent=`${playerName} · 5층 도서관`;hudR.textContent="📚 열람실";
-  showDialog([{sp:"내레이션",text:"교문을 지나 계단을 올라 안산동산고등학교 5층 도서관에 도착했다."},{sp:"내레이션",text:"창가와 책장 사이에 빈 좌석이 있다. 원하는 좌석을 클릭해 보자."}],()=>{mode="explore";});
+  showDialog([{sp:"내레이션",text:"교문을 지나 계단을 올라 안산동산고등학교 5층 도서관, 오도에 도착했다."},{sp:"내레이션",text:"열람 책상 사이 중앙 통로가 출입문과 이어지고, 뒤쪽 양옆에는 읽을 책을 고를 수 있는 서가가 있다."},{sp:"안내",text:"왼쪽이나 오른쪽 책장을 클릭하면 읽을 책을 선택할 수 있다."}],()=>{mode="explore";});
 }
 function leaveLibraryToSchool(){
   scene="school";px=SCHOOL_GATE[0];py=SCHOOL_GATE[1]+1;dir="down";mode="explore";hudL.textContent=`${playerName} · 안산동산고등학교`;hudR.textContent="🏫 교문 개방";
+}
+function openLibraryBookMenu(){
+  mode="locked";
+  openModal(`
+    <div class="box">
+      <div class="title-big yellow">5층 도서관 · 서가</div>
+      <p class="qtext" style="text-align:center;">어떤 책을 읽을까?</p>
+      <button class="opt" data-library-book="gasigogi"><b>조세희</b> 『내 그물로 오는 가시고기』<br><span class="hint">읽은 뒤 사실 확인 퀴즈 5문제</span></button>
+      <button class="opt" data-library-book="nanjango"><b>조세희</b> 『난장이가 쏘아올린 작은 공』<br><span class="hint">준비 중</span></button>
+      <button class="opt" data-library-book="captain"><b>전광용</b> 『꺼삐딴 리』<br><span class="hint">읽은 뒤 독해 퀴즈 5문제</span></button>
+      <button class="btn" id="libraryBookClose">책장을 닫는다</button>
+    </div>`);
+  modal.querySelector('[data-library-book="gasigogi"]').onclick=()=>{closeModal();showDialog([{sp:"내레이션",text:"조세희의 『내 그물로 오는 가시고기』를 꺼냈다."},{sp:"안내",text:"이야기를 끝까지 읽으면 사실 확인 퀴즈 5문제가 이어진다."}],startGasigogiLibraryStory);};
+  modal.querySelector('[data-library-book="nanjango"]').onclick=()=>{closeModal();showDialog([{sp:"서가 안내",text:"『난장이가 쏘아올린 작은 공』 독서 콘텐츠는 아직 준비 중이다."}],()=>{mode="explore";});};
+  modal.querySelector('[data-library-book="captain"]').onclick=()=>{closeModal();showDialog([{sp:"내레이션",text:"전광용의 『꺼삐딴 리』를 꺼냈다."},{sp:"서가 안내",text:`이야기를 끝까지 읽으면 ${CAPTAIN_QUESTIONS.length}문제 가운데 다섯 문제가 무작위로 출제된다.`}],startCaptainStory);};
+  document.getElementById("libraryBookClose").onclick=()=>{closeModal();mode="explore";};
+}
+function startGasigogiLibraryStory(){
+  const state={playerName,basePlayerName,selectedAvatarId,mentorName,activeTitle,captainMaster,catMaster,grammarMaster};
+  try{sessionStorage.setItem("gasigogi_library_state",JSON.stringify(state));}catch(_e){}
+  location.href=`gasigogi-full-story.html?library=1&state=${encodeURIComponent(JSON.stringify(state))}`;
+}
+function startGasigogiQuiz(){
+  gasigogiQuizSet=shuffle([...GASIGOGI_QUESTIONS]).slice(0,GASIGOGI_QUIZ_COUNT);gasigogiQuizIndex=0;gasigogiQuizCorrect=0;mode="locked";showGasigogiQuizQuestion();
+}
+function showGasigogiQuizQuestion(){
+  if(gasigogiQuizIndex>=gasigogiQuizSet.length){finishGasigogiQuiz();return;}
+  const q=gasigogiQuizSet[gasigogiQuizIndex];
+  openModal(`<div class="box"><div class="title-big yellow">가시고기 사실 확인</div><p class="qtext" style="text-align:center;"><span class="hint">${gasigogiQuizIndex+1} / ${gasigogiQuizSet.length}</span></p><p class="qtext">${q.q}</p>${q.opts.map((o,i)=>`<button class="opt" data-gasigogi-answer="${i}">${i+1}. ${o}</button>`).join("")}</div>`);
+  modal.querySelectorAll("[data-gasigogi-answer]").forEach(btn=>btn.onclick=()=>{
+    const picked=Number(btn.dataset.gasigogiAnswer),correct=picked===q.a;if(correct)gasigogiQuizCorrect++;
+    gasigogiQuizIndex++;
+    openModal(`<div class="box mini"><div class="title-big ${correct?"green":"red"}">${correct?"정답":"오답"}</div><div class="explain ${correct?"good":"bad"}"><b>정답: ${q.a+1}. ${q.opts[q.a]}</b><br><br>${q.e}</div><button class="btn primary" id="gasigogiQuizNext">${gasigogiQuizIndex<gasigogiQuizSet.length?"다음 문제":"결과 확인"}</button></div>`);
+    document.getElementById("gasigogiQuizNext").onclick=showGasigogiQuizQuestion;
+  });
+}
+function finishGasigogiQuiz(){
+  const perfect=gasigogiQuizCorrect===GASIGOGI_QUIZ_COUNT;
+  try{const key=`gasigogi_quiz_best_${basePlayerName||playerName}`;const old=Number(localStorage.getItem(key)||0);if(gasigogiQuizCorrect>old)localStorage.setItem(key,String(gasigogiQuizCorrect));}catch(_e){}
+  openModal(`<div class="box mini"><div class="title-big ${perfect?"green":"yellow"}">${perfect?"완전한 독해":"독서 확인 완료"}</div><p class="qtext" style="text-align:center;">5문제 중 <b class="yellow">${gasigogiQuizCorrect}문제</b>를 맞혔다.</p><div class="explain good">${perfect?"작품 속 사건과 인물 관계를 정확히 기억하고 있다.":"틀린 문제의 해설을 떠올리며 작품의 사건 순서를 다시 확인해 보자."}</div><button class="btn primary" id="gasigogiReturnLibrary">도서관으로 돌아간다</button><button class="btn" id="gasigogiReadAgain">이야기를 다시 읽는다</button></div>`);
+  document.getElementById("gasigogiReturnLibrary").onclick=()=>{closeModal();scene="library";px=7;py=9;dir="up";mode="explore";hudL.textContent=`${playerName} · 5층 도서관`;hudR.textContent=`📚 퀴즈 ${gasigogiQuizCorrect}/5`;};
+  document.getElementById("gasigogiReadAgain").onclick=()=>{closeModal();startGasigogiLibraryStory();};
+}
+function resumeLibraryQuizFromStory(){
+  const params=new URLSearchParams(location.search);if(params.get("resumeLibraryQuiz")!=="1")return false;
+  let saved={};try{saved=JSON.parse(params.get("state")||sessionStorage.getItem("gasigogi_library_state")||"{}");}catch(_e){}
+  basePlayerName=saved.basePlayerName||saved.playerName||"동산고학생";playerName=saved.playerName||basePlayerName;selectedAvatarId=AVATARS.some(a=>a.id===saved.selectedAvatarId)?saved.selectedAvatarId:"dongsan-boy";mentorName=saved.mentorName||"";activeTitle=saved.activeTitle||"";captainMaster=!!saved.captainMaster;catMaster=!!saved.catMaster;grammarMaster=!!saved.grammarMaster;
+  stageWrap.classList.remove("title-scene");scene="library";px=7;py=9;dir="up";mode="locked";hudL.textContent=`${playerName} · 5층 도서관`;hudR.textContent="📚 독서 퀴즈";
+  try{history.replaceState(null,"","index.html");}catch(_e){}
+  setTimeout(()=>showDialog([{sp:"내레이션",text:"책의 마지막 장을 덮었다."},{sp:"서가 안내",text:"이제 작품에서 확인한 사실을 묻는 다섯 문제를 풀어 보자."}],startGasigogiQuiz),80);return true;
 }
 function stopGrammarQuizTimer(){
   if(grammarQuizTimer!==null){clearInterval(grammarQuizTimer);grammarQuizTimer=null;}
@@ -3919,33 +3997,59 @@ function enterHellDirect(){
   spawnStatues(); updateHud(); mode="explore";
 }
 
-showTitle();
+if(!resumeLibraryQuizFromStory())showTitle();
 
-/* ═══════════════ PWA 서비스 워커 등록 + 자동 업데이트 ═══════════════ */
+/* ═══════════════ PWA 서비스 워커 등록 + 학생별 자동 업데이트 ═══════════════ */
+async function forceAppUpdate(){
+  appVersionBtn.disabled=true;appVersionBtn.textContent="업데이트 확인 중…";
+  try{
+    if("serviceWorker" in navigator){
+      const reg=await navigator.serviceWorker.getRegistration();
+      if(reg){
+        await reg.update();
+        if(reg.waiting)reg.waiting.postMessage({type:"SKIP_WAITING"});
+      }
+    }
+    if("caches" in window){
+      const keys=await caches.keys();
+      await Promise.all(keys.filter(key=>key.startsWith("idiom-quest-")).map(key=>caches.delete(key)));
+    }
+    const url=new URL(location.href);url.searchParams.set("appVersion",String(Date.now()));
+    location.replace(url.href);
+  }catch(e){
+    appVersionBtn.disabled=false;appVersionBtn.textContent=`버전 ${APP_VERSION} · 다시 확인`;
+  }
+}
+appVersionBtn.addEventListener("click",forceAppUpdate);
+
 if("serviceWorker" in navigator){
   let refreshing=false;
-  /* 새 서비스 워커가 제어권을 넘겨받으면(=새 버전 활성화) 한 번만 새로고침 */
   navigator.serviceWorker.addEventListener("controllerchange",()=>{
-    if(refreshing) return;
+    if(refreshing)return;
     refreshing=true;
     location.reload();
   });
-  window.addEventListener("load",()=>{
-    navigator.serviceWorker.register("./sw.js").then(reg=>{
-      /* 주기적으로 새 버전 확인(재접속 없이도 갱신 감지) */
-      setInterval(()=>{ reg.update().catch(()=>{}); }, 60*60*1000); // 1시간마다
+  navigator.serviceWorker.addEventListener("message",event=>{
+    if(event.data?.type==="APP_VERSION")appVersionBtn.textContent=`버전 ${APP_VERSION}`;
+  });
+  window.addEventListener("load",async()=>{
+    try{
+      const reg=await navigator.serviceWorker.register("./sw.js",{updateViaCache:"none"});
+      const check=()=>reg.update().catch(()=>{});
+      await check();
+      setInterval(check,10*60*1000);
+      window.addEventListener("online",check);
+      document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")check();});
       reg.addEventListener("updatefound",()=>{
         const nw=reg.installing;
-        if(!nw) return;
+        if(!nw)return;
         nw.addEventListener("statechange",()=>{
-          /* 새 워커가 설치 완료되고, 기존 컨트롤러가 있으면(=업데이트 상황) 즉시 활성화 요청 */
-          if(nw.state==="installed" && navigator.serviceWorker.controller){
-            nw.postMessage&&nw.postMessage("skip");
-            /* skipWaiting은 sw install에서 이미 호출되므로 controllerchange가 곧 발생 */
-          }
+          if(nw.state==="installed"&&navigator.serviceWorker.controller)nw.postMessage({type:"SKIP_WAITING"});
         });
       });
-    }).catch(()=>{});
+    }catch(e){
+      appVersionBtn.textContent=`버전 ${APP_VERSION} · 오프라인`;
+    }
   });
 }
 </script>
