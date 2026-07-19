@@ -1,5 +1,5 @@
 /* 사자성어 여행단 - 학생별 자동 업데이트 서비스 워커 */
-const VERSION="94-2026.07.13";
+const VERSION="96-2026.07.19";
 const CACHE=`idiom-quest-v${VERSION}`;
 const APP_SHELL=[
   "./",
