@@ -309,7 +309,7 @@ button.avatar-card[hidden]{display:none;}
 <script src="assets/data/pos-questions-v1.js"></script>
 <script>
 "use strict";
-const APP_VERSION="96 · 2026.07.19";
+const APP_VERSION="98 · 2026.07.19";
 const appVersionBtn=document.getElementById("appVersionBtn");
 appVersionBtn.textContent=`버전 ${APP_VERSION}`;
 /* ═══════════════ 사자성어 50 ═══════════════ */
@@ -2260,6 +2260,21 @@ function drawAvatarSprite(g,x,footY,a,facing="down",frame=0,bob=0,seated=false){
   if(seated)return drawCharacterAsset(`player-${a.id}-seated`,0,0,{screenX:x,screenFoot:footY+bob,width:54,height:54,facing,skin:a.skin,noBlink:true,action:false});
   return drawCharacterAsset(`player-${a.id}`,0,0,{screenX:x,screenFoot:footY+bob,width:48,height:68,facing,walking:moving,skin:a.skin,noBlink:false});
 }
+function playerWalkRenderSize(){
+  // 승객이 68×84로 배치되는 지하철에서는 앞쪽 통로의 주인공도 같은 체급으로 보이게 한다.
+  return scene==="subway"?{width:54,height:81}:{width:48,height:72};
+}
+function drawPlayerWalkFrame(sheet,a,row,col,x,renderFoot,width,height){
+  // 생성된 스프라이트의 오른쪽 행은 일부 캐릭터·프레임만 축소되어 있다.
+  // 온전한 왼쪽 행을 좌우 반전해 모든 캐릭터의 오른쪽 이동 크기와 발 위치를 고정한다.
+  if(row===2){
+    ctx.save();ctx.translate(x,0);ctx.scale(-1,1);
+    ctx.drawImage(sheet,col*32,48,32,48,-width/2,renderFoot-height,width,height);
+    ctx.restore();
+    return;
+  }
+  ctx.drawImage(sheet,col*32,row*48,32,48,x-width/2,renderFoot-height,width,height);
+}
 function drawPlayerPixel(){
   const a=selectedAvatar(),x=visualPx*TILE+16,footY=visualPy*TILE+29;
   const v20WalkSheet=avatarWalkSheet(a);
@@ -2269,23 +2284,20 @@ function drawPlayerPixel(){
     if(a.id==="dongsan-boy"&&playerSpeaking&&v20BoyEmotionSheet.complete&&v20BoyEmotionSheet.naturalWidth){
       const emotions={neutral:0,surprised:1,happy:2,sad:3,angry:4,embarrassed:5,thinking:6,determined:7};
       const index=emotions[currentPlayerEmotion]??0;
-      const renderFoot=footY+2,dw=40,dh=60;
+      const renderFoot=footY+2,{width:dw,height:dh}=playerWalkRenderSize();
       ctx.save();ctx.imageSmoothingEnabled=false;ctx.fillStyle="#18202a55";ctx.beginPath();ctx.ellipse(x,renderFoot,13,3.5,0,0,Math.PI*2);ctx.fill();
       ctx.drawImage(v20BoyEmotionSheet,(index%4)*32,Math.floor(index/4)*48,32,48,x-dw/2,renderFoot-dh,dw,dh);ctx.restore();return;
     }
     const moving=Math.abs(visualPx-px)+Math.abs(visualPy-py)>.012;
     const row={down:0,left:1,right:2,up:3}[dir]??0;
     const col=moving?(1+Math.floor(T*8)%3):0;
-    const renderFoot=footY+2,dw=40,dh=60;
+    const renderFoot=footY+2,{width:dw,height:dh}=playerWalkRenderSize();
     ctx.save();ctx.imageSmoothingEnabled=false;
-    ctx.fillStyle="#18202a55";ctx.beginPath();ctx.ellipse(x,renderFoot,13,3.5,0,0,Math.PI*2);ctx.fill();
-    ctx.drawImage(v20WalkSheet,col*32,row*48,32,48,x-dw/2,renderFoot-dh,dw,dh);ctx.restore();
+    ctx.fillStyle="#18202a55";ctx.beginPath();ctx.ellipse(x,renderFoot,Math.max(13,dw*.27),Math.max(3.5,dh*.048),0,0,Math.PI*2);ctx.fill();
+    drawPlayerWalkFrame(v20WalkSheet,a,row,col,x,renderFoot,dw,dh);ctx.restore();
     return;
   }
-  const nearTop=visualPy<1.45;
-  const photoInterior=["cafe","restaurant","academy","classroom"].includes(scene);
-  const interiorHeight=Math.max(55,Math.min(67,52+visualPy*1.55));
-  const height=photoInterior?interiorHeight:(nearTop?58:70),width=photoInterior?Math.round(height*.7):(nearTop?41:49);
+  const {width,height}=playerWalkRenderSize();
   drawCharacterAsset(`player-${a.id}`,0,0,{screenX:x,screenFoot:footY,width,height,facing:dir,walking:Math.abs(visualPx-px)+Math.abs(visualPy-py)>.012,skin:a.skin});
 }
 function drawStudent(s){
@@ -3094,7 +3106,8 @@ function showTitle(){
         ${AVATARS.map(a=>`<button class="avatar-card${a.id===selectedAvatarId?" selected":""}" type="button" data-avatar="${a.id}" data-school="${a.school}" role="radio" aria-checked="${a.id===selectedAvatarId}"${a.school!==selectedSchoolId?" hidden":""}><span class="avatar-portrait-frame"><span class="avatar-portrait" style="background-image:url('${a.sprite}')"></span></span><span class="avatar-card-copy"><span class="avatar-card-name">${a.name}</span><span class="avatar-card-desc">${a.desc}</span></span></button>`).join("")}
       </div>
       <button class="btn primary" id="startBtn">시작한다</button>
-      <button class="btn" id="lbBtn">🏆 한자성어 · 품사 랭킹 보기</button>
+      <button class="btn" id="idiomLbBtn">🏆 한자성어 랭킹 보기</button>
+      <button class="btn" id="grammarLbBtn">🐓 품사 10문제 시간 랭킹</button>
     </div>`);
   const input=document.getElementById("nameInput");
   const updateSchoolPicker=schoolId=>{
@@ -3130,7 +3143,8 @@ function showTitle(){
     applyPlayerTitle();saveTitleProfile();classInSession=false;classSleepPhase=false;restaurantSeated=false;orderedFood="";closeModal();startCafe();
   };
   document.getElementById("startBtn").onclick=start;
-  document.getElementById("lbBtn").onclick=()=>{ showRankingModal(); };
+  document.getElementById("idiomLbBtn").onclick=()=>{ showRankingModal("idiom"); };
+  document.getElementById("grammarLbBtn").onclick=()=>{ showRankingModal("grammar"); };
   input.addEventListener("keydown",e=>{ if(e.key==="Enter") start(); });
   loadGlobalSurvivalStat();
   input.focus();
@@ -3384,8 +3398,8 @@ async function startGrammarQuiz(){
   showGrammarQuizQuestion();
 }
 function grammarElapsedText(){
-  const sec=Math.max(0,Math.floor((Date.now()-grammarQuizStartedAt)/1000));
-  return `${String(Math.floor(sec/60)).padStart(2,"0")}:${String(sec%60).padStart(2,"0")}`;
+  const sec=Math.max(0,(Date.now()-grammarQuizStartedAt)/1000);
+  return `${sec.toFixed(1)}초`;
 }
 function showGrammarQuizQuestion(){
   stopGrammarQuizTimer();grammarQuizLocked=false;mode="locked";
@@ -3436,12 +3450,12 @@ async function completeGrammarQuiz(){
   const localResult=await addRecord(raw,elapsed,"grammar");
   const serverSec=await submitGrammarScore(elapsed);
   const finalSec=serverSec??localResult.entry.sec;
-  hudL.textContent=`${playerName} · 안산동산고등학교`;hudR.textContent=`🐓 10문제 정답 · ${fmt(finalSec)}`;
+  hudL.textContent=`${playerName} · ${selectedAvatar().school==="hwasung"?"화성고등학교":"안산동산고등학교"}`;hudR.textContent=`🐓 10문제 정답 · ${formatGrammarTime(finalSec)}`;
   showDialog([
     {sp:"닭",text:"꼬끼오~! 최고난도를 포함한 열 문제를 모두 맞혔다."},
     {sp:"닭",text:`칭호 획득! 이제부터 너는 ‘품사를 이해한 ${raw}’이다.`}
   ],()=>{
-    openModal(`<div class="box mini"><div class="title-big green">품사 시험 완료</div><p class="qtext" style="text-align:center;">10문제 전문항 정답 · <b class="yellow">${fmt(finalSec)}</b><br><span class="hint">현재 기기 기록 ${localResult.rank}위</span></p><button class="btn primary" id="grammarRankOpen">품사 랭킹 보기</button><button class="btn" id="grammarContinue">계속 탐험한다</button></div>`);
+    openModal(`<div class="box mini"><div class="title-big green">품사 시험 완료</div><p class="qtext" style="text-align:center;">10문제 전문항 정답 · <b class="yellow">${formatGrammarTime(finalSec)}</b><br><span class="hint">풀이 시간이 짧은 순 · 현재 기기 기록 ${localResult.rank}위</span></p><button class="btn primary" id="grammarRankOpen">품사 10문제 시간 랭킹</button><button class="btn" id="grammarContinue">계속 탐험한다</button></div>`);
     document.getElementById("grammarRankOpen").onclick=()=>showRankingModal("grammar",false);
     document.getElementById("grammarContinue").onclick=()=>{closeModal();mode="explore";};
   });
@@ -3882,11 +3896,13 @@ function dedupeLeaderboard(list){
 function escapeRankingText(value){
   return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[ch]));
 }
-function rankingRowsHtml(list,limit=20,highlightKey=""){
+const formatGrammarTime=sec=>`${Math.max(0,Math.round(Number(sec)||0))}초`;
+function rankingRowsHtml(list,limit=20,highlightKey="",type="idiom"){
   return list.slice(0,limit).map((e,i)=>{
     const me=highlightKey&&rankingNameKey(e.name)===highlightKey;
     const avatar=escapeRankingText(e.avatar?avatarSchoolLabel(e.avatar):(e.school==="hwasung"?"화성고 · 미확인":e.school==="dongsan"?"동산고 · 미확인":"기존 기록"));
-    return `<div class="lb-row${me?" me":""}"><span class="lb-rank">${i+1}위</span><span class="lb-name">${escapeRankingText(e.name)}${me?" ◀":""}</span><span class="lb-avatar">${avatar}</span><span class="lb-time">${fmt(e.sec)}</span></div>`;
+    const time=type==="grammar"?formatGrammarTime(e.sec):fmt(e.sec);
+    return `<div class="lb-row${me?" me":""}"><span class="lb-rank">${i+1}위</span><span class="lb-name">${escapeRankingText(e.name)}${me?" ◀":""}</span><span class="lb-avatar">${avatar}</span><span class="lb-time">${time}</span></div>`;
   }).join("")||`<div style="text-align:center;">아직 기록이 없습니다</div>`;
 }
 const lbStorageKey=type=>type==="grammar"?"idiom_lb_grammar":"idiom_lb";
@@ -3956,10 +3972,11 @@ async function showRankingModal(initialType="idiom",returnToTitle=true){
     catch(e){ list=await lbLoad(type); }
   } else { list=await lbLoad(type); }
   list=dedupeLeaderboard(list);
-  const rows=rankingRowsHtml(list,20);
+  const rows=rankingRowsHtml(list,20,"",type);
   openModal(`
     <div class="box leaderboard-box">
-      <div class="title-big yellow" style="font-size:24px; letter-spacing:2px;">👑 ${label}</div>
+      <div class="title-big yellow" style="font-size:24px; letter-spacing:2px;">${type==="grammar"?"🐓":"👑"} ${label}</div>
+      <p class="hint" style="text-align:center;">${type==="grammar"?"10문제를 모두 맞힌 기록만 등록 · 총 풀이 시간이 짧은 순":"15개 석상을 모두 정화한 생환 기록 · 시간이 짧은 순"}</p>
       <div class="school-grid" aria-label="랭킹 종류 선택">
         <button class="school-card${type==="idiom"?" selected":""}" id="idiomRankTab">한자성어</button>
         <button class="school-card${type==="grammar"?" selected":""}" id="grammarRankTab">품사</button>
