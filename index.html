@@ -7,6 +7,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="favicon.png">
 <link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preload" href="assets/fonts/NotoOldHangul-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <meta name="theme-color" content="#1b1830">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,6 +18,11 @@
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/NeoDunggeunmoPro-Regular.woff') format('woff');
   font-display: swap;
 }
+@font-face {
+  font-family:'NotoOldHangul';
+  src:url('assets/fonts/NotoOldHangul-Regular.woff2') format('woff2');
+  font-display:swap;
+}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
   --ink:#171329; --night:#2b2548; --night2:#3a315c; --paper:#fff2d6;
@@ -25,7 +31,8 @@
 }
 html,body{height:100%;min-height:100dvh;}
 body{
-  font-family:'NeoDGM',monospace; color:var(--paper);
+  /* 표준 옛한글 조합 자모는 전용 서브셋으로 조합하고, 나머지는 게임 도트 글꼴을 유지한다. */
+  font-family:'NotoOldHangul','NeoDGM',monospace; color:var(--paper);
   background:
     radial-gradient(circle at 20% 18%,#50366a66 0 2px,transparent 3px),
     radial-gradient(circle at 82% 28%,#ffc26955 0 1px,transparent 2px),
@@ -160,6 +167,7 @@ input#nameInput:focus{ outline:none; border-color:var(--lantern); box-shadow:0 0
 .avatar-start-box input#nameInput{padding:8px;margin-bottom:6px;font-size:15px;}
 .school-picker-title{font-size:9px;text-align:center;color:#cbe7ef;margin:1px 0 4px;letter-spacing:1px;}
 .school-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:6px;}
+.leaderboard-box .school-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
 button.school-card{padding:6px 8px;border:2px solid #587486;border-bottom-width:3px;border-radius:7px;background:#16283d;color:#bcd3dc;font:9px NeoDGM,monospace;cursor:pointer;}
 button.school-card.selected{border-color:#ffd372;background:#314b5d;color:#fff1c6;box-shadow:0 0 10px #ffd37233;}
 .avatar-picker-title{font-size:10px;text-align:center;color:#ffe3a5;margin:2px 0 5px;letter-spacing:1px;}
@@ -307,9 +315,10 @@ button.avatar-card[hidden]{display:none;}
 </div>
 
 <script src="assets/data/pos-questions-v1.js"></script>
+<script src="assets/data/korean-history-questions-v1.js"></script>
 <script>
 "use strict";
-const APP_VERSION="98 · 2026.07.19";
+const APP_VERSION="107 · 2026.07.19";
 const appVersionBtn=document.getElementById("appVersionBtn");
 appVersionBtn.textContent=`버전 ${APP_VERSION}`;
 /* ═══════════════ 사자성어 50 ═══════════════ */
@@ -440,6 +449,12 @@ const v20ChampionGirl=new Image();v20ChampionGirl.decoding="async";v20ChampionGi
 const v24ClassSleepSheet=new Image();v24ClassSleepSheet.decoding="async";v24ClassSleepSheet.src="assets/v24/characters/players/dongsan-sleep-at-desk-v24.png";
 const v30RoosterSheet=new Image();v30RoosterSheet.decoding="async";v30RoosterSheet.src="assets/v30/characters/creatures/school-rooster-sprites-v30.png";
 const v31AlleyCatSheet=new Image();v31AlleyCatSheet.decoding="async";v31AlleyCatSheet.src="assets/v31/characters/creatures/korean-alley-cat-v31.png";
+const v45HistoryChampionSheet=new Image();v45HistoryChampionSheet.decoding="async";v45HistoryChampionSheet.src="assets/v45/characters/rankings/korean-history-champions-v45.png";
+const v47IdiomGeneralRunSheet=new Image();v47IdiomGeneralRunSheet.decoding="async";v47IdiomGeneralRunSheet.src="assets/v47/characters/players/idiom-general-run-v47.png";
+const v47HistoryCaptainRunSheet=new Image();v47HistoryCaptainRunSheet.decoding="async";v47HistoryCaptainRunSheet.src="assets/v47/characters/players/history-captain-run-v47.png";
+const v49CompactPhoenixSheet=new Image();v49CompactPhoenixSheet.decoding="async";v49CompactPhoenixSheet.src="assets/v49/characters/rankings/pos-king-phoenix-compact-v49.png";
+// v49 시트의 362px 셀 안에서 모든 프레임의 발을 y=330에 맞췄다.
+const COMPACT_PHOENIX_FOOT_RATIO=330/362;
 const V20_CAFE_STUDENT_FILES={
   "스미스":"assets/v20/characters/npcs/smith-chair-seated-v20.png",
   "마리":"assets/v20/characters/npcs/mari-chair-seated-v20.png",
@@ -557,7 +572,7 @@ let px=7, py=9, dir="down", stepFrame=0;
 let statues=[], cleared=0, yeomraVisible=false;
 let dialogQueue=[], dialogDone=null, typing=null, fullText="";
 let currentPlayerEmotion="neutral";
-let runStart=0, finished=false, memLB=[], sessionToken=null,grammarSessionToken=null,trainDestination="home";
+let runStart=0, finished=false, memLB=[], sessionToken=null,grammarSessionToken=null,historySessionToken=null,trainDestination="home";
 /* ★★★ 통합 랭킹 서버 주소 ★★★
    Google Apps Script 웹 앱 URL을 아래 따옴표 안에 붙여넣으세요.
    비워 두면 이 기기에만 기록이 저장됩니다. */
@@ -592,13 +607,42 @@ const EMPTY_SEATS=SEATS.filter(([x,y])=>!STUDENTS.some(s=>s.x===x&&s.y===y));
 const DOCTOR_POS=[5,8];
 let champName=null;
 let champAvatarId="dongsan-boy";
+// 품사 시간 랭킹 1위는 중앙 통로에서 바로 접근 가능한 우측 타일에 등장한다.
+const GRAMMAR_OWNER_POS=[10,8];
+const GRAMMAR_OWNER_SCREEN={x:336,foot:285};
+let grammarChampName=null;
+let grammarChampAvatarId="dongsan-boy";
+// 국어사대장은 천년 고양이 바로 오른쪽에 등장한다.
+const HISTORY_CHAMP_POS=[7,5];
+let historyChampName=null;
+let historyChampAvatarId="dongsan-boy";
+function championPlayerMode(){
+  const raw=basePlayerName||playerName;
+  if(!raw)return "";
+  const key=rankingNameKey(raw),same=name=>!!name&&rankingNameKey(name)===key;
+  // 한 학생이 여러 부문 1위라면 가장 독특한 이동 수단을 우선한다.
+  if(same(grammarChampName))return "grammar";
+  if(same(historyChampName))return "history";
+  if(same(champName))return "idiom";
+  return "";
+}
+function championMoveRepeatMs(){
+  const role=championPlayerMode();
+  return role==="grammar"?42:role==="idiom"?62:role==="history"?68:0;
+}
+function championAutoWalkMs(){
+  const role=championPlayerMode();
+  return role==="grammar"?30:role==="idiom"?44:role==="history"?48:72;
+}
 function saveChampionAvatar(name,avatar){
   try{const map=JSON.parse(localStorage.getItem("idiom_champion_avatars")||"{}");map[name]=avatar;localStorage.setItem("idiom_champion_avatars",JSON.stringify(map));}catch(e){}
 }
 function knownChampionAvatar(name){
   try{return JSON.parse(localStorage.getItem("idiom_champion_avatars")||"{}")[name]||null;}catch(e){return null;}
 }
-const doctorAt=(x,y)=>(x===DOCTOR_POS[0]&&y===DOCTOR_POS[1]);
+const doctorAt=(x,y)=>championPlayerMode()!=="idiom"&&(x===DOCTOR_POS[0]&&y===DOCTOR_POS[1]);
+const grammarOwnerAt=(x,y)=>grammarChampName&&championPlayerMode()!=="grammar"&&x===GRAMMAR_OWNER_POS[0]&&y===GRAMMAR_OWNER_POS[1];
+const historyChampionAt=(x,y)=>historyChampName&&championPlayerMode()!=="history"&&x===HISTORY_CHAMP_POS[0]&&y===HISTORY_CHAMP_POS[1];
 const CAMP_POS=[9,8];
 const campManagerAt=(x,y)=>(x===CAMP_POS[0]&&y===CAMP_POS[1]);
 const CAFE_SOLIDS=[];
@@ -625,7 +669,8 @@ const CAT_POS=[5,5];
 const catAt=(x,y)=>x===CAT_POS[0]&&y===CAT_POS[1];
 const SCHOOL_EXIT=[7,10];
 const SCHOOL_GATE=[7,3];
-const CHICKEN_POS=[2,9];
+// 입구 중앙 통로 바로 왼쪽. [6,9]까지 걸어오면 한 칸 거리에서 대화할 수 있다.
+const CHICKEN_POS=[5,9];
 const chickenAt=(x,y)=>x===CHICKEN_POS[0]&&y===CHICKEN_POS[1];
 // 화성고 앞 도로와 교내는 중앙 보행로로 연결한다.
 const HWASUNG_ROAD_EXIT=[7,10];
@@ -644,9 +689,10 @@ const LIBRARY_SEAT_VISUALS=[
   {gx:3,gy:5,x:108,foot:165},{gx:5,gy:5,x:174,foot:165},{gx:7,gy:5,x:240,foot:165},{gx:9,gy:5,x:306,foot:165},{gx:11,gy:5,x:371,foot:165}
 ];
 let gasigogiQuizSet=[],gasigogiQuizIndex=0,gasigogiQuizCorrect=0;
-let catQuizIndex=0, catQuizCorrect=0;
+let catQuizIndex=0,catQuizSet=[],catQuizTimer=null,catQuizDeadline=0,catQuizStartedAt=0,catQuizLocked=false;
 let grammarQuizIndex=0,grammarQuizSet=[],grammarQuizTimer=null,grammarQuizDeadline=0,grammarQuizStartedAt=0,grammarQuizLocked=false;
-const GRAMMAR_QUIZ_COUNT=10,GRAMMAR_QUESTION_SECONDS=20;
+const GRAMMAR_QUIZ_COUNT=10,GRAMMAR_QUESTION_SECONDS=45;
+const HISTORY_QUIZ_COUNT=10,HISTORY_QUESTION_SECONDS=45;
 const GASIGOGI_QUIZ_COUNT=5;
 const GASIGOGI_QUESTIONS=[
   {q:"소설 첫 장면에서 경훈이 잠에서 깨어 커튼을 젖힌 때는 언제인가?",opts:["새벽 5시가 지난 때","정오 무렵","저녁 7시 무렵","자정 직전"],a:0,e:"첫 장면은 새벽 5시가 넘었는데도 방 안이 어두운 상황에서 시작한다."},
@@ -664,14 +710,6 @@ const GASIGOGI_QUESTIONS=[
   {q:"재판부가 김영수에게 선고한 형은 무엇인가?",opts:["사형","무기징역","징역 10년","집행유예"],a:0,e:"재판장은 김영수에게 사형을 선고했다."},
   {q:"경훈이 ‘행복하게 일하는 약’ 계획을 처음 말한 상대는 누구인가?",opts:["아버지","사촌","회사 변호사","어머니"],a:3,e:"경훈은 집으로 돌아온 뒤 어머니에게 노동자들의 음식이나 음료에 약을 넣겠다는 생각을 말했다."},
   {q:"경훈의 꿈에서 그물로 몰려온 것은 어떤 모습의 물고기였는가?",opts:["살이 통통한 잉어","앙상한 뼈와 가시가 드러난 가시고기","황금빛 고래","날개가 달린 물고기"],a:1,e:"살찐 고기 대신 뼈와 가시가 드러난 가시고기 떼가 그물에 몰려왔다."}
-];
-// 고양이 퀴즈 문항은 이 배열만 수정하면 문제·보기·해설을 교체할 수 있다.
-const CAT_QUESTIONS=[
-  {q:"『훈민정음』이 반포된 해와 책의 간행을 가장 정확하게 짝지은 것은?",opts:["1443년 창제 · 1446년 반포","1446년 창제 · 1443년 반포","1445년 창제 · 1446년 반포","1446년 창제 · 1448년 반포"],a:0,e:"세종 25년(1443)에 창제하고 세종 28년(1446)에 『훈민정음』 해례본을 간행·반포했다."},
-  {q:"중세 국어의 모음 조화에 대한 설명으로 옳은 것은?",opts:["양성 모음은 양성 모음끼리, 음성 모음은 음성 모음끼리 어울리는 경향이 있었다","모든 모음이 항상 자유롭게 결합했다","자음의 조화만 존재했다","현대 국어와 완전히 같은 방식으로만 작동했다"],a:0,e:"중세 국어는 ㆍ·ㅏ·ㅗ 등의 양성 모음과 ㅡ·ㅓ·ㅜ 등의 음성 모음이 서로 어울리는 모음 조화가 강했다."},
-  {q:"중세 국어의 성조 표기인 방점에서 글자 왼쪽에 점 두 개를 찍은 ‘상성’은 어떤 음 높이의 결합인가?",opts:["낮은 소리와 높은 소리가 결합된 복합 성조","처음부터 끝까지 낮은 소리","처음부터 끝까지 높은 소리","짧게 끊기는 소리"],a:0,e:"방점은 평성(무점), 거성(1점), 상성(2점)을 구별했으며 상성은 낮은 소리와 높은 소리가 결합된 성조다."},
-  {q:"훈민정음 초성 17자에 대한 설명으로 가장 적절한 것은?",opts:["발음 기관의 모양과 발음 작용을 본떠 기본자를 만들고, 획을 더해 가획자를 만들었다","한자의 부수를 그대로 빌려 만들었다","모든 글자를 원형 하나에서 무작위로 파생했다","초성은 11자뿐이고 나머지는 후대에 추가했다"],a:0,e:"ㄱ·ㄴ·ㅁ·ㅅ·ㅇ은 발음 기관을 본뜬 기본자이고, 획을 더한 가획자와 이체자가 체계를 이룬다."},
-  {q:"세종어제훈민정음 서문의 ‘나랏말싸미 듕귁에 달아’에 대한 설명으로 옳은 것은?",opts:["우리말이 중국말과 달라 한자만으로는 백성의 뜻을 제대로 적기 어렵다는 문제의식이다","중국어를 표준어로 삼자는 선언이다","한자를 폐지하고 문자를 하나로 통일하자는 주장이다","왕실에서만 쓸 비밀 문자를 만들겠다는 뜻이다"],a:0,e:"서문은 우리말과 중국어의 구조가 다르므로 한자를 모르는 백성이 쉽게 익힐 새 문자가 필요하다는 창제 취지를 밝힌다."}
 ];
 // 충장로 건물의 상호작용 지점은 문 그림이 아니라 문 바로 앞 보도 타일이다.
 const CAFE_DOOR=[3,6];
@@ -771,6 +809,7 @@ function blocked(x,y){
   }
   if(scene==="subway") return isWall(x,y);
   if(scene==="convenience"){
+    if(historyChampionAt(x,y)) return true;
     if(inZone(x,y,9,11,5,5)) return false;
     if(inZone(x,y,0,0,6,9)||inZone(x,y,14,14,6,9)) return false;
     if(y<=4||(x<=3&&y<=5)) return true;
@@ -783,10 +822,11 @@ function blocked(x,y){
   }
   if(scene==="school"){
     if(chickenAt(x,y)) return true;
+    if(grammarOwnerAt(x,y)) return true;
     if(inZone(x,y,6,8,10,10)) return false;
     if(inZone(x,y,6,8,3,3)) return false;
-    // 중앙 통로에서 왼쪽 보도의 닭 앞까지 걸어갈 수 있는 접근로.
-    if(inZone(x,y,3,8,9,9)) return false;
+    // 중앙 통로에서 닭과 품사왕까지 이어지는 접근로.
+    if(inZone(x,y,3,12,9,9)) return false;
     if(y<=3) return true;
     if(y>=4&&y<=9&&(x<6||x>8)) return true;
     return isWall(x,y);
@@ -1734,8 +1774,9 @@ const CAPTAIN_QUESTIONS=[
 
 function captainMasterSaved(name){try{return JSON.parse(localStorage.getItem("captain_lee_masters")||"[]").includes(name);}catch(e){return false;}}
 function saveCaptainMaster(name){try{const a=JSON.parse(localStorage.getItem("captain_lee_masters")||"[]");if(!a.includes(name))a.push(name);localStorage.setItem("captain_lee_masters",JSON.stringify(a));}catch(e){}}
-function catMasterSaved(name){try{return JSON.parse(localStorage.getItem("cat_masters")||"[]").includes(name);}catch(e){return false;}}
-function saveCatMaster(name){try{const a=JSON.parse(localStorage.getItem("cat_masters")||"[]");if(!a.includes(name)){a.push(name);localStorage.setItem("cat_masters",JSON.stringify(a));}}catch(e){}}
+const CAT_MASTERY_KEY="cat_history_masters_v1";
+function catMasterSaved(name){try{return JSON.parse(localStorage.getItem(CAT_MASTERY_KEY)||"[]").includes(name);}catch(e){return false;}}
+function saveCatMaster(name){try{const a=JSON.parse(localStorage.getItem(CAT_MASTERY_KEY)||"[]");if(!a.includes(name)){a.push(name);localStorage.setItem(CAT_MASTERY_KEY,JSON.stringify(a));}}catch(e){}}
 function grammarMasterSaved(name){try{return JSON.parse(localStorage.getItem("grammar_masters")||"[]").includes(name);}catch(e){return false;}}
 function saveGrammarMaster(name){try{const a=JSON.parse(localStorage.getItem("grammar_masters")||"[]");if(!a.includes(name)){a.push(name);localStorage.setItem("grammar_masters",JSON.stringify(a));}}catch(e){}}
 function loadTitleProfile(name){try{return JSON.parse(localStorage.getItem(`idiom_title_${name}`)||"{}")||{};}catch(e){return {};}}
@@ -1746,7 +1787,7 @@ function saveTitleProfile(){
 function applyPlayerTitle(){
   const raw=basePlayerName||playerName;if(!raw)return;
   if(activeTitle==="grammar"&&grammarMaster)playerName=`품사를 이해한 ${raw}`;
-  else if(activeTitle==="cat"&&catMaster)playerName=`고양이 ${raw}`;
+  else if(activeTitle==="history"&&catMaster)playerName=`국어사를 이해한 ${raw}`;
   else if(activeTitle==="captain"&&captainMaster)playerName=`꺼삐딴 리 마스터 ${raw}`;
   else if(activeTitle==="mentor"&&mentorName)playerName=`${mentorName}의 제자 ${raw}`;
   else if(activeTitle==="train")playerName=`집에 가려다 실패한 ${raw}`;
@@ -2275,8 +2316,67 @@ function drawPlayerWalkFrame(sheet,a,row,col,x,renderFoot,width,height){
   }
   ctx.drawImage(sheet,col*32,row*48,32,48,x-width/2,renderFoot-height,width,height);
 }
+function drawChampionSpeedTrail(role,x,foot,moving){
+  if(!moving)return;
+  const [dx,dy]=DIRS[dir]||[0,1],gold=role==="grammar"?"#ffd35a":role==="idiom"?"#f4c35b":"#d7b8ff";
+  ctx.save();ctx.lineCap="round";ctx.globalCompositeOperation="screen";
+  const count=role==="grammar"?5:3;
+  for(let i=1;i<=count;i++){
+    const spread=(i%2?1:-1)*i*2.1,backX=x-dx*(12+i*8)+(dy?spread:0),backY=foot-dy*(7+i*5)+(dx?spread:0)-12;
+    ctx.globalAlpha=Math.max(.08,.48-i*.07);ctx.strokeStyle=gold;ctx.lineWidth=Math.max(1,4-i*.45);
+    ctx.beginPath();ctx.moveTo(backX,backY);ctx.lineTo(backX-dx*(10+i*3),backY-dy*(7+i*2));ctx.stroke();
+  }
+  ctx.restore();
+}
+function drawChampionPlayer(a,x,foot,moving){
+  const role=championPlayerMode();
+  if(!role)return false;
+  const female=a.id.endsWith("girl"),renderFoot=foot+2;
+  drawChampionSpeedTrail(role,x,renderFoot,moving);
+  ctx.save();ctx.imageSmoothingEnabled=false;
+  if(role==="grammar"&&v49CompactPhoenixSheet.complete&&v49CompactPhoenixSheet.naturalWidth){
+    const outdoors=["street","station","convenience","school","hwasungRoad","hwasungSchool","hell"].includes(scene);
+    const sw=v49CompactPhoenixSheet.naturalWidth/4,sh=v49CompactPhoenixSheet.naturalHeight/3;
+    const col=Math.max(0,AVATARS.findIndex(v=>v.id===a.id)),wingFrames=[0,1,2,1];
+    const row=wingFrames[Math.floor(T*(moving?12:4))%wingFrames.length];
+    const dw=outdoors?124:112,dh=dw,bob=moving?Math.sin(T*18)*1.4:Math.sin(T*2)*.5;
+    ctx.fillStyle="#5e351c55";ctx.beginPath();ctx.ellipse(x,renderFoot,Math.max(18,dw*.23),4,0,0,Math.PI*2);ctx.fill();
+    ctx.translate(x,0);if(!moving||dir!=="right")ctx.scale(-1,1);
+    ctx.drawImage(v49CompactPhoenixSheet,col*sw,row*sh,sw,sh,-dw/2,renderFoot-dh*COMPACT_PHOENIX_FOOT_RATIO+bob,dw,dh);
+    ctx.restore();return true;
+  }
+  if(role==="idiom"){
+    const idle=female?v20ChampionGirl:v20ChampionBoy;
+    if(!moving&&idle.complete&&idle.naturalWidth){
+      const dw=55,dh=77;ctx.fillStyle="#17202b55";ctx.beginPath();ctx.ellipse(x,renderFoot,15,3.8,0,0,Math.PI*2);ctx.fill();
+      ctx.drawImage(idle,0,0,40,56,x-dw/2,renderFoot-dh,dw,dh);ctx.restore();return true;
+    }
+    if(v47IdiomGeneralRunSheet.complete&&v47IdiomGeneralRunSheet.naturalWidth){
+      const sw=v47IdiomGeneralRunSheet.naturalWidth/4,sh=v47IdiomGeneralRunSheet.naturalHeight/4;
+      const row={down:0,left:1,right:2,up:3}[dir]??0,col=(female?2:0)+(Math.floor(T*13)%2),dw=62,dh=79;
+      ctx.fillStyle="#17202b55";ctx.beginPath();ctx.ellipse(x,renderFoot,17,4,0,0,Math.PI*2);ctx.fill();
+      ctx.drawImage(v47IdiomGeneralRunSheet,col*sw,row*sh,sw,sh,x-dw/2,renderFoot-dh,dw,dh);ctx.restore();return true;
+    }
+  }
+  if(role==="history"){
+    if(!moving&&v45HistoryChampionSheet.complete&&v45HistoryChampionSheet.naturalWidth){
+      const sw=v45HistoryChampionSheet.naturalWidth/2,sh=v45HistoryChampionSheet.naturalHeight/2,dw=66,dh=76;
+      ctx.fillStyle="#17202b55";ctx.beginPath();ctx.ellipse(x,renderFoot,16,3.8,0,0,Math.PI*2);ctx.fill();
+      ctx.drawImage(v45HistoryChampionSheet,(female?1:0)*sw,0,sw,sh,x-dw/2,renderFoot-dh+3,dw,dh);ctx.restore();return true;
+    }
+    if(v47HistoryCaptainRunSheet.complete&&v47HistoryCaptainRunSheet.naturalWidth){
+      const sw=v47HistoryCaptainRunSheet.naturalWidth/4,sh=v47HistoryCaptainRunSheet.naturalHeight/4;
+      const row={down:0,left:1,right:2,up:3}[dir]??0,col=(female?2:0)+(Math.floor(T*12)%2),dw=64,dh=80;
+      ctx.fillStyle="#17202b55";ctx.beginPath();ctx.ellipse(x,renderFoot,17,4,0,0,Math.PI*2);ctx.fill();
+      ctx.drawImage(v47HistoryCaptainRunSheet,col*sw,row*sh,sw,sh,x-dw/2,renderFoot-dh,dw,dh);ctx.restore();return true;
+    }
+  }
+  ctx.restore();return false;
+}
 function drawPlayerPixel(){
   const a=selectedAvatar(),x=visualPx*TILE+16,footY=visualPy*TILE+29;
+  const moving=Math.abs(visualPx-px)+Math.abs(visualPy-py)>.012;
+  if(drawChampionPlayer(a,x,footY,moving))return;
   const v20WalkSheet=avatarWalkSheet(a);
   if(v20WalkSheet&&v20WalkSheet.complete&&v20WalkSheet.naturalWidth){
     const speaker=(dlgSp.textContent||"").replace(/\s+/g,"");
@@ -2288,7 +2388,6 @@ function drawPlayerPixel(){
       ctx.save();ctx.imageSmoothingEnabled=false;ctx.fillStyle="#18202a55";ctx.beginPath();ctx.ellipse(x,renderFoot,13,3.5,0,0,Math.PI*2);ctx.fill();
       ctx.drawImage(v20BoyEmotionSheet,(index%4)*32,Math.floor(index/4)*48,32,48,x-dw/2,renderFoot-dh,dw,dh);ctx.restore();return;
     }
-    const moving=Math.abs(visualPx-px)+Math.abs(visualPy-py)>.012;
     const row={down:0,left:1,right:2,up:3}[dir]??0;
     const col=moving?(1+Math.floor(T*8)%3):0;
     const renderFoot=footY+2,{width:dw,height:dh}=playerWalkRenderSize();
@@ -2327,7 +2426,7 @@ function drawChampionV20(gx,gy,options={}){
   ctx.drawImage(img,frame*40,0,40,56,x-w/2,foot-h,w,h);ctx.restore();
   if(speaking||Math.abs(px-gx)+Math.abs(py-gy)<=1)pixelLabel(`${label} · ${avatarSchoolLabel(champAvatarId)}`,x,foot-h-5,"#66508a");
 }
-function drawDoctor(){drawChampionV20(...DOCTOR_POS);}
+function drawDoctor(){if(championPlayerMode()!=="idiom")drawChampionV20(...DOCTOR_POS);}
 function drawCampManager(){drawCharacterAsset("camp-manager",...CAMP_POS,{width:44,height:64,label:"캠프장"});}
 const PIXEL_NPC_COLORS=[
   {hair:"#3d2a22",coat:"#4f8790",trim:"#bde1d4",skin:"#efbe91"},
@@ -2396,6 +2495,49 @@ function drawPixelChicken(){
   ctx.restore();
   if(speaking||near)pixelLabel("닭",x,foot-62,"#8b4b32");
 }
+function grammarOwnerLabel(){return grammarChampName?`품사왕 ${grammarChampName}`:"";}
+function drawGrammarOwner(){
+  if(!grammarChampName||championPlayerMode()==="grammar")return;
+  const a=AVATARS.find(v=>v.id===grammarChampAvatarId)||AVATARS[0];
+  const x=GRAMMAR_OWNER_SCREEN.x,foot=GRAMMAR_OWNER_SCREEN.foot;
+  const speaking=characterIsSpeaking(grammarOwnerLabel()),bob=Math.sin(T*1.8+characterPhase(grammarChampName)*6)*.45+(speaking?Math.sin(T*7)*.7:0);
+  ctx.save();ctx.imageSmoothingEnabled=false;
+  ctx.fillStyle="#18202a55";ctx.beginPath();ctx.ellipse(x,foot,29,4,0,0,Math.PI*2);ctx.fill();
+  if(v49CompactPhoenixSheet.complete&&v49CompactPhoenixSheet.naturalWidth){
+    const col=Math.max(0,AVATARS.findIndex(v=>v.id===a.id)),wingFrames=[0,1,2,1];
+    const row=wingFrames[Math.floor(T*(speaking?8:3))%wingFrames.length];
+    const sw=v49CompactPhoenixSheet.naturalWidth/4,sh=v49CompactPhoenixSheet.naturalHeight/3,dw=124,dh=124;
+    // 생성 원본은 오른쪽을 보므로 전체를 반전해 통로 쪽인 왼쪽을 바라보게 한다.
+    ctx.translate(x,0);ctx.scale(-1,1);
+    ctx.drawImage(v49CompactPhoenixSheet,col*sw,row*sh,sw,sh,-dw/2,foot-dh*COMPACT_PHOENIX_FOOT_RATIO+bob,dw,dh);
+  }else{
+    ctx.restore();
+    drawCharacterAsset(`player-${a.id}`,...GRAMMAR_OWNER_POS,{screenX:x,screenFoot:foot,width:54,height:76,facing:"down",skin:a.skin,noBlink:false,action:speaking});
+    pixelLabel(grammarOwnerLabel(),x,foot-98,"#8b4b32");
+    return;
+  }
+  ctx.restore();
+  pixelLabel(grammarOwnerLabel(),x,foot-86,"#8b4b32");
+}
+function historyChampionLabel(){return historyChampName?`국어사대장 ${historyChampName}`:"";}
+function drawHistoryChampion(){
+  if(!historyChampName||championPlayerMode()==="history")return;
+  const x=HISTORY_CHAMP_POS[0]*TILE+16,foot=HISTORY_CHAMP_POS[1]*TILE+29;
+  const speaking=characterIsSpeaking(historyChampionLabel()),female=historyChampAvatarId.endsWith("girl");
+  const bob=Math.sin(T*1.7+characterPhase(historyChampName)*6)*.35+(speaking?Math.sin(T*6)*.55:0);
+  ctx.save();ctx.imageSmoothingEnabled=false;
+  ctx.fillStyle="#17202b55";ctx.beginPath();ctx.ellipse(x,foot,15,3.5,0,0,Math.PI*2);ctx.fill();
+  if(v45HistoryChampionSheet.complete&&v45HistoryChampionSheet.naturalWidth){
+    const sw=v45HistoryChampionSheet.naturalWidth/2,sh=v45HistoryChampionSheet.naturalHeight/2,dw=72,dh=72;
+    ctx.drawImage(v45HistoryChampionSheet,(female?1:0)*sw,(speaking?1:0)*sh,sw,sh,x-dw/2,foot-dh+4+bob,dw,dh);
+  }else{
+    const a=AVATARS.find(v=>v.id===historyChampAvatarId)||AVATARS[0];
+    const sheet=avatarWalkSheet(a);
+    if(sheet&&sheet.complete&&sheet.naturalWidth)ctx.drawImage(sheet,(speaking?1:0)*32,0,32,48,x-24,foot-72+bob,48,72);
+  }
+  ctx.restore();
+  pixelLabel(historyChampionLabel(),x,foot-76,"#66508a");
+}
 function drawPixelFood(){
   if(!orderedFood)return;const x=372,y=243;
   ctx.fillStyle="#f1e4c4";ctx.fillRect(x-10,y-4,20,8);ctx.fillStyle=orderedFood==="짜장면"?"#56321f":orderedFood==="짬뽕"?"#d55535":"#d8a944";ctx.fillRect(x-7,y-8,14,7);ctx.fillStyle="#e7c16b";ctx.fillRect(x-5,y-7,3,2);ctx.fillRect(x+2,y-5,3,2);
@@ -2433,6 +2575,7 @@ function drawSubwayInterior(){
 function drawConvenienceFrame(){
   drawPixelSceneBackground("convenience");
   drawPixelCat();
+  drawHistoryChampion();
 }
 function drawConvenienceInterior(){
   drawPixelSceneBackground("convenienceInterior");
@@ -2441,7 +2584,7 @@ function drawConvenienceInterior(){
   drawCharacterAsset("cleo",...CONVENIENCE_CASHIER,{screenX:350,screenFoot:104,width:50,height:70,label:"안젤라",pixelArt:true,action:false,shadow:"#14212d22"});
   ctx.restore();
 }
-function drawSchoolCampus(){drawPixelSceneBackground("school");drawPixelChicken();}
+function drawSchoolCampus(){drawPixelSceneBackground("school");drawPixelChicken();if(grammarChampName)drawGrammarOwner();}
 function drawHwasungRoad(){drawPixelSceneBackground("hwasungRoad");pixelSceneSign("화성고등학교",240,119,"#f8e5ba",10);}
 function drawHwasungSchool(){drawPixelSceneBackground("hwasungSchool");pixelSceneSign("화성고등학교",240,112,"#f8e5ba",10);}
 function drawLibraryInterior(){
@@ -2621,7 +2764,8 @@ function updateScenePresentation(now){
     cv.classList.remove("scene-enter");void cv.offsetWidth;cv.classList.add("scene-enter");
     setTimeout(()=>cv.classList.remove("scene-enter"),450);
   }else{
-    const ease=1-Math.exp(-dt*15);visualPx+=(px-visualPx)*ease;visualPy+=(py-visualPy)*ease;
+    const role=championPlayerMode(),speed=role==="grammar"?24:role?19:15;
+    const ease=1-Math.exp(-dt*speed);visualPx+=(px-visualPx)*ease;visualPy+=(py-visualPy)*ease;
   }
 }
 function drawGlobalAtmosphere(){
@@ -2657,7 +2801,7 @@ function drawDoorHintAt(x,y,color="#ffd875"){
 }
 function drawInteractionHints(){
   if(mode==="title"||dlg.style.display==="block"||modal.style.display==="block"||scene==="captain"||scene==="subway") return;
-  if(scene==="cafe"){EMPTY_SEATS.forEach(([x,y])=>drawHint(x,y,"","#a9f0db"));drawHint(DOCTOR_POS[0],DOCTOR_POS[1]);drawHint(CAMP_POS[0],CAMP_POS[1]);drawHint(EXIT[0],EXIT[1]);}
+  if(scene==="cafe"){EMPTY_SEATS.forEach(([x,y])=>drawHint(x,y,"","#a9f0db"));if(doctorAt(...DOCTOR_POS))drawHint(DOCTOR_POS[0],DOCTOR_POS[1]);drawHint(CAMP_POS[0],CAMP_POS[1]);drawHint(EXIT[0],EXIT[1]);}
   else if(scene==="street"){
     // 표시와 실제 진입 판정이 동일한 문 앞 보도 타일을 사용한다.
     drawHint(...CAFE_DOOR,"","#79dcff");
@@ -2667,9 +2811,9 @@ function drawInteractionHints(){
   }
   else if(scene==="station"){drawHint(...STATION_ENTRY_POS);drawHint(7,10);}
   else if(scene==="platform"){drawHint(...PLATFORM_TRAIN_POS);drawHint(7,0);}
-  else if(scene==="convenience"){drawHint(...CAT_POS,"","#9fd8ff");drawHint(...CONVENIENCE_DOOR,"","#7de7df");drawHint(0,6);drawHint(14,6);}
+  else if(scene==="convenience"){drawHint(...CAT_POS,"","#9fd8ff");if(historyChampionAt(...HISTORY_CHAMP_POS))drawHint(...HISTORY_CHAMP_POS,"","#e9c97a");drawHint(...CONVENIENCE_DOOR,"","#7de7df");drawHint(0,6);drawHint(14,6);}
   else if(scene==="convenienceInterior"){drawHint(...CONVENIENCE_CASHIER);drawHint(...CONVENIENCE_EXIT);}
-  else if(scene==="school"){drawHint(...CHICKEN_POS,"품사 닭","#ffe08a");drawHint(...SCHOOL_GATE);drawHint(...SCHOOL_EXIT);}
+  else if(scene==="school"){drawHint(...CHICKEN_POS,"품사 닭","#ffe08a");if(grammarOwnerAt(...GRAMMAR_OWNER_POS))drawHint(...GRAMMAR_OWNER_POS,"품사왕","#f4c86f");drawHint(...SCHOOL_GATE);drawHint(...SCHOOL_EXIT);}
   else if(scene==="hwasungRoad"){drawHint(...HWASUNG_ROAD_GATE,"화성고 정문","#ffe08a");drawHint(...HWASUNG_ROAD_EXIT);}
   else if(scene==="hwasungSchool"){drawHint(...HWASUNG_MAIN_ENTRANCE,"본관","#ffe08a");drawHint(...HWASUNG_SCHOOL_EXIT);}
   else if(scene==="library"){LIBRARY_SEATS.forEach(([x,y])=>drawHint(x,y,"","#c9f3dd"));drawHint(2,3,"책 고르기","#ffe08a");drawHint(12,3,"책 고르기","#ffe08a");drawHint(...LIBRARY_EXIT);}
@@ -2763,7 +2907,7 @@ function autoWalkTo(gx,gy,exact,onArrive){
   const path=[];for(let k=found;k&&k!==startKey;k=prev.get(k)){const [x,y]=k.split(",").map(Number);path.push([x,y]);}path.reverse();
   mode="autowalk";let i=0;
   const finish=()=>{if(scene!==startScene)return;mode=startMode;const dx=gx-px,dy=gy-py;if(Math.abs(dx)>Math.abs(dy))dir=dx>0?"right":"left";else if(dy)dir=dy>0?"down":"up";onArrive();};
-  const tick=()=>{if(scene!==startScene){mode=startMode;return;}if(i>=path.length){finish();return;}const [nx,ny]=path[i++];dir=nx>px?"right":nx<px?"left":ny>py?"down":"up";px=nx;py=ny;stepFrame++;setTimeout(tick,72);};
+  const tick=()=>{if(scene!==startScene){mode=startMode;return;}if(i>=path.length){finish();return;}const [nx,ny]=path[i++];dir=nx>px?"right":nx<px?"left":ny>py?"down":"up";px=nx;py=ny;stepFrame++;setTimeout(tick,championAutoWalkMs());};
   tick();
 }
 function interactWithPoet(poet){
@@ -2811,7 +2955,7 @@ function runJoystickStep(){
   if(scene!==beforeScene||joystickPointerId===null||!mobileMovementReady()){
     resetMobileJoystick();return;
   }
-  joystickTimer=setTimeout(runJoystickStep,JOYSTICK_REPEAT_MS);
+  joystickTimer=setTimeout(runJoystickStep,championMoveRepeatMs()||JOYSTICK_REPEAT_MS);
 }
 function setJoystickVector(clientX,clientY){
   const dx=clientX-joystickOriginX,dy=clientY-joystickOriginY;
@@ -2885,7 +3029,7 @@ cv.addEventListener("click", e=>{
     const stu=STUDENTS.find(s=>{const v=CAFE_SEAT_VISUALS[s.seat];return v&&Math.abs(cx-v.x)<=22&&cy>=88&&cy<=160;});
     if(seat)autoWalkTo(seat[0],seat[1],true,()=>{dir="up";openSeatChoice();});
     else if(stu)autoWalkTo(stu.x,stu.y,false,()=>showDialog([{sp:stu.name,text:stu.line}],()=>{mode="cafe";}));
-    else if(Math.abs(tx-DOCTOR_POS[0])<=1&&Math.abs(ty-DOCTOR_POS[1])<=1)autoWalkTo(...DOCTOR_POS,false,talkToDoctor);
+    else if(doctorAt(...DOCTOR_POS)&&Math.abs(tx-DOCTOR_POS[0])<=1&&Math.abs(ty-DOCTOR_POS[1])<=1)autoWalkTo(...DOCTOR_POS,false,talkToDoctor);
     else if(Math.abs(tx-CAMP_POS[0])<=1&&Math.abs(ty-CAMP_POS[1])<=1)autoWalkTo(...CAMP_POS,false,talkToCampManager);
     else if(inZone(tx,ty,6,8,9,10))autoWalkTo(...EXIT,false,enterStreet);
   }else if(scene==="street"&&mode==="explore"){
@@ -2906,7 +3050,8 @@ cv.addEventListener("click", e=>{
     if(inZone(tx,ty,6,8,5,7))autoWalkTo(...PLATFORM_TRAIN_POS,false,boardStationTrain);
     else if(inZone(tx,ty,6,8,0,1))autoWalkTo(7,0,false,leaveStationPlatform);
   }else if(scene==="convenience"&&mode==="explore"){
-    if(Math.abs(tx-CAT_POS[0])<=1&&Math.abs(ty-CAT_POS[1])<=1)autoWalkTo(...CAT_POS,false,talkToCat);
+    if(historyChampionAt(...HISTORY_CHAMP_POS)&&Math.abs(tx-HISTORY_CHAMP_POS[0])<=1&&Math.abs(ty-HISTORY_CHAMP_POS[1])<=1)autoWalkTo(...HISTORY_CHAMP_POS,false,talkToHistoryChampion);
+    else if(Math.abs(tx-CAT_POS[0])<=1&&Math.abs(ty-CAT_POS[1])<=1)autoWalkTo(...CAT_POS,false,talkToCat);
     else if(inZone(tx,ty,9,11,4,6))autoWalkTo(...CONVENIENCE_DOOR,false,enterConvenienceInterior);
     else if(inZone(tx,ty,0,1,5,10))autoWalkTo(0,Math.max(6,Math.min(9,ty)),false,leaveConvenienceFrame);
     else if(inZone(tx,ty,13,14,5,10))autoWalkTo(14,Math.max(6,Math.min(9,ty)),false,enterSchoolFromConvenience);
@@ -2914,7 +3059,8 @@ cv.addEventListener("click", e=>{
     if(Math.abs(tx-CONVENIENCE_CASHIER[0])<=1&&Math.abs(ty-CONVENIENCE_CASHIER[1])<=1)autoWalkTo(...CONVENIENCE_CASHIER,false,()=>showDialog([{sp:"안젤라",text:"안녕, 난 요새 맞춤법을 공부하고 있어. 너도 미리 공부해둬."}],()=>{mode="explore";}));
     else if(inZone(tx,ty,6,8,9,10))autoWalkTo(...CONVENIENCE_EXIT,false,leaveConvenienceInterior);
   }else if(scene==="school"&&mode==="explore"){
-    if(Math.abs(tx-CHICKEN_POS[0])<=1&&Math.abs(ty-CHICKEN_POS[1])<=1)autoWalkTo(...CHICKEN_POS,false,talkToChicken);
+    if(grammarOwnerAt(...GRAMMAR_OWNER_POS)&&Math.abs(cx-GRAMMAR_OWNER_SCREEN.x)<=90&&cy>=GRAMMAR_OWNER_SCREEN.foot-145&&cy<=GRAMMAR_OWNER_SCREEN.foot+12)autoWalkTo(...GRAMMAR_OWNER_POS,false,talkToGrammarOwner);
+    else if(Math.abs(tx-CHICKEN_POS[0])<=1&&Math.abs(ty-CHICKEN_POS[1])<=1)autoWalkTo(...CHICKEN_POS,false,talkToChicken);
     else if(inZone(tx,ty,6,8,9,10))autoWalkTo(...SCHOOL_EXIT,false,leaveSchoolToConvenience);
     else if(inZone(tx,ty,6,8,2,4))autoWalkTo(...SCHOOL_GATE,false,enterLibraryFromSchool);
   }else if(scene==="hwasungRoad"&&mode==="explore"){
@@ -2975,6 +3121,7 @@ function tryMove(d){
     if(d==="up"&&inZone(nx,ny,6,8,0,0)){dir=d;leaveStationPlatform();return;}
   }
   if(scene==="convenience"){
+    if(historyChampionAt(nx,ny)){dir=d;talkToHistoryChampion();return;}
     if(catAt(nx,ny)){dir=d;talkToCat();return;}
     if(d==="up"&&inZone(nx,ny,9,11,5,5)){dir=d;enterConvenienceInterior();return;}
     if(d==="left"&&inZone(nx,ny,0,0,6,9)){dir=d;leaveConvenienceFrame();return;}
@@ -2985,6 +3132,7 @@ function tryMove(d){
     if(d==="down"&&inZone(nx,ny,6,8,10,10)){dir=d;leaveConvenienceInterior();return;}
   }
   if(scene==="school"){
+    if(grammarOwnerAt(nx,ny)){dir=d;talkToGrammarOwner();return;}
     if(chickenAt(nx,ny)){dir=d;talkToChicken();return;}
     if(d==="down"&&inZone(nx,ny,6,8,10,10)){dir=d;leaveSchoolToConvenience();return;}
     if(d==="up"&&inZone(nx,ny,6,8,3,3)){dir=d;enterLibraryFromSchool();return;}
@@ -3030,13 +3178,29 @@ function tryMove(d){
   if(scene==="cafe" && mode==="cafe" && inList(EMPTY_SEATS,px,py)) openSeatChoice();
   if(scene==="restaurant"&&px===RESTAURANT_EMPTY_SEAT[0]&&py===RESTAURANT_EMPTY_SEAT[1]){restaurantSeated=false;openFoodOrder();}
 }
+let championKeyTimer=null,championKeyDir="";
+function stopChampionKeyMove(){if(championKeyTimer!==null)clearTimeout(championKeyTimer);championKeyTimer=null;championKeyDir="";}
+function runChampionKeyMove(){
+  if(!championKeyDir||!championMoveRepeatMs()){stopChampionKeyMove();return;}
+  tryMove(championKeyDir);championKeyTimer=setTimeout(runChampionKeyMove,championMoveRepeatMs());
+}
 document.addEventListener("keydown",e=>{
   const k=e.key;
   if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(k)) e.preventDefault();
   if(dlg.style.display==="block" && (k===" "||k==="Enter"||k==="z"||k==="Z")){ nextDialog(); return; }
   const map={ArrowUp:"up",w:"up",W:"up",ArrowDown:"down",s:"down",S:"down",ArrowLeft:"left",a:"left",A:"left",ArrowRight:"right",d:"right",D:"right"};
-  if(map[k]) tryMove(map[k]);
+  if(map[k]){
+    const moveDir=map[k],repeat=championMoveRepeatMs();
+    if(!repeat){tryMove(moveDir);return;}
+    if(championKeyDir===moveDir)return;
+    stopChampionKeyMove();championKeyDir=moveDir;tryMove(moveDir);championKeyTimer=setTimeout(runChampionKeyMove,repeat);
+  }
 });
+document.addEventListener("keyup",e=>{
+  const map={ArrowUp:"up",w:"up",W:"up",ArrowDown:"down",s:"down",S:"down",ArrowLeft:"left",a:"left",A:"left",ArrowRight:"right",d:"right",D:"right"};
+  if(map[e.key]===championKeyDir)stopChampionKeyMove();
+});
+window.addEventListener("blur",stopChampionKeyMove);
 /* 캔버스 스와이프로 이동 */
 let swX=0, swY=0, swT=0;
 cv.addEventListener("touchstart",e=>{
@@ -3059,7 +3223,7 @@ cv.addEventListener("touchend",e=>{
 document.querySelectorAll("#pad button").forEach(b=>{
   let t=null;
   const go=()=>tryMove(b.dataset.d);
-  b.addEventListener("pointerdown",e=>{e.preventDefault();go();t=setInterval(go,170);});
+  b.addEventListener("pointerdown",e=>{e.preventDefault();go();t=setInterval(go,championMoveRepeatMs()||170);});
   ["pointerup","pointerleave","pointercancel"].forEach(ev=>b.addEventListener(ev,()=>{clearInterval(t);t=null;}));
 });
 
@@ -3108,6 +3272,7 @@ function showTitle(){
       <button class="btn primary" id="startBtn">시작한다</button>
       <button class="btn" id="idiomLbBtn">🏆 한자성어 랭킹 보기</button>
       <button class="btn" id="grammarLbBtn">🐓 품사 10문제 시간 랭킹</button>
+      <button class="btn" id="historyLbBtn">🐈 국어사 10문제 시간 랭킹</button>
     </div>`);
   const input=document.getElementById("nameInput");
   const updateSchoolPicker=schoolId=>{
@@ -3128,7 +3293,7 @@ function showTitle(){
       const on=other===card;other.classList.toggle("selected",on);other.setAttribute("aria-checked",String(on));
     });
   }));
-  const start=()=>{
+  const start=async()=>{
     let v=input.value;
     v=v.replace(/[\u200B-\u200D\u2060\uFEFF\u00A0\u180E\u2000-\u200A\u202F\u205F\u3000\uFFA0\u1160\u3164\u115F]/g,"");
     v=v.replace(/\s+/g,"").trim();
@@ -3137,14 +3302,17 @@ function showTitle(){
     if([...v].length!==3){ input.placeholder="이름은 한글 세 글자로 입력하세요"; input.value=""; return; }
     const nv=v;
     if(FORBIDDEN.includes(nv)||FORBIDDEN_PART.some(p=>nv.includes(p))){ basePlayerName=v;playerName=v;mentorName="";activeTitle="";captainMaster=false;catMaster=false;grammarMaster=false;classInSession=false;classSleepPhase=false;restaurantSeated=false;orderedFood="";closeModal();teacherDeath();return; }
+    const startBtn=document.getElementById("startBtn");startBtn.disabled=true;startBtn.textContent="1위 기록 확인 중…";
     basePlayerName=v;captainMaster=captainMasterSaved(v);catMaster=catMasterSaved(v);grammarMaster=grammarMasterSaved(v);
-    const profile=loadTitleProfile(v);mentorName=profile.mentor||"";activeTitle=profile.active||((grammarMaster&&"grammar")||(catMaster&&"cat")||(captainMaster&&"captain")||(mentorName&&"mentor")||"");
+    const profile=loadTitleProfile(v);mentorName=profile.mentor||"";activeTitle=profile.active||((grammarMaster&&"grammar")||(catMaster&&"history")||(captainMaster&&"captain")||(mentorName&&"mentor")||"");
     try{localStorage.setItem("idiom_last_avatar",selectedAvatarId);localStorage.setItem("idiom_last_school",selectedSchoolId);}catch(e){}
+    await Promise.allSettled([fetchChampion(),fetchGrammarChampion(),fetchHistoryChampion()]);
     applyPlayerTitle();saveTitleProfile();classInSession=false;classSleepPhase=false;restaurantSeated=false;orderedFood="";closeModal();startCafe();
   };
   document.getElementById("startBtn").onclick=start;
   document.getElementById("idiomLbBtn").onclick=()=>{ showRankingModal("idiom"); };
   document.getElementById("grammarLbBtn").onclick=()=>{ showRankingModal("grammar"); };
+  document.getElementById("historyLbBtn").onclick=()=>{ showRankingModal("history"); };
   input.addEventListener("keydown",e=>{ if(e.key==="Enter") start(); });
   loadGlobalSurvivalStat();
   input.focus();
@@ -3169,8 +3337,13 @@ function startCafe(){
   scene="cafe"; px=7; py=9; dir="up"; mode="locked";
   hudL.textContent=`${playerName} · 스터디카페`; hudR.textContent="🌙 밤 10시";
   fetchChampion();
+  fetchGrammarChampion();
+  fetchHistoryChampion();
+  const championRole=championPlayerMode();
+  const championIntro=championRole==="grammar"?"품사 랭킹 1위의 이름이 확인되었다. 품사왕의 봉황을 타며 이동 속도가 크게 빨라진다.":championRole==="history"?"국어사 랭킹 1위의 이름이 확인되었다. 국어사대장의 복식과 달리기 동작이 활성화되었다.":championRole==="idiom"?"한자성어 통합 랭킹 1위의 이름이 확인되었다. 사자성어 대장군의 복식과 달리기 동작이 활성화되었다.":"";
   showDialog([
     {sp:"내레이션", text:`밤 10시. ${eun(playerName)} 혼자 스터디카페에 들어왔다.`},
+    ...(championIntro?[{sp:"랭킹 시스템",text:championIntro}]:[]),
     {sp:"내레이션", text:"위쪽 벽을 따라 놓인 빈 책걸상 아무 곳에나 앉아 보자. (좌석을 클릭하거나 직접 이동)"}
   ], ()=>{ mode="cafe"; });
 }
@@ -3272,6 +3445,7 @@ function leaveStationFrame(){
 }
 function enterConvenienceFrame(){
   scene="convenience";px=2;py=6;dir="right";mode="explore";hudL.textContent=`${playerName} · 편의점 앞 도로`;hudR.textContent="🌙 밤 10시";
+  fetchHistoryChampion();
   showDialog([{sp:"내레이션",text:"스터디카페 오른쪽 길로 빠져나왔다. 세븐일레븐의 초록·주황·빨간 간판이 밤거리를 밝히고 있다."},{sp:"내레이션",text:"편의점 옆에는 회갈색 얼룩 고양이가 앉아 있다. 가까이 가서 말을 걸어 보자."}],()=>{mode="explore";});
 }
 function leaveConvenienceFrame(){
@@ -3286,10 +3460,12 @@ function leaveConvenienceInterior(){
 }
 function enterSchoolFromConvenience(){
   scene="school";px=7;py=8;dir="up";mode="explore";hudL.textContent=`${playerName} · 안산동산고등학교`;hudR.textContent="🏫 교문 개방";
+  fetchGrammarChampion();
   showDialog([{sp:"내레이션",text:"세븐일레븐 오른쪽 길을 따라가자 안산동산고등학교 정문이 나타났다."},{sp:"내레이션",text:"교문은 언제나 열려 있다. 중앙 통로를 따라 학교 안으로 들어갈 수 있다."}],()=>{mode="explore";});
 }
 function leaveSchoolToConvenience(){
   scene="convenience";px=13;py=6;dir="left";mode="explore";hudL.textContent=`${playerName} · 세븐일레븐 앞`;hudR.textContent="🌙 밤 10시";
+  fetchHistoryChampion();
 }
 function enterLibraryFromSchool(){
   scene="library";px=7;py=9;dir="up";mode="explore";hudL.textContent=`${playerName} · 5층 도서관`;hudR.textContent="📚 열람실";
@@ -3297,6 +3473,7 @@ function enterLibraryFromSchool(){
 }
 function leaveLibraryToSchool(){
   scene="school";px=SCHOOL_GATE[0];py=SCHOOL_GATE[1]+1;dir="down";mode="explore";hudL.textContent=`${playerName} · 안산동산고등학교`;hudR.textContent="🏫 교문 개방";
+  fetchGrammarChampion();
 }
 function openLibraryBookMenu(){
   mode="locked";
@@ -3351,14 +3528,11 @@ function resumeLibraryQuizFromStory(){
 function stopGrammarQuizTimer(){
   if(grammarQuizTimer!==null){clearInterval(grammarQuizTimer);grammarQuizTimer=null;}
 }
-const GRAMMAR_EXPERT_INDICES=[21,22,30,31,32,33,34,35,36,52,61,68,73,79,86,94];
 function buildGrammarQuizSet(){
+  // 첫 문제는 닭의 앞 대사와 바로 이어지는 기존 ‘꼬끼오’ 품사 문제를 유지한다.
   const first={...POS_QUESTION_BANK[0],level:"기초 확인"};
-  const expertIndices=shuffle(GRAMMAR_EXPERT_INDICES).slice(0,5);
-  const used=new Set([0,...expertIndices]);
-  const experts=expertIndices.map(i=>({...POS_QUESTION_BANK[i],level:"최고난도"}));
-  const regular=shuffle(POS_QUESTION_BANK.map((q,i)=>({q,i})).filter(v=>!used.has(v.i))).slice(0,GRAMMAR_QUIZ_COUNT-1-experts.length).map(v=>({...v.q,level:"심화"}));
-  return [first,...shuffle([...experts,...regular])];
+  const hard=shuffle(CSAT_POS_QUESTION_GROUPS).slice(0,9).map(group=>({...shuffle(group)[0],level:"오답 집중 · 최고난도"}));
+  return [first,...hard];
 }
 async function requestGrammarToken(){
   grammarSessionToken=null;if(!SERVER_URL)return;
@@ -3390,6 +3564,51 @@ function talkToChicken(){
     {sp:"닭",text:"꼬끼오~!의 품사는?"}
   ],startGrammarQuiz);
 }
+function talkToGrammarOwner(){
+  if(!grammarChampName){mode="explore";return;}
+  mode="locked";
+  showDialog([{sp:grammarOwnerLabel(),text:`나는 품사 10문제를 가장 빠르게 푼 품사왕 ${grammarChampName}(이)다. 닭은 학교 앞에 그대로 두고, 이제 봉황을 타고 다니며 표준국어대사전의 품사와 뜻을 알려 주지.`}],openWordKingDictionary);
+}
+function officialDictionaryUrl(word){return `https://stdict.korean.go.kr/search/searchResult.do?pageSize=10&searchKeyword=${encodeURIComponent(word)}`;}
+function openWordKingDictionary(message="찾을 단어를 입력하면 표준국어대사전의 품사와 뜻을 확인할 수 있다."){
+  mode="locked";
+  openModal(`<div class="box mini">
+    <div class="title-big yellow">🔥 품사왕의 사전</div>
+    <p class="qtext">${escapeRankingText(message)}</p>
+    <input id="wordKingInput" maxlength="20" placeholder="예: 아름답다" autocomplete="off">
+    <button class="btn primary" id="wordKingSearch">표준국어대사전에서 찾기</button>
+    <button class="btn" id="wordKingClose">그만 묻는다</button>
+  </div>`);
+  const input=document.getElementById("wordKingInput");
+  const search=()=>lookupWordKing(input.value);
+  document.getElementById("wordKingSearch").onclick=search;
+  document.getElementById("wordKingClose").onclick=()=>{closeModal();mode="explore";};
+  input.addEventListener("keydown",e=>{if(e.key==="Enter")search();});input.focus();
+}
+async function lookupWordKing(value){
+  const word=String(value||"").normalize("NFC").trim().replace(/\s+/g," ");
+  if(!word||word.length>20){openWordKingDictionary("한글 단어를 20자 이내로 입력해라.");return;}
+  openModal(`<div class="box mini"><p class="qtext" style="text-align:center;">품사왕이 ‘${escapeRankingText(word)}’을 찾는 중...</p></div>`);
+  let payload=null;
+  if(SERVER_URL){
+    try{
+      const res=await fetch(SERVER_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({action:"dictionary",word})});
+      payload=await res.json();
+    }catch(_e){}
+  }
+  const official=payload&&payload.officialUrl||officialDictionaryUrl(word);
+  const results=payload&&payload.ok&&Array.isArray(payload.results)?payload.results:[];
+  if(results.length){
+    const cards=results.slice(0,6).map((item,i)=>`<div class="explain good" style="margin-top:8px;"><b>${i+1}. ${escapeRankingText(item.word)}${item.supNo?`<sup>${escapeRankingText(item.supNo)}</sup>`:""} · ${escapeRankingText(item.pos||"품사 없음")}</b><br>${escapeRankingText(item.definition||"뜻풀이 없음")}</div>`).join("");
+    openModal(`<div class="box"><div class="title-big yellow">표준국어대사전 · ${escapeRankingText(word)}</div>${cards}<a class="btn" href="${escapeRankingText(official)}" target="_blank" rel="noopener">공식 사전에서 전체 보기</a><button class="btn primary" id="wordKingAgain">다른 단어 찾기</button><button class="btn" id="wordKingDone">닫기</button></div>`);
+    document.getElementById("wordKingAgain").onclick=()=>openWordKingDictionary();
+    document.getElementById("wordKingDone").onclick=()=>{closeModal();mode="explore";};
+    return;
+  }
+  openModal(`<div class="box mini"><div class="title-big yellow">표준국어대사전</div><p class="qtext">현재 게임 서버에 사전 인증 키가 연결되지 않았거나 검색 결과가 없다. 아래 공식 검색 결과에서 품사와 뜻을 바로 확인할 수 있다.</p><a class="btn primary" href="${escapeRankingText(official)}" target="_blank" rel="noopener">‘${escapeRankingText(word)}’ 공식 검색 결과 열기</a><button class="btn" id="wordKingAgain">다른 단어 찾기</button><button class="btn" id="wordKingDone">닫기</button></div>`);
+  document.getElementById("wordKingAgain").onclick=()=>openWordKingDictionary();
+  document.getElementById("wordKingDone").onclick=()=>{closeModal();mode="explore";};
+}
 async function startGrammarQuiz(){
   stopGrammarQuizTimer();
   grammarQuizSet=buildGrammarQuizSet();
@@ -3405,7 +3624,7 @@ function showGrammarQuizQuestion(){
   stopGrammarQuizTimer();grammarQuizLocked=false;mode="locked";
   const item=grammarQuizSet[grammarQuizIndex];
   openModal(`<div class="box">
-    <p class="qtext" style="text-align:center;"><b class="yellow">🐓 닭의 품사 시험</b><br><span class="hint">문제 ${grammarQuizIndex+1} / ${GRAMMAR_QUIZ_COUNT} · 전체 문제은행 ${POS_QUESTION_BANK.length}문항</span><br><span class="tag">${item.level||"심화"}</span></p>
+    <p class="qtext" style="text-align:center;"><b class="yellow">🐓 수능·공무원형 품사 시험</b><br><span class="hint">문제 ${grammarQuizIndex+1} / ${GRAMMAR_QUIZ_COUNT} · 고난도 문제은행 ${CSAT_POS_QUESTION_BANK.length}문항 · 5지선다</span><br><span class="tag">${item.source||item.level||"오답 집중"}</span></p>
     <div class="grammar-clock" id="grammarClock"><span>남은 시간 <b id="grammarRemain">${GRAMMAR_QUESTION_SECONDS}.0초</b></span><span>총 시간 <b id="grammarElapsed">${grammarElapsedText()}</b></span></div>
     <p class="qtext">${item.q}</p>
     ${item.opts.map((o,i)=>`<button class="opt" data-grammar-i="${i}">${i+1}. ${o}</button>`).join("")}
@@ -3424,7 +3643,7 @@ function showGrammarQuizQuestion(){
 async function answerGrammarQuiz(choice){
   if(grammarQuizLocked)return;grammarQuizLocked=true;stopGrammarQuizTimer();
   const item=grammarQuizSet[grammarQuizIndex];closeModal();
-  if(choice!==item.a){failGrammarQuiz(`틀렸다. 정답은 ${item.opts[item.a]}이다.`);return;}
+  if(choice!==item.a){failGrammarQuiz(`틀렸다. 정답은 ${item.opts[item.a]}이다. ${item.e}`);return;}
   await sendGrammarProgress(grammarQuizIndex);
   grammarQuizIndex++;
   if(grammarQuizIndex===1){
@@ -3448,7 +3667,9 @@ async function completeGrammarQuiz(){
   const elapsed=Math.max(1,Math.round((Date.now()-grammarQuizStartedAt)/1000));
   const raw=basePlayerName||playerName;grammarMaster=true;activeTitle="grammar";saveGrammarMaster(raw);applyPlayerTitle();saveTitleProfile();
   const localResult=await addRecord(raw,elapsed,"grammar");
+  if(localResult.rank===1){grammarChampName=raw;grammarChampAvatarId=selectedAvatarId;saveChampionAvatar(raw,selectedAvatarId);}
   const serverSec=await submitGrammarScore(elapsed);
+  fetchGrammarChampion();
   const finalSec=serverSec??localResult.entry.sec;
   hudL.textContent=`${playerName} · ${selectedAvatar().school==="hwasung"?"화성고등학교":"안산동산고등학교"}`;hudR.textContent=`🐓 10문제 정답 · ${formatGrammarTime(finalSec)}`;
   showDialog([
@@ -3463,7 +3684,7 @@ async function completeGrammarQuiz(){
 function talkToCat(){
   mode="locked";
   if(catMaster){
-    showDialog([{sp:"고양이",text:`안녕 ${basePlayerName||playerName}!`}],()=>{mode="explore";});
+    showDialog([{sp:"고양이",text:`다시 왔구냥, ${basePlayerName||playerName}! 국어사 10문제 기록을 더 줄여 보겠냥?`}],openCatQuiz);
     return;
   }
   showDialog([
@@ -3474,33 +3695,93 @@ function talkToCat(){
     {sp:"고양이",text:"나는 1000년 묵은 고양이다. 인간들은 내 말을 못 들을 텐데 넌 참 신기한 놈이구냥."},
     {sp:"고양이",text:"내 말을 알아듣는 인간을 살려둘 수는 없지!!!"},
     {sp:playerName,text:"갑자기? 그게 무슨 말이야 고양아... 살려줘..."},
-    {sp:"고양이",text:"지금부터 내가 중세국어 퀴즈를 낼 것이다. 틀리면... 지옥을 볼 것이다."}
+    {sp:"고양이",text:"네 교재의 고대·중세·근대 국어에서 열 문제를 내겠다. 문제마다 45초다. 틀리거나 시간이 다 되면... 지옥을 볼 것이다."}
   ],openCatQuiz);
 }
-function openCatQuiz(){
-  catQuizIndex=0;catQuizCorrect=0;showCatQuizQuestion();
+function stopCatQuizTimer(){
+  if(catQuizTimer!==null){clearInterval(catQuizTimer);catQuizTimer=null;}
 }
+function buildHistoryQuizSet(){
+  const take=(era,count)=>shuffle(KOREAN_HISTORY_QUESTION_BANK.filter(q=>q.era===era)).slice(0,count);
+  return shuffle([...take("고대 국어",2),...take("중세 국어",4),...take("훈민정음",2),...take("근대 국어",2)]);
+}
+async function requestHistoryToken(){
+  historySessionToken=null;if(!SERVER_URL)return;
+  try{
+    const res=await fetch(SERVER_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({action:"historyStart"})});
+    const j=await res.json();if(j&&j.ok&&j.token)historySessionToken=j.token;
+  }catch(_e){}
+}
+async function sendHistoryProgress(idx){
+  if(!SERVER_URL||!historySessionToken)return;
+  try{await fetch(SERVER_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({action:"historyProgress",token:historySessionToken,idx})});}catch(_e){}
+}
+async function submitHistoryScore(sec){
+  if(!SERVER_URL||!historySessionToken)return null;
+  try{
+    const res=await fetch(SERVER_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({action:"historyFinish",token:historySessionToken,name:rankingSubmitName(basePlayerName||playerName),baseName:basePlayerName||playerName,avatar:selectedAvatarId,school:selectedAvatar().school,quizType:"history",clientSec:Math.round(sec)})});
+    const j=await res.json();historySessionToken=null;return j&&j.ok?j.sec:null;
+  }catch(_e){return null;}
+}
+async function openCatQuiz(){
+  stopCatQuizTimer();catQuizSet=buildHistoryQuizSet();catQuizIndex=0;catQuizStartedAt=Date.now();catQuizLocked=false;
+  await requestHistoryToken();showCatQuizQuestion();
+}
+function historyElapsedText(){return `${Math.max(0,(Date.now()-catQuizStartedAt)/1000).toFixed(1)}초`;}
 function showCatQuizQuestion(){
-  mode="locked";
-  const item=CAT_QUESTIONS[catQuizIndex];
-  openModal(`<div class="box"><p class="qtext" style="text-align:center;"><b class="yellow">고양이의 중세국어 퀴즈</b><br><span class="hint">${catQuizIndex+1} / ${CAT_QUESTIONS.length}</span></p><p class="qtext">${item.q}</p>${item.opts.map((o,i)=>`<button class="opt" data-cat-i="${i}">${i+1}. ${o}</button>`).join("")}</div>`);
+  stopCatQuizTimer();catQuizLocked=false;mode="locked";
+  const item=catQuizSet[catQuizIndex];
+  openModal(`<div class="box"><p class="qtext" style="text-align:center;"><b class="yellow">🐈 교재 기반 국어사 타임어택</b><br><span class="hint">문제 ${catQuizIndex+1} / ${HISTORY_QUIZ_COUNT} · 문제은행 ${KOREAN_HISTORY_QUESTION_BANK.length}문항</span><br><span class="tag">${escapeRankingText(item.era)} · ${escapeRankingText(item.level)} · 교재 ${item.page}쪽</span></p><div class="grammar-clock" id="catClock"><span>남은 시간 <b id="catRemain">${HISTORY_QUESTION_SECONDS}.0초</b></span><span>총 시간 <b id="catElapsed">${historyElapsedText()}</b></span></div><p class="qtext">${item.q}</p>${item.opts.map((o,i)=>`<button class="opt" data-cat-i="${i}">${i+1}. ${o}</button>`).join("")}</div>`);
   modal.querySelectorAll("[data-cat-i]").forEach(b=>b.onclick=()=>answerCatQuiz(+b.dataset.catI));
+  catQuizDeadline=Date.now()+HISTORY_QUESTION_SECONDS*1000;
+  const tick=()=>{
+    const remain=Math.max(0,catQuizDeadline-Date.now()),remainEl=document.getElementById("catRemain"),elapsedEl=document.getElementById("catElapsed"),clock=document.getElementById("catClock");
+    if(remainEl)remainEl.textContent=`${(remain/1000).toFixed(1)}초`;
+    if(elapsedEl)elapsedEl.textContent=historyElapsedText();
+    if(clock)clock.classList.toggle("danger",remain<=5000);
+    if(remain<=0&&!catQuizLocked){catQuizLocked=true;stopCatQuizTimer();failCatQuiz("시간이 다 되었다냥.");}
+  };
+  tick();catQuizTimer=setInterval(tick,100);
 }
-function answerCatQuiz(choice){
-  const item=CAT_QUESTIONS[catQuizIndex];closeModal();
+async function answerCatQuiz(choice){
+  if(catQuizLocked)return;catQuizLocked=true;stopCatQuizTimer();
+  const item=catQuizSet[catQuizIndex];closeModal();
   if(choice!==item.a){
-    showDialog([{sp:"고양이",text:"틀렸군. 중세국어를 우습게 본 대가로 지옥을 보여주겠다냥."}],()=>{
-      fade.innerHTML="고양이의 꼬리가 빛났다...<br><br>지옥으로 떨어진다.";fade.style.opacity=1;fade.style.pointerEvents="auto";setTimeout(()=>enterHell(),1600);
-    });
+    failCatQuiz(`틀렸다냥. 정답은 ${item.opts[item.a]}이다. ${item.e}`);
     return;
   }
-  catQuizCorrect++;catQuizIndex++;
-  if(catQuizIndex<CAT_QUESTIONS.length){
+  await sendHistoryProgress(catQuizIndex);catQuizIndex++;
+  if(catQuizIndex<HISTORY_QUIZ_COUNT){
     showDialog([{sp:"고양이",text:`정답이다냥. ${item.e}`}],showCatQuizQuestion);
   }else{
-    const raw=basePlayerName||playerName;catMaster=true;activeTitle="cat";saveCatMaster(raw);applyPlayerTitle();saveTitleProfile();hudL.textContent=`${playerName} · 세븐일레븐`;hudR.textContent="🐈 칭호 획득";
-    showDialog([{sp:"고양이",text:"대단하다냥! 중세국어의 핵심을 모두 꿰뚫었구냥."},{sp:"고양이",text:`칭호 획득! 이제부터 너는 고양이 ${raw}다냥. 후에 널 고양이로 임명한다냥.`}],()=>{scene="convenience";px=CAT_POS[0];py=CAT_POS[1];dir="left";mode="explore";});
+    showDialog([{sp:"고양이",text:`마지막 문제도 정답이다냥. ${item.e}`}],completeCatQuiz);
   }
+}
+function failCatQuiz(reason){
+  stopCatQuizTimer();closeModal();historySessionToken=null;mode="locked";
+  showDialog([{sp:"고양이",text:`${reason} 국어사를 우습게 본 대가로 지옥을 보여주겠다냥.`}],()=>{
+    fade.innerHTML="고양이의 꼬리가 빛났다...<br><br>🐈<br><br>사자성어 지옥으로 떨어진다.";fade.style.opacity=1;fade.style.pointerEvents="auto";setTimeout(()=>enterHell(),1600);
+  });
+}
+async function completeCatQuiz(){
+  const elapsed=Math.max(1,Math.round((Date.now()-catQuizStartedAt)/1000)),raw=basePlayerName||playerName;
+  catMaster=true;activeTitle="history";saveCatMaster(raw);applyPlayerTitle();saveTitleProfile();
+  const localResult=await addRecord(raw,elapsed,"history");
+  if(localResult.rank===1){historyChampName=raw;historyChampAvatarId=selectedAvatarId;saveChampionAvatar(raw,selectedAvatarId);}
+  const serverSec=await submitHistoryScore(elapsed);fetchHistoryChampion();
+  const finalSec=serverSec??localResult.entry.sec;
+  hudL.textContent=`${playerName} · 편의점 앞 도로`;hudR.textContent=`🐈 10문제 정답 · ${formatGrammarTime(finalSec)}`;
+  showDialog([{sp:"고양이",text:"대단하다냥! 고대·중세·근대 국어 열 문제를 모두 맞혔구냥."},{sp:"고양이",text:`칭호 획득! 이제부터 너는 ‘국어사를 이해한 ${raw}’이다냥.`}],()=>{
+    openModal(`<div class="box mini"><div class="title-big green">국어사 시험 완료</div><p class="qtext" style="text-align:center;">10문제 전문항 정답 · <b class="yellow">${formatGrammarTime(finalSec)}</b><br><span class="hint">풀이 시간이 짧은 순 · 현재 기기 기록 ${localResult.rank}위</span></p><button class="btn primary" id="historyRankOpen">국어사 10문제 시간 랭킹</button><button class="btn" id="historyContinue">계속 탐험한다</button></div>`);
+    document.getElementById("historyRankOpen").onclick=()=>showRankingModal("history",false);
+    document.getElementById("historyContinue").onclick=()=>{closeModal();scene="convenience";px=CAT_POS[0];py=CAT_POS[1]+1;dir="up";mode="explore";};
+  });
+}
+function talkToHistoryChampion(){
+  if(!historyChampName){mode="explore";return;}
+  const fact=KOREAN_HISTORY_CONCEPTS[Math.floor(Math.random()*KOREAN_HISTORY_CONCEPTS.length)];
+  mode="locked";
+  showDialog([{sp:historyChampionLabel(),text:`오늘의 국어사 개념이다. ${fact.text} 교재 ${fact.page}쪽에서 다시 확인할 수 있어.`}],()=>{mode="explore";});
 }
 function enterCafeFromStreet(){
   scene="cafe"; px=7; py=9; dir="up"; mode="cafe";
@@ -3694,6 +3975,53 @@ async function fetchChampion(){
     }
   }catch(e){}
 }
+async function fetchGrammarChampion(){
+  try{
+    const list=SERVER_URL?await fetchGlobalLB("grammar"):await lbLoad("grammar");
+    if(list&&list.length){
+      const first=list[0],name=rankingStudentName(first.name);
+      grammarChampName=name;
+      grammarChampAvatarId=AVATARS.some(a=>a.id===first.avatar)?first.avatar:(knownChampionAvatar(name)||"dongsan-boy");
+      return;
+    }
+    grammarChampName=null;grammarChampAvatarId="dongsan-boy";
+  }catch(e){
+    try{
+      const list=await lbLoad("grammar");
+      if(list&&list.length){
+        const first=list[0],name=rankingStudentName(first.name);
+        grammarChampName=name;
+        grammarChampAvatarId=AVATARS.some(a=>a.id===first.avatar)?first.avatar:(knownChampionAvatar(name)||"dongsan-boy");
+        return;
+      }
+      grammarChampName=null;grammarChampAvatarId="dongsan-boy";
+    }catch(_e){}
+  }
+}
+async function fetchHistoryChampion(){
+  try{
+    const serverList=SERVER_URL?await fetchGlobalLB("history"):[];
+    const list=serverList.length?serverList:await lbLoad("history");
+    if(list&&list.length){
+      const first=list[0],name=rankingStudentName(first.name);
+      historyChampName=name;
+      historyChampAvatarId=AVATARS.some(a=>a.id===first.avatar)?first.avatar:(knownChampionAvatar(name)||"dongsan-boy");
+      return;
+    }
+    historyChampName=null;historyChampAvatarId="dongsan-boy";
+  }catch(_e){
+    try{
+      const list=await lbLoad("history");
+      if(list&&list.length){
+        const first=list[0],name=rankingStudentName(first.name);
+        historyChampName=name;
+        historyChampAvatarId=AVATARS.some(a=>a.id===first.avatar)?first.avatar:(knownChampionAvatar(name)||"dongsan-boy");
+        return;
+      }
+    }catch(__e){}
+    historyChampName=null;historyChampAvatarId="dongsan-boy";
+  }
+}
 function docName(){ return champName ? `사자성어 대장군 ${champName}` : "사자성어 대장군"; }
 function talkToDoctor(){
   mode="locked";
@@ -3849,6 +4177,7 @@ function rankingNameKey(name){
     .replace(/^집에가려다실패한/,"")
     .replace(/^귀가에실패한/,"")
     .replace(/^품사를이해한/,"")
+    .replace(/^국어사를이해한/,"")
     .replace(/^고양이/,"")
     .replace(/^꺼삐딴리마스터/,"")
     .replace(/^꺼삐딴리/,"")
@@ -3867,10 +4196,10 @@ function rankingSubmitName(name){
   const raw=basePlayerName||String(name||"").trim();
   if(activeTitle==="train")return `귀가에 실패한 ${raw}`;
   if(activeTitle==="grammar")return `품사를 이해한 ${raw}`;
+  if(activeTitle==="history")return `국어사를 이해한 ${raw}`;
   if(activeTitle==="captain")return `꺼삐딴 리 ${raw}`;
   if(activeTitle==="mentor"&&mentorName)return `${mentorName} 제자 ${raw}`;
   if(activeTitle==="general")return `대장군 ${raw}`;
-  if(activeTitle==="cat")return `고양이 ${raw}`;
   return raw;
 }
 function rankingStudentName(name){
@@ -3901,11 +4230,19 @@ function rankingRowsHtml(list,limit=20,highlightKey="",type="idiom"){
   return list.slice(0,limit).map((e,i)=>{
     const me=highlightKey&&rankingNameKey(e.name)===highlightKey;
     const avatar=escapeRankingText(e.avatar?avatarSchoolLabel(e.avatar):(e.school==="hwasung"?"화성고 · 미확인":e.school==="dongsan"?"동산고 · 미확인":"기존 기록"));
-    const time=type==="grammar"?formatGrammarTime(e.sec):fmt(e.sec);
+    const time=type==="idiom"?fmt(e.sec):formatGrammarTime(e.sec);
     return `<div class="lb-row${me?" me":""}"><span class="lb-rank">${i+1}위</span><span class="lb-name">${escapeRankingText(e.name)}${me?" ◀":""}</span><span class="lb-avatar">${avatar}</span><span class="lb-time">${time}</span></div>`;
   }).join("")||`<div style="text-align:center;">아직 기록이 없습니다</div>`;
 }
-const lbStorageKey=type=>type==="grammar"?"idiom_lb_grammar":"idiom_lb";
+const lbStorageKey=type=>type==="grammar"?"idiom_lb_grammar":type==="history"?"idiom_lb_history":"idiom_lb";
+// 수능·공무원형 문제 전환 시점 이전의 기기별 품사 기록을 한 번만 폐기한다.
+const GRAMMAR_RANK_RESET_ID="2026-07-19-csat-reset-1";
+try{
+  if(localStorage.getItem("idiom_grammar_rank_reset_id")!==GRAMMAR_RANK_RESET_ID){
+    localStorage.removeItem(lbStorageKey("grammar"));
+    localStorage.setItem("idiom_grammar_rank_reset_id",GRAMMAR_RANK_RESET_ID);
+  }
+}catch(e){}
 async function lbLoad(type="idiom"){
   const key=lbStorageKey(type);
   if(window.storage){
@@ -3961,31 +4298,34 @@ async function fetchGlobalLB(type="idiom"){
   const res=await fetch(`${SERVER_URL}?type=${encodeURIComponent(type)}&t=${Date.now()}`,{cache:"no-store"});
   if(!res.ok) throw new Error("server");
   const list=await res.json();
-  return dedupeLeaderboard(list);
+  const typed=(Array.isArray(list)?list:[]).filter(row=>type==="idiom"?(!row.type||row.type==="idiom"):row.type===type);
+  return dedupeLeaderboard(typed);
 }
 async function showRankingModal(initialType="idiom",returnToTitle=true){
   openModal(`<div class="box mini"><p class="qtext" style="text-align:center;">랭킹을 불러오는 중...</p></div>`);
-  const type=initialType==="grammar"?"grammar":"idiom";
+  const type=["idiom","grammar","history"].includes(initialType)?initialType:"idiom";
   let list=[], label="이 기기 기록";
   if(SERVER_URL){
-    try{ list=await fetchGlobalLB(type); label=type==="grammar"?"전체 품사 랭킹":"전체 한자성어 랭킹"; }
+    try{ list=await fetchGlobalLB(type); label=type==="grammar"?"전체 품사 랭킹":type==="history"?"전체 국어사 랭킹":"전체 한자성어 랭킹"; }
     catch(e){ list=await lbLoad(type); }
   } else { list=await lbLoad(type); }
   list=dedupeLeaderboard(list);
   const rows=rankingRowsHtml(list,20,"",type);
   openModal(`
     <div class="box leaderboard-box">
-      <div class="title-big yellow" style="font-size:24px; letter-spacing:2px;">${type==="grammar"?"🐓":"👑"} ${label}</div>
-      <p class="hint" style="text-align:center;">${type==="grammar"?"10문제를 모두 맞힌 기록만 등록 · 총 풀이 시간이 짧은 순":"15개 석상을 모두 정화한 생환 기록 · 시간이 짧은 순"}</p>
+      <div class="title-big yellow" style="font-size:24px; letter-spacing:2px;">${type==="grammar"?"🐓":type==="history"?"🐈":"👑"} ${label}</div>
+      <p class="hint" style="text-align:center;">${type==="idiom"?"15개 석상을 모두 정화한 생환 기록 · 시간이 짧은 순":type==="grammar"?"품사 10문제를 모두 맞힌 기록만 등록 · 총 풀이 시간이 짧은 순":"교재 기반 국어사 10문제를 모두 맞힌 기록만 등록 · 총 풀이 시간이 짧은 순"}</p>
       <div class="school-grid" aria-label="랭킹 종류 선택">
         <button class="school-card${type==="idiom"?" selected":""}" id="idiomRankTab">한자성어</button>
         <button class="school-card${type==="grammar"?" selected":""}" id="grammarRankTab">품사</button>
+        <button class="school-card${type==="history"?" selected":""}" id="historyRankTab">국어사</button>
       </div>
       <div class="explain good leaderboard-list">${rows}</div>
       <button class="btn primary" id="closeLb">닫기</button>
     </div>`);
   document.getElementById("idiomRankTab").onclick=()=>showRankingModal("idiom",returnToTitle);
   document.getElementById("grammarRankTab").onclick=()=>showRankingModal("grammar",returnToTitle);
+  document.getElementById("historyRankTab").onclick=()=>showRankingModal("history",returnToTitle);
   document.getElementById("closeLb").onclick=()=>{closeModal();if(returnToTitle)showTitle();else mode="explore";};
 }
 async function addRecord(name,sec,type="idiom"){
