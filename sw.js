@@ -1,5 +1,5 @@
 /* 사자성어 여행단 - 학생별 자동 업데이트 서비스 워커 */
-const VERSION="98-2026.07.19";
+const VERSION="107-2026.07.19";
 const CACHE=`idiom-quest-v${VERSION}`;
 const APP_SHELL=[
   "./",
@@ -7,7 +7,13 @@ const APP_SHELL=[
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
-  "./assets/data/pos-questions-v1.js"
+  "./assets/data/pos-questions-v1.js",
+  "./assets/data/korean-history-questions-v1.js",
+  "./assets/fonts/NotoOldHangul-Regular.woff2",
+  "./assets/v45/characters/rankings/korean-history-champions-v45.png",
+  "./assets/v47/characters/players/idiom-general-run-v47.png",
+  "./assets/v47/characters/players/history-captain-run-v47.png",
+  "./assets/v49/characters/rankings/pos-king-phoenix-compact-v49.png"
 ];
 
 function canStore(response){
