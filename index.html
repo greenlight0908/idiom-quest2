@@ -133,10 +133,11 @@ button.btn.primary:hover{filter:brightness(1.08)}
 .explain b{ color:var(--lantern); }
 .leaderboard-box{max-width:480px!important;padding-left:12px!important;padding-right:12px!important;}
 .leaderboard-list{font-size:13px;line-height:1.45;padding:8px 9px;}
-.lb-row{display:grid;grid-template-columns:42px minmax(0,1fr) 52px;align-items:start;gap:5px;padding:5px 0;border-bottom:1px solid #ffffff18;}
+.lb-row{display:grid;grid-template-columns:42px minmax(0,1fr) 76px 52px;align-items:start;gap:5px;padding:5px 0;border-bottom:1px solid #ffffff18;}
 .lb-row:last-child{border-bottom:0;}
 .lb-rank{white-space:nowrap;color:#ffe2a0;}
 .lb-name{min-width:0;white-space:normal;word-break:keep-all;overflow-wrap:anywhere;line-height:1.45;}
+.lb-avatar{text-align:center;white-space:nowrap;color:#b9d8e1;font-size:9px;line-height:1.45;}
 .lb-time{text-align:right;white-space:nowrap;color:#d8efe9;}
 .lb-row.me{color:var(--lantern);font-weight:bold;}
 .lb-row.me .lb-rank,.lb-row.me .lb-time{color:var(--lantern);}
@@ -157,12 +158,17 @@ input#nameInput:focus{ outline:none; border-color:var(--lantern); box-shadow:0 0
 .survival-stat b{color:#ffd372;font-size:15px;letter-spacing:1px;}
 .survival-stat small{color:#a9d8cd;font-size:7px;}
 .avatar-start-box input#nameInput{padding:8px;margin-bottom:6px;font-size:15px;}
+.school-picker-title{font-size:9px;text-align:center;color:#cbe7ef;margin:1px 0 4px;letter-spacing:1px;}
+.school-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:6px;}
+button.school-card{padding:6px 8px;border:2px solid #587486;border-bottom-width:3px;border-radius:7px;background:#16283d;color:#bcd3dc;font:9px NeoDGM,monospace;cursor:pointer;}
+button.school-card.selected{border-color:#ffd372;background:#314b5d;color:#fff1c6;box-shadow:0 0 10px #ffd37233;}
 .avatar-picker-title{font-size:10px;text-align:center;color:#ffe3a5;margin:2px 0 5px;letter-spacing:1px;}
 .avatar-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:9px;}
 button.avatar-card{position:relative;display:grid;grid-template-columns:58px minmax(0,1fr);align-items:center;gap:8px;min-width:0;height:82px;padding:7px 8px;margin:0;border:2px solid #607789;border-bottom-width:4px;border-radius:8px;background:linear-gradient(180deg,#1d3047,#142238);color:#f8edd4;font-family:inherit;cursor:pointer;overflow:hidden;text-align:left;}
 button.avatar-card:hover,button.avatar-card:focus-visible{outline:none;border-color:#9bc5d8;background:linear-gradient(180deg,#29445a,#1b3046);transform:translateY(-1px);}
 button.avatar-card.selected{border-color:#ffd372;background:linear-gradient(180deg,#344f61,#20394e);box-shadow:0 0 0 2px #ffe2a533,0 0 14px #ffd37255;}
 button.avatar-card.selected::after{content:"선택됨";position:absolute;right:5px;top:5px;padding:3px 4px;border-radius:4px;background:#ffd372;color:#172338;font-size:6px;line-height:1;box-shadow:0 2px 0 #8d6034;}
+button.avatar-card[hidden]{display:none;}
 .avatar-portrait-frame{display:flex;align-items:center;justify-content:center;width:58px;height:64px;border:1px solid #66889b;border-radius:6px;background:linear-gradient(180deg,#b9d8de 0 55%,#8aab9a 55% 58%,#526e5e 58% 100%);box-shadow:inset 0 0 0 2px #d9f0ed33;overflow:hidden;}
 .avatar-portrait{width:32px;height:48px;flex:0 0 32px;background-size:400% 400%;background-position:0 0;background-repeat:no-repeat;image-rendering:pixelated;transform:scale(1.18);transform-origin:center bottom;}
 .avatar-card-copy{display:flex;min-width:0;flex-direction:column;gap:5px;padding-top:5px;}
@@ -245,6 +251,7 @@ button.avatar-card.selected::after{content:"선택됨";position:absolute;right:5
   .survival-stat{gap:5px;margin-bottom:3px;padding:3px 5px;font-size:8px;border-width:1px;}
   .survival-stat b{font-size:11px;}.survival-stat small{font-size:6px;}
   .avatar-start-box input#nameInput{padding:5px;margin-bottom:3px;font-size:13px;border-width:2px;}
+  .school-picker-title{font-size:7px;margin:0 0 2px;}.school-grid{gap:4px;margin-bottom:3px;}button.school-card{padding:3px 5px;font-size:7px;border-width:1px;border-bottom-width:2px;}
   .avatar-picker-title{font-size:8px;margin:0 0 3px;}
   .avatar-grid{gap:5px;margin-bottom:4px;}
   button.avatar-card{grid-template-columns:43px minmax(0,1fr);height:60px;padding:3px 4px;border-width:1px;border-bottom-width:3px;gap:4px;}
@@ -257,7 +264,8 @@ button.avatar-card.selected::after{content:"선택됨";position:absolute;right:5
   .avatar-start-box button.btn{padding:4px 7px;margin-bottom:3px;font-size:11px;border-width:2px;border-bottom-width:3px;}
   .leaderboard-box{padding-left:8px!important;padding-right:8px!important;}
   .leaderboard-list{font-size:11px;padding:6px;}
-  .lb-row{grid-template-columns:36px minmax(0,1fr) 46px;gap:4px;padding:4px 0;}
+  .lb-row{grid-template-columns:34px minmax(0,1fr) 62px 44px;gap:3px;padding:4px 0;}
+  .lb-avatar{font-size:7px;}
 }
 @media (hover:none) and (pointer:coarse){
   #pad{display:none;}
@@ -301,7 +309,7 @@ button.avatar-card.selected::after{content:"선택됨";position:absolute;right:5
 <script src="assets/data/pos-questions-v1.js"></script>
 <script>
 "use strict";
-const APP_VERSION="94 · 2026.07.13";
+const APP_VERSION="96 · 2026.07.19";
 const appVersionBtn=document.getElementById("appVersionBtn");
 appVersionBtn.textContent=`버전 ${APP_VERSION}`;
 /* ═══════════════ 사자성어 50 ═══════════════ */
@@ -424,6 +432,8 @@ const cafeBackground=new Image();cafeBackground.decoding="async";cafeBackground.
 const v20StudyChairLayers=new Image();v20StudyChairLayers.decoding="async";v20StudyChairLayers.src="assets/v20/furniture/study-chair-layers-v20.png";
 const v20BoySheet=new Image();v20BoySheet.decoding="async";v20BoySheet.src="assets/v20/characters/players/dongsan-boy-walk-v20.png";
 const v20GirlSheet=new Image();v20GirlSheet.decoding="async";v20GirlSheet.src="assets/v20/characters/players/dongsan-girl-walk-v20.png";
+const v44HwasungBoySheet=new Image();v44HwasungBoySheet.decoding="async";v44HwasungBoySheet.src="assets/v44/characters/players/hwasung-boy-walk-v44.png";
+const v44HwasungGirlSheet=new Image();v44HwasungGirlSheet.decoding="async";v44HwasungGirlSheet.src="assets/v44/characters/players/hwasung-girl-walk-v44.png";
 const v20BoyEmotionSheet=new Image();v20BoyEmotionSheet.decoding="async";v20BoyEmotionSheet.src="assets/v20/characters/players/dongsan-boy-emotions-v20.png";
 const v20ChampionBoy=new Image();v20ChampionBoy.decoding="async";v20ChampionBoy.src="assets/v20/characters/champions/champion-boy-v20.png";
 const v20ChampionGirl=new Image();v20ChampionGirl.decoding="async";v20ChampionGirl.src="assets/v20/characters/champions/champion-girl-v20.png";
@@ -459,6 +469,8 @@ const SCENE_FILES={
   convenience:"assets/v31/backgrounds/seven-eleven-exterior-v31.png",
   convenienceInterior:"assets/v31/backgrounds/seven-eleven-interior-v31.png",
   school:"assets/v18/backgrounds/exterior/school-v18.png",
+  hwasungRoad:"assets/v44/backgrounds/hwasung-school-front-road-v44.png",
+  hwasungSchool:"assets/v44/backgrounds/hwasung-school-campus-v44.png",
   library:"assets/v41/backgrounds/dongsan-library5f-v41.png",
   restaurant:"assets/v20/backgrounds/haochi-chairless-v20.png",
   academy:"assets/v23/backgrounds/sidae-academy-lobby-v23.png",
@@ -472,12 +484,19 @@ const CAPTAIN_SCENE_FILES=Array.from({length:16},(_,i)=>i===15
   ?"assets/v43/captain-ri/captain-scene-16-v43.png"
   :`assets/v42/captain-ri/captain-scene-${String(i+1).padStart(2,"0")}-v42.png`);
 const captainSceneImages=CAPTAIN_SCENE_FILES.map(src=>{const img=new Image();img.decoding="async";img.src=src;return img;});
+const SCHOOLS=[
+  {id:"dongsan",name:"안산동산고",short:"동산고"},
+  {id:"hwasung",name:"화성고",short:"화성고"}
+];
 const AVATARS=[
-  {id:"dongsan-boy",name:"동산고 남학생",desc:"검정 동복 · 붉은 넥타이",hair:"#27242a",hairHi:"#55505b",skin:"#efc29d",top:"#f3f4ec",topHi:"#ffffff",bottom:"#263d60",shoe:"#25262b",style:"schoolboy",outfit:"uniform-boy",bag:"none"},
-  {id:"dongsan-girl",name:"동산고 여학생",desc:"검정 동복 · 회색 치마",hair:"#392d2c",hairHi:"#6e5148",skin:"#efc09a",top:"#263d60",topHi:"#4f6684",bottom:"#263d60",shoe:"#25262b",style:"schoolgirl",outfit:"uniform-girl",bag:"none"}
+  {id:"dongsan-boy",school:"dongsan",name:"동산고 남학생",desc:"검정 동복 · 붉은 넥타이",sprite:"assets/v20/characters/players/dongsan-boy-walk-v20.png",hair:"#27242a",hairHi:"#55505b",skin:"#efc29d",top:"#f3f4ec",topHi:"#ffffff",bottom:"#263d60",shoe:"#25262b",style:"schoolboy",outfit:"uniform-boy",bag:"none"},
+  {id:"dongsan-girl",school:"dongsan",name:"동산고 여학생",desc:"검정 동복 · 회색 치마",sprite:"assets/v20/characters/players/dongsan-girl-walk-v20.png",hair:"#392d2c",hairHi:"#6e5148",skin:"#efc09a",top:"#263d60",topHi:"#4f6684",bottom:"#263d60",shoe:"#25262b",style:"schoolgirl",outfit:"uniform-girl",bag:"none"},
+  {id:"hwasung-boy",school:"hwasung",name:"화성고 남학생",desc:"밤색 재킷 · 베이지 배색",sprite:"assets/v44/characters/players/hwasung-boy-walk-v44.png",hair:"#262322",hairHi:"#4d4742",skin:"#efc19b",top:"#49372d",topHi:"#c7ad82",bottom:"#382d29",shoe:"#2b2523",style:"schoolboy",outfit:"uniform-boy",bag:"none"},
+  {id:"hwasung-girl",school:"hwasung",name:"화성고 여학생",desc:"밤색 동복 · 주황 배색",sprite:"assets/v44/characters/players/hwasung-girl-walk-v44.png",hair:"#2f2927",hairHi:"#5b504c",skin:"#efbf98",top:"#49372d",topHi:"#c7ad82",bottom:"#49372d",shoe:"#2b2523",style:"schoolgirl",outfit:"uniform-girl",bag:"none"}
 ];
 const CHARACTER_FILES={};
 for(const avatar of AVATARS){
+  if(avatar.school!=="dongsan")continue;
   CHARACTER_FILES[`player-${avatar.id}`]=`assets/v18/characters/players/${avatar.id}-idle-v18.png`;
   CHARACTER_FILES[`player-${avatar.id}-action`]=`assets/v18/characters/players/${avatar.id}-wave-v18.png`;
   CHARACTER_FILES[`player-${avatar.id}-seated`]=`assets/v19/characters/seated/players/${avatar.id}-seated-v19.png`;
@@ -527,20 +546,23 @@ Object.assign(CHARACTER_FILES,{
 const characterImages=Object.fromEntries(Object.entries(CHARACTER_FILES).map(([key,src])=>{
   const img=new Image();img.decoding="async";img.src=src;return [key,img];
 }));
-let selectedAvatarId="dongsan-boy";
+let selectedAvatarId="dongsan-boy",selectedSchoolId="dongsan";
 const selectedAvatar=()=>AVATARS.find(a=>a.id===selectedAvatarId)||AVATARS[0];
+const selectedSchool=()=>SCHOOLS.find(s=>s.id===selectedAvatar().school)||SCHOOLS[0];
+const avatarWalkSheet=a=>a.id==="dongsan-boy"?v20BoySheet:a.id==="dongsan-girl"?v20GirlSheet:a.id==="hwasung-boy"?v44HwasungBoySheet:a.id==="hwasung-girl"?v44HwasungGirlSheet:null;
+const avatarSchoolLabel=id=>{const a=AVATARS.find(v=>v.id===id);if(!a)return "선택 미확인";return `${a.school==="hwasung"?"화성고":"동산고"} ${a.id.endsWith("girl")?"여":"남"}`;};
 let mode="title", scene="cafe", playerName="", basePlayerName="", mentorName="", activeTitle="", classInSession=false, classSleepPhase=false, restaurantSeated=false, orderedFood="";
 let captainStage=0, captainMaster=false, captainQuizSet=[], captainQuizIndex=0, captainTimeCardToken=0, catMaster=false, grammarMaster=false;
 let px=7, py=9, dir="down", stepFrame=0;
 let statues=[], cleared=0, yeomraVisible=false;
 let dialogQueue=[], dialogDone=null, typing=null, fullText="";
 let currentPlayerEmotion="neutral";
-let runStart=0, finished=false, memLB=[], sessionToken=null;
+let runStart=0, finished=false, memLB=[], sessionToken=null,grammarSessionToken=null,trainDestination="home";
 /* ★★★ 통합 랭킹 서버 주소 ★★★
    Google Apps Script 웹 앱 URL을 아래 따옴표 안에 붙여넣으세요.
    비워 두면 이 기기에만 기록이 저장됩니다. */
 const SERVER_URL="https://script.google.com/macros/s/AKfycbwJBpgm6txu7xU2lJOMtjXizcXIEwTDg9T332De-2K8bRg6tirCidC9mKCiPjN2xeAq/exec";
-const FORBIDDEN=["정규영","류용수","구교훈","이한빈","홍주혜","장해든누리","해든누리","조경현","김소정","김훈","이진섭","안정석","문지유","김양식","이윤진","이유진","김창하","송지현","한예원","이광은"];
+const FORBIDDEN=["정규영","류용수","구교훈","김동준","이한빈","홍주혜","장해든누리","해든누리","조경현","김소정","김훈","이진섭","안정석","문지유","김양식","이윤진","이유진","김창하","송지현","한예원","이광은"];
 const FORBIDDEN_PART=["프로락틴","상변","규영"];
 
 const eun=n=>{const c=n.charCodeAt(n.length-1);if(c<0xAC00||c>0xD7A3)return n+"은(는)";return n+(((c-0xAC00)%28)>0?"은":"는");};
@@ -605,6 +627,11 @@ const SCHOOL_EXIT=[7,10];
 const SCHOOL_GATE=[7,3];
 const CHICKEN_POS=[2,9];
 const chickenAt=(x,y)=>x===CHICKEN_POS[0]&&y===CHICKEN_POS[1];
+// 화성고 앞 도로와 교내는 중앙 보행로로 연결한다.
+const HWASUNG_ROAD_EXIT=[7,10];
+const HWASUNG_ROAD_GATE=[7,4];
+const HWASUNG_SCHOOL_EXIT=[7,10];
+const HWASUNG_MAIN_ENTRANCE=[7,3];
 const LIBRARY_EXIT=[7,10];
 // 출입문과 양쪽 책장 사이의 이동 통로를 확보하기 위해 앞줄 책상은 제거했다.
 const LIBRARY_DESKS=[[3,4],[5,4],[7,4],[9,4],[11,4]];
@@ -619,7 +646,7 @@ const LIBRARY_SEAT_VISUALS=[
 let gasigogiQuizSet=[],gasigogiQuizIndex=0,gasigogiQuizCorrect=0;
 let catQuizIndex=0, catQuizCorrect=0;
 let grammarQuizIndex=0,grammarQuizSet=[],grammarQuizTimer=null,grammarQuizDeadline=0,grammarQuizStartedAt=0,grammarQuizLocked=false;
-const GRAMMAR_QUIZ_COUNT=7,GRAMMAR_QUESTION_SECONDS=20;
+const GRAMMAR_QUIZ_COUNT=10,GRAMMAR_QUESTION_SECONDS=20;
 const GASIGOGI_QUIZ_COUNT=5;
 const GASIGOGI_QUESTIONS=[
   {q:"소설 첫 장면에서 경훈이 잠에서 깨어 커튼을 젖힌 때는 언제인가?",opts:["새벽 5시가 지난 때","정오 무렵","저녁 7시 무렵","자정 직전"],a:0,e:"첫 장면은 새벽 5시가 넘었는데도 방 안이 어두운 상황에서 시작한다."},
@@ -731,7 +758,7 @@ function blocked(x,y){
   }
   if(scene==="station"){
     // 새 정면 역사 건물은 2~6행, 출입문 앞은 7행이다.
-    if(inZone(x,y,6,8,0,0)) return false;
+    if(inZone(x,y,6,8,10,10)) return false;
     if(inZone(x,y,6,8,7,7)) return false;
     if(y>=2&&y<=6&&x>=3&&x<=11) return true;
     return isWall(x,y);
@@ -763,6 +790,16 @@ function blocked(x,y){
     if(y<=3) return true;
     if(y>=4&&y<=9&&(x<6||x>8)) return true;
     return isWall(x,y);
+  }
+  if(scene==="hwasungRoad"){
+    // 화성고 정문과 횡단보도를 잇는 중앙 3칸만 보행 가능하게 유지한다.
+    if(inZone(x,y,6,8,4,10))return false;
+    return isWall(x,y)||y<=3||x<6||x>8;
+  }
+  if(scene==="hwasungSchool"){
+    // 운동장과 중앙 진입로를 넓게 열어 배경 구조물과 충돌하지 않도록 한다.
+    if(inZone(x,y,5,9,3,10))return false;
+    return isWall(x,y)||y<=2||x<2||x>12;
   }
   if(scene==="library"){
     if(inZone(x,y,6,8,10,10)) return false;
@@ -2213,12 +2250,19 @@ function drawCharacterAsset(key,gx,gy,options={}){
 }
 function drawAvatarSprite(g,x,footY,a,facing="down",frame=0,bob=0,seated=false){
   const moving=!seated&&(Math.abs(visualPx-px)+Math.abs(visualPy-py)>.012);
+  if(seated&&a.school==="hwasung"){
+    const sheet=avatarWalkSheet(a),row=facing==="up"?3:0;
+    if(sheet&&sheet.complete&&sheet.naturalWidth){
+      g.save();g.imageSmoothingEnabled=false;g.fillStyle="#18202a55";g.beginPath();g.ellipse(x,footY+bob,13,3.5,0,0,Math.PI*2);g.fill();
+      g.drawImage(sheet,0,row*48,32,48,x-20,footY-58+bob,40,60);g.restore();return true;
+    }
+  }
   if(seated)return drawCharacterAsset(`player-${a.id}-seated`,0,0,{screenX:x,screenFoot:footY+bob,width:54,height:54,facing,skin:a.skin,noBlink:true,action:false});
   return drawCharacterAsset(`player-${a.id}`,0,0,{screenX:x,screenFoot:footY+bob,width:48,height:68,facing,walking:moving,skin:a.skin,noBlink:false});
 }
 function drawPlayerPixel(){
   const a=selectedAvatar(),x=visualPx*TILE+16,footY=visualPy*TILE+29;
-  const v20WalkSheet=a.id==="dongsan-boy"?v20BoySheet:a.id==="dongsan-girl"?v20GirlSheet:null;
+  const v20WalkSheet=avatarWalkSheet(a);
   if(v20WalkSheet&&v20WalkSheet.complete&&v20WalkSheet.naturalWidth){
     const speaker=(dlgSp.textContent||"").replace(/\s+/g,"");
     const playerSpeaking=dlg.style.display==="block"&&[playerName,basePlayerName,"나","주인공"].filter(Boolean).some(n=>speaker.includes(String(n).replace(/\s+/g,"")));
@@ -2262,14 +2306,14 @@ function drawStudent(s){
   else drawCharacterAsset(key,s.x,s.y,{screenX:v.x,screenFoot:v.y+14,width:44,height:46,seated:true,label:s.name,noBlink:true,action:false,shadow:"#17253024"});
 }
 function drawChampionV20(gx,gy,options={}){
-  const img=champAvatarId==="dongsan-girl"?v20ChampionGirl:v20ChampionBoy;
+  const img=champAvatarId.endsWith("-girl")?v20ChampionGirl:v20ChampionBoy;
   if(!img.complete||!img.naturalWidth)return drawCharacterAsset("doctor",gx,gy,{width:48,height:70,label:docName()});
   const label=docName(),speaking=characterIsSpeaking(label),frame=speaking?1:0;
   const x=options.screenX??(gx*TILE+16),foot=options.screenFoot??(gy*TILE+29),scale=options.scale||1;
   const w=40*scale,h=56*scale;
   ctx.save();ctx.imageSmoothingEnabled=false;ctx.fillStyle="#17202b55";ctx.beginPath();ctx.ellipse(x,foot,w*.28,3.2*scale,0,0,Math.PI*2);ctx.fill();
   ctx.drawImage(img,frame*40,0,40,56,x-w/2,foot-h,w,h);ctx.restore();
-  if(speaking||Math.abs(px-gx)+Math.abs(py-gy)<=1)pixelLabel(label,x,foot-h-5,"#66508a");
+  if(speaking||Math.abs(px-gx)+Math.abs(py-gy)<=1)pixelLabel(`${label} · ${avatarSchoolLabel(champAvatarId)}`,x,foot-h-5,"#66508a");
 }
 function drawDoctor(){drawChampionV20(...DOCTOR_POS);}
 function drawCampManager(){drawCharacterAsset("camp-manager",...CAMP_POS,{width:44,height:64,label:"캠프장"});}
@@ -2365,13 +2409,14 @@ function drawOfficialStudyCafeStreetSign(){
 function drawStreetClean(){drawPixelSceneBackground("street");drawOfficialStudyCafeStreetSign();drawOfficialSidaeExteriorSign();}
 function drawStationFrame(){drawPixelSceneBackground("station");pixelSceneSign("사리역",240,151,"#f6e8bd",13);}
 function drawStationPlatform(){
-  drawPixelSceneBackground("platform");pixelSceneSign("사리역",80,82,"#d8ebef",9);pixelSceneSign("집으로 가는 열차",400,82,"#f2dfac",8);
+  drawPixelSceneBackground("platform");pixelSceneSign("사리역",80,82,"#d8ebef",9);pixelSceneSign("집 · 화성고 방면",400,82,"#f2dfac",8);
   PLATFORM_PASSENGERS.forEach((p,i)=>drawCharacterAsset(PASSENGER_ASSETS[i],p[0],p[1],{width:56,height:70,pixelArt:true}));
 }
 function drawSubwayInterior(){
   drawPixelSceneBackground("subway");ctx.save();ctx.globalAlpha=.35;ctx.fillStyle="#7eb7d4";
   for(const [x,w] of [[48,128],[304,128]])for(let i=0;i<4;i++){const sx=x+((T*(18+i*5)+i*37)%w);ctx.fillRect(sx,76+i*10,10+i*5,2);}ctx.restore();
   [[80,226],[150,226],[330,226],[400,226]].forEach((p,i)=>drawCharacterAsset(PASSENGER_SEATED_ASSETS[i],0,0,{screenX:p[0],screenFoot:p[1],width:68,height:84,noBlink:true,action:false,pixelArt:true,shadow:"#17253038"}));
+  pixelSceneSign(trainDestination==="hwasung"?"사리역 → 화성고":"사리역 → 집",240,58,"#d9f6ff",8);
 }
 function drawConvenienceFrame(){
   drawPixelSceneBackground("convenience");
@@ -2385,6 +2430,8 @@ function drawConvenienceInterior(){
   ctx.restore();
 }
 function drawSchoolCampus(){drawPixelSceneBackground("school");drawPixelChicken();}
+function drawHwasungRoad(){drawPixelSceneBackground("hwasungRoad");pixelSceneSign("화성고등학교",240,119,"#f8e5ba",10);}
+function drawHwasungSchool(){drawPixelSceneBackground("hwasungSchool");pixelSceneSign("화성고등학교",240,112,"#f8e5ba",10);}
 function drawLibraryInterior(){
   drawPixelSceneBackground("library");pixelSceneSign("5층 도서관 · 오도",240,19,"#f6e8bd",8);
   const pulse=.45+.25*Math.sin(T*3.2);ctx.save();ctx.lineWidth=2;ctx.setLineDash([5,4]);ctx.strokeStyle=`rgba(255,216,117,${pulse})`;
@@ -2439,10 +2486,14 @@ function drawHellHanjaInscriptions(){
 function drawHell(){drawPixelSceneBackground("hell");drawHellHanjaInscriptions();}
 function drawSelectedAvatarSeated(gx,gy){
   const x=gx*TILE+16,footY=gy*TILE+29,bob=Math.sin(T*1.25)>.15?0:1;
+  if(selectedAvatar().school==="hwasung"){drawAvatarSprite(ctx,x,footY+bob,selectedAvatar(),"down",0,0,true);return;}
   drawCharacterAsset(`player-${selectedAvatar().id}-seated`,0,0,{screenX:x,screenFoot:footY+bob,width:49,height:49,noBlink:true,action:false,shadow:"#17253030"});
 }
 function drawSelectedAvatarBackSeated(screenX,screenFoot,size=48){
   const a=selectedAvatar(),bob=Math.sin(T*1.25)>.15?0:1;
+  if(a.school==="hwasung"){
+    const sheet=avatarWalkSheet(a);if(sheet&&sheet.complete&&sheet.naturalWidth){ctx.save();ctx.imageSmoothingEnabled=false;ctx.fillStyle="#17253030";ctx.beginPath();ctx.ellipse(screenX,screenFoot,13,3,0,0,Math.PI*2);ctx.fill();ctx.drawImage(sheet,0,144,32,48,screenX-size*.42,screenFoot-size*1.24+bob,size*.84,size*1.24);ctx.restore();return;}
+  }
   drawCharacterAsset(`player-${a.id}-back-seated`,0,0,{screenX,screenFoot:screenFoot+bob,width:size,height:size,noBlink:true,action:false,seated:true,shadow:"#17253024"});
 }
 function drawStudySeatedPlayer(){
@@ -2456,20 +2507,21 @@ function drawStudySeatedPlayer(){
 }
 function drawRestaurantSeatedPlayer(){
   const bob=Math.sin(T*1.25)>.15?0:1;
+  if(selectedAvatar().school==="hwasung"){drawAvatarSprite(ctx,382,286+bob,selectedAvatar(),"down",0,0,true);return;}
   drawCharacterAsset(`player-${selectedAvatar().id}-seated`,0,0,{screenX:382,screenFoot:286+bob,width:57,height:57,noBlink:true,action:false,seated:true,shadow:"#2b211a2c"});
 }
 function drawSeatedPlayer(){
   // 교실 왼쪽 안쪽 맨 앞 실제 책상에 맞춘 수업 자세. 합성 책상을 새로 만들지 않는다.
   const x=138,frame=selectedAvatar().id==="dongsan-girl"?1:0;
   ctx.save();ctx.imageSmoothingEnabled=false;
-  if(classSleepPhase&&v24ClassSleepSheet.complete&&v24ClassSleepSheet.naturalWidth){
+  if(classSleepPhase&&selectedAvatar().school==="dongsan"&&v24ClassSleepSheet.complete&&v24ClassSleepSheet.naturalWidth){
     const bob=Math.sin(T*2.2)>.45?1:0;
     ctx.drawImage(v24ClassSleepSheet,frame*40,0,40,56,x-20,238+bob,40,56);
     const pulse=.72+.28*Math.sin(T*3.1);
     ctx.globalAlpha=pulse;ctx.fillStyle="#d9efff";ctx.font="bold 8px NeoDGM,monospace";ctx.textAlign="left";
     ctx.fillText("Z",151,242);ctx.font="bold 6px NeoDGM,monospace";ctx.fillText("Z",158,235);ctx.globalAlpha=1;
   }else{
-    const sheet=selectedAvatar().id==="dongsan-girl"?v20GirlSheet:v20BoySheet;
+    const sheet=avatarWalkSheet(selectedAvatar());
     if(sheet&&sheet.complete&&sheet.naturalWidth)ctx.drawImage(sheet,0,144,32,48,x-20,234,40,60);
     else drawSelectedAvatarBackSeated(x,294,44);
   }
@@ -2530,11 +2582,13 @@ function drawPortalMarkers(){
   if(scene==="cafe")drawPortalThreshold(240,340,76);
   else if(scene==="street"){
     drawPortalThreshold(100,128,64);drawPortalThreshold(240,130,72,0,"#ffd18a");drawPortalThreshold(438,128,60);drawPortalThreshold(240,342,86,0,"#f4df9c");drawPortalEdge(478,226,150,"right");
-  }else if(scene==="station"){drawPortalThreshold(240,4,82,0,"#f2d28b");drawPortalThreshold(240,224,72);}
+  }else if(scene==="station"){drawPortalThreshold(240,342,82,0,"#f2d28b");drawPortalThreshold(240,224,72);}
   else if(scene==="platform"){drawPortalThreshold(240,4,82,0,"#f2d28b");drawPortalThreshold(240,208,82);}
   else if(scene==="convenience"){drawPortalEdge(2,247,150,"left");drawPortalEdge(478,247,150,"right");drawPortalThreshold(320,191,72);}
   else if(scene==="convenienceInterior")drawPortalThreshold(240,342,82);
   else if(scene==="school"){drawPortalThreshold(240,153,70);drawPortalThreshold(240,342,84);}
+  else if(scene==="hwasungRoad"){drawPortalThreshold(240,143,72,0,"#ffd18a");drawPortalThreshold(240,342,84);}
+  else if(scene==="hwasungSchool"){drawPortalThreshold(240,118,72,0,"#ffd18a");drawPortalThreshold(240,342,84);}
   else if(scene==="library"||scene==="restaurant")drawPortalThreshold(240,342,82);
   else if(scene==="academy"){drawPortalThreshold(66,118,44);drawPortalThreshold(344,118,44);drawPortalThreshold(429,118,44);drawPortalThreshold(240,342,84);}
   else if(scene==="classroom")drawPortalThreshold(240,342,76);
@@ -2542,7 +2596,7 @@ function drawPortalMarkers(){
 }
 
 /* ── 전역 시네마틱 렌더링 ── */
-const SMOOTH_SCENES=new Set(["cafe","street","station","platform","subway","convenience","convenienceInterior","school","library","restaurant","academy","classroom","hell"]);
+const SMOOTH_SCENES=new Set(["cafe","street","station","platform","subway","convenience","convenienceInterior","school","hwasungRoad","hwasungSchool","library","restaurant","academy","classroom","hell"]);
 let lastRenderedScene=scene, visualPx=px, visualPy=py, lastRenderTime=performance.now();
 function updateScenePresentation(now){
   const dt=Math.min(.05,(now-lastRenderTime)/1000||.016);lastRenderTime=now;
@@ -2560,7 +2614,7 @@ function updateScenePresentation(now){
 }
 function drawGlobalAtmosphere(){
   if(mode==="title"||scene==="captain") return;
-  const outdoors=["street","station","convenience","school"].includes(scene);
+  const outdoors=["street","station","convenience","school","hwasungRoad","hwasungSchool"].includes(scene);
   const cool=["platform","subway","convenienceInterior","library","academy","classroom"].includes(scene);
   ctx.save();ctx.globalCompositeOperation="screen";
   const top=ctx.createLinearGradient(0,0,0,cv.height);top.addColorStop(0,outdoors?"#8fc7ff1c":cool?"#d8f5ff18":"#ffd58b18");top.addColorStop(.55,"#ffffff00");top.addColorStop(1,outdoors?"#4b69a00a":"#ffb45b08");ctx.fillStyle=top;ctx.fillRect(0,0,cv.width,cv.height);
@@ -2599,11 +2653,13 @@ function drawInteractionHints(){
     drawHint(...ACADEMY_DOOR,"","#79dcff");
     drawHint(7,10,"","#ffd875");drawHint(14,6,"","#79dcff");
   }
-  else if(scene==="station"){drawHint(...STATION_ENTRY_POS);drawHint(7,0);}
+  else if(scene==="station"){drawHint(...STATION_ENTRY_POS);drawHint(7,10);}
   else if(scene==="platform"){drawHint(...PLATFORM_TRAIN_POS);drawHint(7,0);}
   else if(scene==="convenience"){drawHint(...CAT_POS,"","#9fd8ff");drawHint(...CONVENIENCE_DOOR,"","#7de7df");drawHint(0,6);drawHint(14,6);}
   else if(scene==="convenienceInterior"){drawHint(...CONVENIENCE_CASHIER);drawHint(...CONVENIENCE_EXIT);}
   else if(scene==="school"){drawHint(...CHICKEN_POS,"품사 닭","#ffe08a");drawHint(...SCHOOL_GATE);drawHint(...SCHOOL_EXIT);}
+  else if(scene==="hwasungRoad"){drawHint(...HWASUNG_ROAD_GATE,"화성고 정문","#ffe08a");drawHint(...HWASUNG_ROAD_EXIT);}
+  else if(scene==="hwasungSchool"){drawHint(...HWASUNG_MAIN_ENTRANCE,"본관","#ffe08a");drawHint(...HWASUNG_SCHOOL_EXIT);}
   else if(scene==="library"){LIBRARY_SEATS.forEach(([x,y])=>drawHint(x,y,"","#c9f3dd"));drawHint(2,3,"책 고르기","#ffe08a");drawHint(12,3,"책 고르기","#ffe08a");drawHint(...LIBRARY_EXIT);}
   else if(scene==="restaurant"){POETS.forEach(p=>drawHint(p.x,p.y));drawHint(...RESTAURANT_EMPTY_SEAT);drawHint(...RESTAURANT_EXIT);}
   else if(scene==="academy"){drawHint(...ANGELA_POS);CLASSROOM_DOORS.forEach(door=>drawHint(door.x,door.y));drawHint(...ACADEMY_EXIT);}
@@ -2621,6 +2677,8 @@ function render(){
   else if(scene==="convenience") drawConvenienceFrame();
   else if(scene==="convenienceInterior") drawConvenienceInterior();
   else if(scene==="school") drawSchoolCampus();
+  else if(scene==="hwasungRoad") drawHwasungRoad();
+  else if(scene==="hwasungSchool") drawHwasungSchool();
   else if(scene==="library") drawLibraryInterior();
   else if(scene==="restaurant") drawRestaurant();
   else if(scene==="academy") drawAcademy();
@@ -2831,7 +2889,7 @@ cv.addEventListener("click", e=>{
     else if(inZone(tx,ty,6,8,9,10))autoWalkTo(...RESTAURANT_EXIT,false,leaveRestaurant);
   }else if(scene==="station"&&mode==="explore"){
     if(inZone(tx,ty,6,8,6,8))autoWalkTo(...STATION_ENTRY_POS,false,enterStationPlatform);
-    else if(inZone(tx,ty,6,8,0,1))autoWalkTo(7,0,false,leaveStationFrame);
+    else if(inZone(tx,ty,6,8,9,10))autoWalkTo(7,10,false,leaveStationFrame);
   }else if(scene==="platform"&&mode==="explore"){
     if(inZone(tx,ty,6,8,5,7))autoWalkTo(...PLATFORM_TRAIN_POS,false,boardStationTrain);
     else if(inZone(tx,ty,6,8,0,1))autoWalkTo(7,0,false,leaveStationPlatform);
@@ -2847,6 +2905,12 @@ cv.addEventListener("click", e=>{
     if(Math.abs(tx-CHICKEN_POS[0])<=1&&Math.abs(ty-CHICKEN_POS[1])<=1)autoWalkTo(...CHICKEN_POS,false,talkToChicken);
     else if(inZone(tx,ty,6,8,9,10))autoWalkTo(...SCHOOL_EXIT,false,leaveSchoolToConvenience);
     else if(inZone(tx,ty,6,8,2,4))autoWalkTo(...SCHOOL_GATE,false,enterLibraryFromSchool);
+  }else if(scene==="hwasungRoad"&&mode==="explore"){
+    if(inZone(tx,ty,6,8,3,5))autoWalkTo(...HWASUNG_ROAD_GATE,true,enterHwasungSchool);
+    else if(inZone(tx,ty,6,8,9,10))autoWalkTo(...HWASUNG_ROAD_EXIT,false,returnToStationFromHwasung);
+  }else if(scene==="hwasungSchool"&&mode==="explore"){
+    if(inZone(tx,ty,5,9,2,4))autoWalkTo(...HWASUNG_MAIN_ENTRANCE,true,inspectHwasungMainEntrance);
+    else if(inZone(tx,ty,6,8,9,10))autoWalkTo(...HWASUNG_SCHOOL_EXIT,false,leaveHwasungSchool);
   }else if(scene==="library"&&mode==="explore"){
     const bookcase=LIBRARY_BOOKCASES.find(z=>cx>=z.screen[0]&&cx<=z.screen[0]+z.screen[2]&&cy>=z.screen[1]&&cy<=z.screen[1]+z.screen[3]);
     const seat=LIBRARY_SEATS.find(([sx,sy])=>tx===sx&&(ty===sy||ty===sy-1));
@@ -2892,7 +2956,7 @@ function tryMove(d){
   }
   if(scene==="station"){
     if(d==="up"&&inZone(nx,ny,6,8,7,7)){dir=d;enterStationPlatform();return;}
-    if(d==="up"&&inZone(nx,ny,6,8,0,0)){dir=d;leaveStationFrame();return;}
+    if(d==="down"&&inZone(nx,ny,6,8,10,10)){dir=d;leaveStationFrame();return;}
   }
   if(scene==="platform"){
     if(d==="up"&&inZone(nx,ny,6,8,6,6)){dir=d;boardStationTrain();return;}
@@ -2912,6 +2976,14 @@ function tryMove(d){
     if(chickenAt(nx,ny)){dir=d;talkToChicken();return;}
     if(d==="down"&&inZone(nx,ny,6,8,10,10)){dir=d;leaveSchoolToConvenience();return;}
     if(d==="up"&&inZone(nx,ny,6,8,3,3)){dir=d;enterLibraryFromSchool();return;}
+  }
+  if(scene==="hwasungRoad"){
+    if(d==="up"&&inZone(nx,ny,6,8,4,4)){dir=d;enterHwasungSchool();return;}
+    if(d==="down"&&inZone(nx,ny,6,8,10,10)){dir=d;returnToStationFromHwasung();return;}
+  }
+  if(scene==="hwasungSchool"){
+    if(d==="up"&&inZone(nx,ny,5,9,3,3)){dir=d;inspectHwasungMainEntrance();return;}
+    if(d==="down"&&inZone(nx,ny,6,8,10,10)){dir=d;leaveHwasungSchool();return;}
   }
   if(scene==="library"){
     const bookcase=LIBRARY_BOOKCASES.find(z=>inZone(nx,ny,z.x0,z.x1,z.y0,z.y1));
@@ -3007,21 +3079,38 @@ function showTitle(){
   let remembered="";
   try{remembered=localStorage.getItem("idiom_last_avatar")||"";}catch(e){}
   if(AVATARS.some(a=>a.id===remembered))selectedAvatarId=remembered;
+  selectedSchoolId=selectedAvatar().school;
   openModal(`
     <div class="box mini avatar-start-box">
       <div class="title-big yellow">사자성어 여행단</div>
       <div class="survival-stat" id="survivalStat" aria-live="polite"><span>🔥 전체 학생 생환률</span><b>--</b><small>서버 통계를 불러오는 중</small></div>
       <input id="nameInput" maxlength="8" placeholder="주인공의 이름은?" autocomplete="off">
+      <div class="school-picker-title">먼저 소속 학교를 선택하세요</div>
+      <div class="school-grid" role="radiogroup" aria-label="소속 학교 선택">
+        ${SCHOOLS.map(s=>`<button class="school-card${s.id===selectedSchoolId?" selected":""}" type="button" data-school="${s.id}" role="radio" aria-checked="${s.id===selectedSchoolId}">${s.name}</button>`).join("")}
+      </div>
       <div class="avatar-picker-title">함께 모험할 캐릭터</div>
       <div class="avatar-grid" role="radiogroup" aria-label="주인공 캐릭터 선택">
-        ${AVATARS.map(a=>`<button class="avatar-card${a.id===selectedAvatarId?" selected":""}" type="button" data-avatar="${a.id}" role="radio" aria-checked="${a.id===selectedAvatarId}"><span class="avatar-portrait-frame"><span class="avatar-portrait" style="background-image:url('assets/v20/characters/players/${a.id}-walk-v20.png')"></span></span><span class="avatar-card-copy"><span class="avatar-card-name">${a.name}</span><span class="avatar-card-desc">${a.desc}</span></span></button>`).join("")}
+        ${AVATARS.map(a=>`<button class="avatar-card${a.id===selectedAvatarId?" selected":""}" type="button" data-avatar="${a.id}" data-school="${a.school}" role="radio" aria-checked="${a.id===selectedAvatarId}"${a.school!==selectedSchoolId?" hidden":""}><span class="avatar-portrait-frame"><span class="avatar-portrait" style="background-image:url('${a.sprite}')"></span></span><span class="avatar-card-copy"><span class="avatar-card-name">${a.name}</span><span class="avatar-card-desc">${a.desc}</span></span></button>`).join("")}
       </div>
       <button class="btn primary" id="startBtn">시작한다</button>
-      <button class="btn" id="lbBtn">🏆 통합 랭킹 보기</button>
+      <button class="btn" id="lbBtn">🏆 한자성어 · 품사 랭킹 보기</button>
     </div>`);
   const input=document.getElementById("nameInput");
+  const updateSchoolPicker=schoolId=>{
+    selectedSchoolId=SCHOOLS.some(s=>s.id===schoolId)?schoolId:"dongsan";
+    const current=selectedAvatar();
+    if(current.school!==selectedSchoolId)selectedAvatarId=AVATARS.find(a=>a.school===selectedSchoolId).id;
+    document.querySelectorAll(".school-card").forEach(card=>{const on=card.dataset.school===selectedSchoolId;card.classList.toggle("selected",on);card.setAttribute("aria-checked",String(on));});
+    document.querySelectorAll(".avatar-card").forEach(card=>{
+      const visible=card.dataset.school===selectedSchoolId,on=card.dataset.avatar===selectedAvatarId;
+      card.hidden=!visible;card.classList.toggle("selected",on);card.setAttribute("aria-checked",String(on));
+    });
+  };
+  document.querySelectorAll(".school-card").forEach(card=>card.addEventListener("click",()=>updateSchoolPicker(card.dataset.school)));
   document.querySelectorAll(".avatar-card").forEach(card=>card.addEventListener("click",()=>{
     selectedAvatarId=card.dataset.avatar;
+    selectedSchoolId=selectedAvatar().school;
     document.querySelectorAll(".avatar-card").forEach(other=>{
       const on=other===card;other.classList.toggle("selected",on);other.setAttribute("aria-checked",String(on));
     });
@@ -3037,7 +3126,7 @@ function showTitle(){
     if(FORBIDDEN.includes(nv)||FORBIDDEN_PART.some(p=>nv.includes(p))){ basePlayerName=v;playerName=v;mentorName="";activeTitle="";captainMaster=false;catMaster=false;grammarMaster=false;classInSession=false;classSleepPhase=false;restaurantSeated=false;orderedFood="";closeModal();teacherDeath();return; }
     basePlayerName=v;captainMaster=captainMasterSaved(v);catMaster=catMasterSaved(v);grammarMaster=grammarMasterSaved(v);
     const profile=loadTitleProfile(v);mentorName=profile.mentor||"";activeTitle=profile.active||((grammarMaster&&"grammar")||(catMaster&&"cat")||(captainMaster&&"captain")||(mentorName&&"mentor")||"");
-    try{localStorage.setItem("idiom_last_avatar",selectedAvatarId);}catch(e){}
+    try{localStorage.setItem("idiom_last_avatar",selectedAvatarId);localStorage.setItem("idiom_last_school",selectedSchoolId);}catch(e){}
     applyPlayerTitle();saveTitleProfile();classInSession=false;classSleepPhase=false;restaurantSeated=false;orderedFood="";closeModal();startCafe();
   };
   document.getElementById("startBtn").onclick=start;
@@ -3080,9 +3169,9 @@ function enterStreet(){
   ], ()=>{ mode="explore"; });
 }
 function enterStationFrame(){
-  // 하오츠 거리의 아래쪽 도로에서 자연스럽게 이어지는 역 프레임 상단에 배치
-  scene="station";px=7;py=1;dir="down";mode="explore";hudL.textContent=`${playerName} · 사리역`;hudR.textContent="🚉 역사 앞";
-  showDialog([{sp:"내레이션",text:"하오츠 거리의 도로가 아래로 이어지고, 그 끝에 사리역 정면이 나타났다. 위쪽 길로 돌아가거나 역 앞을 둘러볼 수 있다."}],()=>{mode="explore";});
+  // 건물 뒤쪽이 아닌 정면 보도에서 시작해 출입문까지 직접 걸어갈 수 있다.
+  scene="station";px=7;py=9;dir="up";mode="explore";hudL.textContent=`${playerName} · 사리역`;hudR.textContent="🚉 역사 앞";
+  showDialog([{sp:"내레이션",text:"하오츠 거리의 도로가 아래로 이어지고, 그 끝에 사리역 정면이 나타났다. 정면 문으로 승강장에 들어가거나 아래쪽 길로 돌아갈 수 있다."}],()=>{mode="explore";});
 }
 function enterStationPlatform(){
   scene="platform";px=7;py=8;dir="up";mode="explore";hudL.textContent=`${playerName} · 사리역 플랫폼`;hudR.textContent="🚉 승강장";
@@ -3107,12 +3196,15 @@ function openTrainDestination(){
     <div class="box mini">
       <p class="qtext" style="text-align:center;"><b class="yellow">어디로 갈 것인가요?</b></p>
       <button class="opt" id="trainHome">1. 집으로</button>
+      <button class="opt" id="trainHwasung">2. 화성고등학교로</button>
       <button class="btn" id="trainStay">역에 남는다</button>
     </div>`);
   document.getElementById("trainHome").onclick=()=>{closeModal();startTrainRideToHome();};
+  document.getElementById("trainHwasung").onclick=()=>{closeModal();startTrainRideToHwasung();};
   document.getElementById("trainStay").onclick=()=>{closeModal();px=7;py=4;dir="up";showDialog([{sp:"안내 방송",text:"열차를 타지 않고 역사 쪽 통로로 돌아왔다."}],()=>{mode="explore";});};
 }
 function startTrainRideToHome(){
+  trainDestination="home";
   scene="subway";px=7;py=8;dir="up";mode="locked";hudL.textContent=`${playerName} · 귀가 열차`;hudR.textContent="🚇 이동 중";
   showDialog([
     {sp:"내레이션",text:"열차 문이 닫히고, 사리역의 불빛이 창밖으로 멀어졌다."},
@@ -3125,6 +3217,41 @@ function startTrainRideToHome(){
       enterHell();
     },2600);
   });
+}
+function startTrainRideToHwasung(){
+  trainDestination="hwasung";
+  scene="subway";px=7;py=8;dir="up";mode="locked";hudL.textContent=`${playerName} · 화성고 방면 열차`;hudR.textContent="🚇 이동 중";
+  showDialog([
+    {sp:"내레이션",text:"열차 문이 닫히고 사리역 플랫폼이 뒤로 멀어졌다."},
+    {sp:"안내 방송",text:"향남 방면으로 이동합니다. 화성고등학교는 이번 여행의 다음 목적지입니다."},
+    {sp:"내레이션",text:"창밖의 주택가와 논밭이 지나고, 화성고 앞 도로에 도착했다."}
+  ],()=>{
+    fade.innerHTML="사리역에서 화성고로 이동하는 중...";fade.style.opacity=1;fade.style.pointerEvents="auto";
+    setTimeout(enterHwasungRoad,900);
+  });
+}
+function enterHwasungRoad(){
+  fade.innerHTML="";fade.style.opacity=0;fade.style.pointerEvents="none";
+  scene="hwasungRoad";px=HWASUNG_ROAD_EXIT[0];py=HWASUNG_ROAD_EXIT[1]-1;dir="up";mode="explore";
+  hudL.textContent=`${playerName} · 화성고 앞`;hudR.textContent="🏫 장짐길 4";
+  showDialog([{sp:"내레이션",text:"향남의 낮은 건물과 도로 사이로 화성고 정문이 보인다."},{sp:"안내",text:"횡단보도를 건너 중앙 보행로를 따라가면 교내로 들어갈 수 있다."}],()=>{mode="explore";});
+}
+function enterHwasungSchool(){
+  scene="hwasungSchool";px=HWASUNG_SCHOOL_EXIT[0];py=HWASUNG_SCHOOL_EXIT[1]-1;dir="up";mode="explore";
+  hudL.textContent=`${playerName} · 화성고등학교`;hudR.textContent="🏫 교내";
+  showDialog([{sp:"내레이션",text:"정문을 통과하자 운동장과 하얀색·베이지색 교사가 나타났다."},{sp:"안내",text:"중앙 통로를 따라 본관 입구까지 가 볼 수 있다."}],()=>{mode="explore";});
+}
+function inspectHwasungMainEntrance(){
+  showDialog([{sp:"화성고 본관",text:"본관 내부와 화성고 전용 콘텐츠는 아직 준비 중입니다."}],()=>{mode="explore";});
+}
+function leaveHwasungSchool(){
+  scene="hwasungRoad";px=HWASUNG_ROAD_GATE[0];py=HWASUNG_ROAD_GATE[1]+1;dir="down";mode="explore";
+  hudL.textContent=`${playerName} · 화성고 앞`;hudR.textContent="🏫 장짐길 4";
+}
+function returnToStationFromHwasung(){
+  trainDestination="home";scene="platform";px=7;py=8;dir="up";mode="explore";
+  hudL.textContent=`${playerName} · 사리역 플랫폼`;hudR.textContent="🚉 승강장";
+  showDialog([{sp:"내레이션",text:"화성고 앞을 나와 돌아오는 열차를 타고 다시 사리역에 도착했다."}],()=>{mode="explore";});
 }
 function leaveStationFrame(){
   scene="street";px=7;py=9;dir="up";mode="explore";hudL.textContent=`${playerName} · 충장로 거리`;hudR.textContent="🌙 밤 10시";
@@ -3210,10 +3337,37 @@ function resumeLibraryQuizFromStory(){
 function stopGrammarQuizTimer(){
   if(grammarQuizTimer!==null){clearInterval(grammarQuizTimer);grammarQuizTimer=null;}
 }
+const GRAMMAR_EXPERT_INDICES=[21,22,30,31,32,33,34,35,36,52,61,68,73,79,86,94];
+function buildGrammarQuizSet(){
+  const first={...POS_QUESTION_BANK[0],level:"기초 확인"};
+  const expertIndices=shuffle(GRAMMAR_EXPERT_INDICES).slice(0,5);
+  const used=new Set([0,...expertIndices]);
+  const experts=expertIndices.map(i=>({...POS_QUESTION_BANK[i],level:"최고난도"}));
+  const regular=shuffle(POS_QUESTION_BANK.map((q,i)=>({q,i})).filter(v=>!used.has(v.i))).slice(0,GRAMMAR_QUIZ_COUNT-1-experts.length).map(v=>({...v.q,level:"심화"}));
+  return [first,...shuffle([...experts,...regular])];
+}
+async function requestGrammarToken(){
+  grammarSessionToken=null;if(!SERVER_URL)return;
+  try{
+    const res=await fetch(SERVER_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({action:"grammarStart"})});
+    const j=await res.json();if(j&&j.ok&&j.token)grammarSessionToken=j.token;
+  }catch(e){}
+}
+async function sendGrammarProgress(idx){
+  if(!SERVER_URL||!grammarSessionToken)return;
+  try{await fetch(SERVER_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({action:"grammarProgress",token:grammarSessionToken,idx})});}catch(e){}
+}
+async function submitGrammarScore(sec){
+  if(!SERVER_URL||!grammarSessionToken)return null;
+  try{
+    const res=await fetch(SERVER_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({action:"grammarFinish",token:grammarSessionToken,name:rankingSubmitName(basePlayerName||playerName),baseName:basePlayerName||playerName,avatar:selectedAvatarId,school:selectedAvatar().school,quizType:"grammar",clientSec:Math.round(sec)})});
+    const j=await res.json();grammarSessionToken=null;return j&&j.ok?j.sec:null;
+  }catch(e){return null;}
+}
 function talkToChicken(){
   mode="locked";
   if(grammarMaster){
-    showDialog([{sp:"닭",text:"꼬끼오~! 품사를 이해한 학생이 다시 왔군."}],()=>{mode="explore";});
+    showDialog([{sp:"닭",text:"꼬끼오~! 품사를 이해한 학생이 다시 왔군. 10문제를 다시 풀어 랭킹 기록을 갱신해 보자."}],startGrammarQuiz);
     return;
   }
   showDialog([
@@ -3222,10 +3376,11 @@ function talkToChicken(){
     {sp:"닭",text:"꼬끼오~!의 품사는?"}
   ],startGrammarQuiz);
 }
-function startGrammarQuiz(){
+async function startGrammarQuiz(){
   stopGrammarQuizTimer();
-  grammarQuizSet=[POS_QUESTION_BANK[0],...shuffle(POS_QUESTION_BANK.slice(1)).slice(0,GRAMMAR_QUIZ_COUNT-1)];
+  grammarQuizSet=buildGrammarQuizSet();
   grammarQuizIndex=0;grammarQuizStartedAt=Date.now();grammarQuizLocked=false;
+  await requestGrammarToken();
   showGrammarQuizQuestion();
 }
 function grammarElapsedText(){
@@ -3236,7 +3391,7 @@ function showGrammarQuizQuestion(){
   stopGrammarQuizTimer();grammarQuizLocked=false;mode="locked";
   const item=grammarQuizSet[grammarQuizIndex];
   openModal(`<div class="box">
-    <p class="qtext" style="text-align:center;"><b class="yellow">🐓 닭의 품사 시험</b><br><span class="hint">문제 ${grammarQuizIndex+1} / ${GRAMMAR_QUIZ_COUNT} · 전체 문제은행 ${POS_QUESTION_BANK.length}문항</span></p>
+    <p class="qtext" style="text-align:center;"><b class="yellow">🐓 닭의 품사 시험</b><br><span class="hint">문제 ${grammarQuizIndex+1} / ${GRAMMAR_QUIZ_COUNT} · 전체 문제은행 ${POS_QUESTION_BANK.length}문항</span><br><span class="tag">${item.level||"심화"}</span></p>
     <div class="grammar-clock" id="grammarClock"><span>남은 시간 <b id="grammarRemain">${GRAMMAR_QUESTION_SECONDS}.0초</b></span><span>총 시간 <b id="grammarElapsed">${grammarElapsedText()}</b></span></div>
     <p class="qtext">${item.q}</p>
     ${item.opts.map((o,i)=>`<button class="opt" data-grammar-i="${i}">${i+1}. ${o}</button>`).join("")}
@@ -3252,35 +3407,44 @@ function showGrammarQuizQuestion(){
   };
   tick();grammarQuizTimer=setInterval(tick,100);
 }
-function answerGrammarQuiz(choice){
+async function answerGrammarQuiz(choice){
   if(grammarQuizLocked)return;grammarQuizLocked=true;stopGrammarQuizTimer();
   const item=grammarQuizSet[grammarQuizIndex];closeModal();
   if(choice!==item.a){failGrammarQuiz(`틀렸다. 정답은 ${item.opts[item.a]}이다.`);return;}
+  await sendGrammarProgress(grammarQuizIndex);
   grammarQuizIndex++;
   if(grammarQuizIndex===1){
-    showDialog([{sp:"닭",text:"너 품사를 공부했구나 제대로 공부했는지 확인해봐야겠군."}],showGrammarQuizQuestion);
+    showDialog([{sp:"닭",text:`정답이다. ${item.e}`},{sp:"닭",text:"너 품사를 공부했구나. 제대로 공부했는지 최고난도 문제까지 확인해보자."}],showGrammarQuizQuestion);
     return;
   }
   if(grammarQuizIndex<GRAMMAR_QUIZ_COUNT){
     showDialog([{sp:"닭",text:`정답이다. ${item.e}`}],showGrammarQuizQuestion);
     return;
   }
-  completeGrammarQuiz();
+  showDialog([{sp:"닭",text:`정답이다. ${item.e}`}],completeGrammarQuiz);
 }
 function failGrammarQuiz(reason){
-  stopGrammarQuizTimer();closeModal();mode="locked";
+  stopGrammarQuizTimer();closeModal();grammarSessionToken=null;mode="locked";
   showDialog([{sp:"닭",text:`${reason} 품사를 잘못 판단한 자는 사자성어 지옥에서 다시 공부해라. 꼬끼오~!`}],()=>{
     fade.style.background="#000";fade.innerHTML="닭의 울음소리가 천둥처럼 울린다...<br><br>🐓<br><br>사자성어 지옥으로 떨어진다.";fade.style.opacity=1;fade.style.pointerEvents="auto";
     setTimeout(()=>enterHell(),1500);
   });
 }
-function completeGrammarQuiz(){
+async function completeGrammarQuiz(){
+  const elapsed=Math.max(1,Math.round((Date.now()-grammarQuizStartedAt)/1000));
   const raw=basePlayerName||playerName;grammarMaster=true;activeTitle="grammar";saveGrammarMaster(raw);applyPlayerTitle();saveTitleProfile();
-  hudL.textContent=`${playerName} · 안산동산고등학교`;hudR.textContent=`🐓 7문제 정답 · ${grammarElapsedText()}`;
+  const localResult=await addRecord(raw,elapsed,"grammar");
+  const serverSec=await submitGrammarScore(elapsed);
+  const finalSec=serverSec??localResult.entry.sec;
+  hudL.textContent=`${playerName} · 안산동산고등학교`;hudR.textContent=`🐓 10문제 정답 · ${fmt(finalSec)}`;
   showDialog([
-    {sp:"닭",text:"꼬끼오~! 일곱 문제를 모두 맞혔다."},
+    {sp:"닭",text:"꼬끼오~! 최고난도를 포함한 열 문제를 모두 맞혔다."},
     {sp:"닭",text:`칭호 획득! 이제부터 너는 ‘품사를 이해한 ${raw}’이다.`}
-  ],()=>{mode="explore";});
+  ],()=>{
+    openModal(`<div class="box mini"><div class="title-big green">품사 시험 완료</div><p class="qtext" style="text-align:center;">10문제 전문항 정답 · <b class="yellow">${fmt(finalSec)}</b><br><span class="hint">현재 기기 기록 ${localResult.rank}위</span></p><button class="btn primary" id="grammarRankOpen">품사 랭킹 보기</button><button class="btn" id="grammarContinue">계속 탐험한다</button></div>`);
+    document.getElementById("grammarRankOpen").onclick=()=>showRankingModal("grammar",false);
+    document.getElementById("grammarContinue").onclick=()=>{closeModal();mode="explore";};
+  });
 }
 function talkToCat(){
   mode="locked";
@@ -3721,21 +3885,25 @@ function escapeRankingText(value){
 function rankingRowsHtml(list,limit=20,highlightKey=""){
   return list.slice(0,limit).map((e,i)=>{
     const me=highlightKey&&rankingNameKey(e.name)===highlightKey;
-    return `<div class="lb-row${me?" me":""}"><span class="lb-rank">${i+1}위</span><span class="lb-name">${escapeRankingText(e.name)}${me?" ◀":""}</span><span class="lb-time">${fmt(e.sec)}</span></div>`;
+    const avatar=escapeRankingText(e.avatar?avatarSchoolLabel(e.avatar):(e.school==="hwasung"?"화성고 · 미확인":e.school==="dongsan"?"동산고 · 미확인":"기존 기록"));
+    return `<div class="lb-row${me?" me":""}"><span class="lb-rank">${i+1}위</span><span class="lb-name">${escapeRankingText(e.name)}${me?" ◀":""}</span><span class="lb-avatar">${avatar}</span><span class="lb-time">${fmt(e.sec)}</span></div>`;
   }).join("")||`<div style="text-align:center;">아직 기록이 없습니다</div>`;
 }
-async function lbLoad(){
+const lbStorageKey=type=>type==="grammar"?"idiom_lb_grammar":"idiom_lb";
+async function lbLoad(type="idiom"){
+  const key=lbStorageKey(type);
   if(window.storage){
-    try{ const r=await window.storage.get("idiom_lb"); return dedupeLeaderboard(r?JSON.parse(r.value):[]); }
+    try{ const r=await window.storage.get(key); return dedupeLeaderboard(r?JSON.parse(r.value):[]); }
     catch(e){ return []; }
   }
-  try{ const v=localStorage.getItem("idiom_lb"); return dedupeLeaderboard(v?JSON.parse(v):memLB); }catch(e){ return dedupeLeaderboard(memLB); }
+  try{ const v=localStorage.getItem(key); return dedupeLeaderboard(v?JSON.parse(v):(type==="idiom"?memLB:[])); }catch(e){ return dedupeLeaderboard(type==="idiom"?memLB:[]); }
 }
-async function lbSave(list){
+async function lbSave(list,type="idiom"){
+  const key=lbStorageKey(type);
   const unique=dedupeLeaderboard(list).slice(0,50);
-  memLB=unique;
-  if(window.storage){ try{ await window.storage.set("idiom_lb", JSON.stringify(unique)); return; }catch(e){} }
-  try{ localStorage.setItem("idiom_lb", JSON.stringify(unique)); }catch(e){}
+  if(type==="idiom")memLB=unique;
+  if(window.storage){ try{ await window.storage.set(key, JSON.stringify(unique)); return; }catch(e){} }
+  try{ localStorage.setItem(key, JSON.stringify(unique)); }catch(e){}
 }
 async function requestToken(){
   sessionToken=null;
@@ -3766,44 +3934,51 @@ async function submitScore(name){
     const res=await fetch(SERVER_URL,{
       method:"POST",
       headers:{"Content-Type":"text/plain"},
-      body:JSON.stringify({action:"finish", token:sessionToken, name:rankingSubmitName(name), baseName:basePlayerName||name, avatar:selectedAvatarId})
+      body:JSON.stringify({action:"finish", token:sessionToken, name:rankingSubmitName(name), baseName:basePlayerName||name, avatar:selectedAvatarId, school:selectedAvatar().school, quizType:"idiom"})
     });
     const j=await res.json();
     sessionToken=null;
     return (j&&j.ok)? j.sec : null;
   }catch(e){ return null; }
 }
-async function fetchGlobalLB(){
-  const res=await fetch(SERVER_URL+"?t="+Date.now(),{cache:"no-store"});
+async function fetchGlobalLB(type="idiom"){
+  const res=await fetch(`${SERVER_URL}?type=${encodeURIComponent(type)}&t=${Date.now()}`,{cache:"no-store"});
   if(!res.ok) throw new Error("server");
   const list=await res.json();
   return dedupeLeaderboard(list);
 }
-async function showRankingModal(){
+async function showRankingModal(initialType="idiom",returnToTitle=true){
   openModal(`<div class="box mini"><p class="qtext" style="text-align:center;">랭킹을 불러오는 중...</p></div>`);
+  const type=initialType==="grammar"?"grammar":"idiom";
   let list=[], label="이 기기 기록";
   if(SERVER_URL){
-    try{ list=await fetchGlobalLB(); label="전체 통합 랭킹"; }
-    catch(e){ list=await lbLoad(); }
-  } else { list=await lbLoad(); }
+    try{ list=await fetchGlobalLB(type); label=type==="grammar"?"전체 품사 랭킹":"전체 한자성어 랭킹"; }
+    catch(e){ list=await lbLoad(type); }
+  } else { list=await lbLoad(type); }
   list=dedupeLeaderboard(list);
   const rows=rankingRowsHtml(list,20);
   openModal(`
     <div class="box leaderboard-box">
       <div class="title-big yellow" style="font-size:24px; letter-spacing:2px;">👑 ${label}</div>
+      <div class="school-grid" aria-label="랭킹 종류 선택">
+        <button class="school-card${type==="idiom"?" selected":""}" id="idiomRankTab">한자성어</button>
+        <button class="school-card${type==="grammar"?" selected":""}" id="grammarRankTab">품사</button>
+      </div>
       <div class="explain good leaderboard-list">${rows}</div>
       <button class="btn primary" id="closeLb">닫기</button>
     </div>`);
-  document.getElementById("closeLb").onclick=()=>{ closeModal(); showTitle(); };
+  document.getElementById("idiomRankTab").onclick=()=>showRankingModal("idiom",returnToTitle);
+  document.getElementById("grammarRankTab").onclick=()=>showRankingModal("grammar",returnToTitle);
+  document.getElementById("closeLb").onclick=()=>{closeModal();if(returnToTitle)showTitle();else mode="explore";};
 }
-async function addRecord(name,sec){
-  const list=await lbLoad(),savedName=rankingSubmitName(name),key=rankingNameKey(savedName);
-  const entry={name:savedName, sec:Math.round(sec), ts:Date.now(), avatar:selectedAvatarId};
+async function addRecord(name,sec,type="idiom"){
+  const list=await lbLoad(type),savedName=rankingSubmitName(name),key=rankingNameKey(savedName);
+  const entry={name:savedName, sec:Math.round(sec), ts:Date.now(), avatar:selectedAvatarId,school:selectedAvatar().school,type};
   const trimmed=dedupeLeaderboard([...list,entry]).slice(0,50);
   const idx=trimmed.findIndex(e=>rankingNameKey(e.name)===key);
   const kept=idx>=0?trimmed[idx]:entry;
   const rank=idx>=0?idx+1:trimmed.length+1;
-  await lbSave(trimmed);
+  await lbSave(trimmed,type);
   return {list:trimmed, rank, entry:kept, highlightKey:key};
 }
 
@@ -3949,12 +4124,12 @@ function winSequence(){
       if(serverSec!==null){
         try{
           await new Promise(r=>setTimeout(r,1200));
-          const list=dedupeLeaderboard([...(await fetchGlobalLB()),{name:rankName,sec:serverSec,ts:-1,avatar:selectedAvatarId}]);
+          const list=dedupeLeaderboard([...(await fetchGlobalLB("idiom")),{name:rankName,sec:serverSec,ts:-1,avatar:selectedAvatarId,school:selectedAvatar().school,type:"idiom"}]);
           const idx=list.findIndex(e=>rankingNameKey(e.name)===rankKey);
-          const entry=idx>=0?list[idx]:{name:rankName,sec:serverSec,ts:-1,avatar:selectedAvatarId};
+          const entry=idx>=0?list[idx]:{name:rankName,sec:serverSec,ts:-1,avatar:selectedAvatarId,school:selectedAvatar().school,type:"idiom"};
           res={list, rank:idx>=0?idx+1:list.length+1, entry, highlightKey:rankKey};
           clearSec=serverSec;
-          label="전체 통합 랭킹";
+          label="전체 한자성어 랭킹";
         }catch(e){ res=await addRecord(playerName, clearSec); }
       } else {
         res=await addRecord(playerName, clearSec);
@@ -3965,7 +4140,8 @@ function winSequence(){
       const championBanner = isChampion ? `
           <div class="explain good" style="text-align:center; border-color:var(--lantern);">
             🎉 <b style="font-size:20px;">사자성어 대장군 탄생!</b> 🎉<br>
-            <span class="yellow">${playerName}</span>(이)가 통합랭킹 1위에 올랐다!<br>
+            <span class="yellow">${playerName}</span>(이)가 한자성어 랭킹 1위에 올랐다!<br>
+            <b>${avatarSchoolLabel(selectedAvatarId)}</b> 캐릭터로 새 대장군이 되었다.<br>
             이제 스터디카페의 <b>「사자성어 대장군 ${playerName}」</b>(으)로 등장한다.
           </div>` : "";
       openModal(`
